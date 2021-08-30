@@ -55,3 +55,25 @@ add_custom_target(kernel.elf ALL
         -o ${CMAKE_CURRENT_BINARY_DIR}/kernel.elf
     DEPENDS kernel arch platform
 )
+
+add_custom_target(rootfs ALL
+    COMMAND mkdir -p ${CMAKE_BINARY_DIR}/sysroot
+    COMMAND cp $<TARGET_FILE:kernel> ${CMAKE_BINARY_DIR}/sysroot/kernel.elf
+    DEPENDS kernel
+)
+
+if(NOT DEFINED LIMINE_PATH)
+    message(FATAL_ERROR "LIMINE_PATH is not set!")
+endif()
+
+add_custom_target(diskimage ALL
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/boot/mkimg
+        ${CMAKE_BINARY_DIR}/sysroot
+        ${CMAKE_CURRENT_SOURCE_DIR}/boot
+        ${LIMINE_PATH}
+    DEPENDS rootfs
+)
+
+add_custom_target(qemu
+    COMMAND qemu-system-x86_64 -debugcon stdio -drive format=raw,file=${CMAKE_BINARY_DIR}/disk.img -m 512
+)
