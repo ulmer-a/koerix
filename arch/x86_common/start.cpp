@@ -1,5 +1,6 @@
 #include <types.h>
 #include <platform.h>
+#include <debug.h>
 #include <x86/stivale.h>
 
 // setup stack allocation
@@ -29,7 +30,7 @@ static struct stivale_header stivale_hdr = {
 
 extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 {
-    nprint("Hello, world!\n");
+    debug() << "Hello, world!\n";
 
     // memory map
     create_page_bitmap(stivale_info);

@@ -56,18 +56,18 @@ file(GLOB_RECURSE PLATFORM_SOURCES FOLLOW_SYMLINKS
 )
 add_library(platform STATIC ${PLATFORM_SOURCES})
 
-add_custom_target(kernel.elf ALL
+add_custom_target(kernel_bin ALL
     COMMAND "/usr/bin/ld.lld"
         -T ${CMAKE_CURRENT_SOURCE_DIR}/platform/${TARGET_PLATFORM}/${TARGET_ARCH}.ld
         $<TARGET_FILE:baselib> $<TARGET_FILE:kernel> $<TARGET_FILE:arch> $<TARGET_FILE:platform>
-        -o ${CMAKE_CURRENT_BINARY_DIR}/kernel.elf
+        -o ${CMAKE_CURRENT_BINARY_DIR}/kernel_bin
     DEPENDS kernel arch platform baselib
 )
 
 add_custom_target(rootfs ALL
-    COMMAND mkdir -p ${CMAKE_BINARY_DIR}/sysroot
-    COMMAND cp $<TARGET_FILE:kernel> ${CMAKE_BINARY_DIR}/sysroot/kernel.elf
-    DEPENDS kernel.elf
+    COMMAND mkdir -p ${CMAKE_BINARY_DIR}/sysroot/boot
+    COMMAND cp ${CMAKE_BINARY_DIR}/kernel_bin ${CMAKE_BINARY_DIR}/sysroot/boot/kernel.elf
+    DEPENDS kernel_bin
 )
 
 if(NOT DEFINED LIMINE_PATH)
@@ -83,5 +83,5 @@ add_custom_target(diskimage ALL
 )
 
 add_custom_target(qemu
-    COMMAND qemu-system-x86_64 -debugcon stdio -drive format=raw,file=${CMAKE_BINARY_DIR}/disk.img -m 512
+    COMMAND qemu-system-x86_64 -debugcon stdio -drive format=raw,file=${CMAKE_BINARY_DIR}/disk.img -m 256 -s
 )

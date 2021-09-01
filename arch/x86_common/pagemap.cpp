@@ -1,5 +1,6 @@
 #include <types.h>
 #include <mm.h>
+#include <debug.h>
 #include <addr_space.h>
 #include <bitmap.h>
 #include <pagemap.h>
@@ -16,8 +17,18 @@ static size_t getSystemPageCount(stivale_struct* stivale_info)
 {
     /* Compute the amount of page frames present in system RAM */
     auto mmap = (stivale_mmap_entry*)stivale_info->memory_map_addr;
-    auto& last_entry = mmap[stivale_info->memory_map_entries - 1];
-    return ((last_entry.base + last_entry.length) >> PAGE_SHIFT) + 1;
+
+    for (int i = stivale_info->memory_map_entries - 1; i >= 0; i--)
+    {
+        if (mmap[i].type == MEM_RESERVED)
+            continue;
+        auto& last_usable_entry = mmap[i];
+        return ((last_usable_entry.base + last_usable_entry.length)
+                >> PAGE_SHIFT) + 1;
+    }
+
+    assert(false);
+    return 0;
 }
 
 static size_t getFirstNFreePages(stivale_struct* stivale_info, size_t n)
@@ -39,20 +50,46 @@ static size_t getFirstNFreePages(stivale_struct* stivale_info, size_t n)
     return (size_t)-1;
 }
 
+static const char* get_mmap_type_str(uint32_t type)
+{
+    switch (type)
+    {
+    case MEM_RESERVED: return "reserved";
+    case MEM_USABLE: return "usable";
+    case MEM_BAD: return "bad memory";
+    case MEM_ACPI_NVS:
+    case MEM_ACPI_RECLAIMABLE: return "ACPI";
+    case MEM_KERNEL_CODE: return "kernel code";
+    case MEM_LOADER_RECLAIMABLE: return "bootloader reclaimable";
+    default: return "unknown";
+    }
+}
+
+static void print_mmap_entry(stivale_mmap_entry& entry)
+{
+    debug() << "  " << DEBUG_HEX
+            << entry.base << " - " << (entry.base + entry.length - 1)
+            << ": " << get_mmap_type_str(entry.type) << "\n";
+}
+
 void create_page_bitmap(stivale_struct *stivale_info)
 {
     /* Compute total RAM size */
     const auto total_pages = getSystemPageCount(stivale_info);
+    debug() << "Total RAM size: " << (total_pages >> 8) << "MB ("
+            << total_pages << " page frames)\n";
 
     /* Compute the amount of pages needed to store the page bitmap */
     const size_t bitmap_size = BITMAP_BYTE_SIZE(total_pages);
     size_t bitmap_pages = bitmap_size >> PAGE_SHIFT;
-    if (total_pages % PAGE_SIZE != 0)
+    if (bitmap_size % PAGE_SIZE != 0)
         bitmap_pages++;
+    debug() << "PageMap: bitmap size: ~" << (bitmap_size >> 10) << "KB\n";
 
     /* Get a memory location to store the page bitmap */
-    const auto pagemap_addr =
-        (void*)(getFirstNFreePages(stivale_info, bitmap_pages) << PAGE_SHIFT);
+    const size_t bitmap_start_page = getFirstNFreePages(stivale_info, bitmap_pages);
+    const auto pagemap_addr = (void*)(bitmap_start_page << PAGE_SHIFT);
+    debug() << "PageMap: stored at " << pagemap_addr << "\n";
 
     /* Create a temporary bitmap and clear all usable pages */
     baselib::Bitmap tempBitmap { total_pages, pagemap_addr };
@@ -61,6 +98,8 @@ void create_page_bitmap(stivale_struct *stivale_info)
     auto mmap = (stivale_mmap_entry*)stivale_info->memory_map_addr;
     for (int i = 0; i < stivale_info->memory_map_entries; i++)
     {
+        print_mmap_entry(mmap[i]);
+
         if (mmap[i].type == MEM_USABLE ||
             mmap[i].type == MEM_LOADER_RECLAIMABLE)
         {
@@ -73,6 +112,12 @@ void create_page_bitmap(stivale_struct *stivale_info)
                 tempBitmap.clr(start_page + j);
         }
     }
+
+    for (int i = 0; i < bitmap_pages; i++)
+        tempBitmap.clr(bitmap_start_page + i);
+
+    debug() << "Usable RAM: " << (tempBitmap.getClrCount() >> 8)
+            << "/" << (total_pages >> 8) << " MB\n";
 
     /* Initialize the PageManager class */
     new (&s_pagemap) PageMap(total_pages, pagemap_addr);
