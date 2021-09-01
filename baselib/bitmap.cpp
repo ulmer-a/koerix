@@ -1,4 +1,5 @@
 #include <bitmap.h>
+#include <string.h>
 
 using namespace baselib;
 
@@ -20,6 +21,16 @@ Bitmap::~Bitmap()
 {
     if (m_isHeapAllocated)
         delete m_bitmap;
+}
+
+void Bitmap::setAll()
+{
+    memset((void*)m_bitmap, 1, BITMAP_BYTE_SIZE(m_size));
+}
+
+void Bitmap::clrAll()
+{
+    memset((void*)m_bitmap, 0, BITMAP_BYTE_SIZE(m_size));
 }
 
 void Bitmap::set(size_t n)

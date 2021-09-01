@@ -18,6 +18,9 @@ namespace baselib {
         void set(size_t n);
         void clr(size_t n);
 
+        void setAll();
+        void clrAll();
+
         bool get(size_t n) const;
 
       private:

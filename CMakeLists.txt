@@ -67,7 +67,7 @@ add_custom_target(kernel.elf ALL
 add_custom_target(rootfs ALL
     COMMAND mkdir -p ${CMAKE_BINARY_DIR}/sysroot
     COMMAND cp $<TARGET_FILE:kernel> ${CMAKE_BINARY_DIR}/sysroot/kernel.elf
-    DEPENDS kernel
+    DEPENDS kernel.elf
 )
 
 if(NOT DEFINED LIMINE_PATH)

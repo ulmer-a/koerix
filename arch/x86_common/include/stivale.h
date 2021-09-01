@@ -80,6 +80,16 @@ struct stivale_mmap_entry {
     uint32_t unused;
 };
 
+enum stivale_mem_type {
+    MEM_USABLE              = 0x0001,
+    MEM_RESERVED            = 0x0002,
+    MEM_ACPI_RECLAIMABLE    = 0x0003,
+    MEM_ACPI_NVS            = 0x0004,
+    MEM_BAD                 = 0x0005,
+    MEM_KERNEL_CODE         = 0x1000,
+    MEM_LOADER_RECLAIMABLE  = 0x1002
+};
+
 #define STIVALE_FBUF_MMODEL_RGB 1
 
 struct stivale_struct {
