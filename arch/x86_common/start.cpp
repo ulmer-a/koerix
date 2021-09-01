@@ -4,7 +4,7 @@
 #include <x86/stivale.h>
 
 // setup stack allocation
-static const size_t SETUP_STACK_SIZE = 8192;
+static const size_t SETUP_STACK_SIZE = 1024*16;
 static uint8_t _INIT setup_stack[SETUP_STACK_SIZE];
 
 extern void create_page_bitmap(struct stivale_struct *stivale_info);
@@ -32,7 +32,8 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 {
     debug() << "Hello, world!\n";
 
-    // memory map
+    /* Create a map of free pages from the stivale
+     * memory map. */
     create_page_bitmap(stivale_info);
 
     // interrupts
