@@ -1,5 +1,6 @@
 #include <types.h>
 #include <mm.h>
+#include <string.h>
 #include <debug.h>
 #include <addr_space.h>
 #include <bitmap.h>
@@ -10,6 +11,7 @@ static PageMap s_pagemap;
 
 PageMap& PageMap::get()
 {
+    /* Singleton getter for the PageMap */
     return s_pagemap;
 }
 
@@ -79,22 +81,21 @@ void create_page_bitmap(stivale_struct *stivale_info)
     debug() << "Total RAM size: " << (total_pages >> 8) << "MB ("
             << total_pages << " page frames)\n";
 
-    /* Compute the amount of pages needed to store the page bitmap */
-    const size_t bitmap_size = BITMAP_BYTE_SIZE(total_pages);
-    size_t bitmap_pages = bitmap_size >> PAGE_SHIFT;
-    if (bitmap_size % PAGE_SIZE != 0)
-        bitmap_pages++;
-    debug() << "PageMap: bitmap size: ~" << (bitmap_size >> 10) << "KB\n";
+    /* Compute the amount of pages needed to store the page refcounter */
+    size_t pagemap_pages = total_pages >> PAGE_SHIFT;
+    if (total_pages % PAGE_SIZE != 0)
+        pagemap_pages++;
+    debug() << "PageMap: ref counter size: ~" << (total_pages >> 10) << "KB\n";
 
     /* Get a memory location to store the page bitmap */
-    const size_t bitmap_start_page = getFirstNFreePages(stivale_info, bitmap_pages);
-    const auto pagemap_addr = (void*)(bitmap_start_page << PAGE_SHIFT);
-    debug() << "PageMap: stored at " << pagemap_addr << "\n";
+    const size_t pagemap_start_page = getFirstNFreePages(stivale_info, pagemap_pages);
+    const auto pagemap = (uint8_t*)(pagemap_start_page << PAGE_SHIFT);
+    debug() << "PageMap: stored at " << (void*)pagemap << "\n";
 
-    /* Create a temporary bitmap and clear all usable pages */
-    baselib::Bitmap tempBitmap { total_pages, pagemap_addr };
-    tempBitmap.setAll();
+    /* Set initial refcount for all pages to 0xff (max) */
+    memset(pagemap, 0xff, total_pages);
 
+    size_t free_pages = 0;
     auto mmap = (stivale_mmap_entry*)stivale_info->memory_map_addr;
     for (int i = 0; i < stivale_info->memory_map_entries; i++)
     {
@@ -109,16 +110,22 @@ void create_page_bitmap(stivale_struct *stivale_info)
             size_t page_count = mmap[i].length >> PAGE_SHIFT;
 
             for (size_t j = 0; j < page_count; j++)
-                tempBitmap.clr(start_page + j);
+            {
+                free_pages += 1;
+                pagemap[start_page + j] = 0;
+            }
         }
     }
 
-    for (int i = 0; i < bitmap_pages; i++)
-        tempBitmap.clr(bitmap_start_page + i);
-
-    debug() << "Usable RAM: " << (tempBitmap.getClrCount() >> 8)
-            << "/" << (total_pages >> 8) << " MB\n";
+    for (int i = 0; i < pagemap_pages; i++)
+    {
+        free_pages -= 1;
+        pagemap[pagemap_start_page + i] = 0xff;
+    }
 
     /* Initialize the PageManager class */
-    new (&s_pagemap) PageMap(total_pages, pagemap_addr);
+    new (&s_pagemap) PageMap(total_pages, free_pages, pagemap);
+
+    debug() << "Usable RAM: " << (free_pages >> 8)
+            << "/" << (total_pages >> 8) << " MB\n";
 }
