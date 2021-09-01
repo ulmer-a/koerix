@@ -101,8 +101,7 @@ void create_page_bitmap(stivale_struct *stivale_info)
     {
         print_mmap_entry(mmap[i]);
 
-        if (mmap[i].type == MEM_USABLE ||
-            mmap[i].type == MEM_LOADER_RECLAIMABLE)
+        if (mmap[i].type == MEM_USABLE)
         {
             /* For usable memory and bootloader reclaimable memory, the
              * base and length fields are guaranteed to be page aligned. */

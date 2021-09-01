@@ -36,12 +36,18 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
      * memory map. */
     create_page_bitmap(stivale_info);
 
-    // interrupts
+    /* Load our own Global Descriptor Table */
 
-    // enable scheduler
+    /* Load an interrupt descriptor table */
 
-    for (;;) {
-        // Panic
-        hlt();
-    }
+    /* Create the kernel virtual memory address space and
+     * setup the kernel heap */
+
+    /* Enable scheduling */
+    // auto& sched = Scheduler::get();
+    // sched.enableScheduling();
+    // sched.yield();
+
+    /* This will never be reached */
+    for (;;) { hlt(); }
 }
