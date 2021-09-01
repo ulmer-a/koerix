@@ -7,8 +7,6 @@
 static const size_t SETUP_STACK_SIZE = 1024*16;
 static uint8_t _INIT setup_stack[SETUP_STACK_SIZE];
 
-extern void create_page_bitmap(struct stivale_struct *stivale_info);
-
 _SECTION(".stivalehdr")
 static struct stivale_header stivale_hdr = {
     // location of the setup stack
@@ -29,6 +27,7 @@ static struct stivale_header stivale_hdr = {
 };
 
 extern "C" void setup_gdt();
+extern void create_page_bitmap(struct stivale_struct *stivale_info);
 
 extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 {
