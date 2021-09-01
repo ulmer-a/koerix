@@ -27,6 +27,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/${TARGET_PLATFORM}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/baselib/include
 )
 
 file(GLOB_RECURSE KERNEL_SOURCES
@@ -35,6 +36,13 @@ file(GLOB_RECURSE KERNEL_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel/*.cpp
 )
 add_library(kernel STATIC ${KERNEL_SOURCES})
+
+file(GLOB_RECURSE BASELIB_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/baselib/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/baselib/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/baselib/*.cpp
+)
+add_library(baselib STATIC ${BASELIB_SOURCES})
 
 file(GLOB_RECURSE ARCH_SOURCES FOLLOW_SYMLINKS
     ${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/*.c
@@ -51,9 +59,9 @@ add_library(platform STATIC ${PLATFORM_SOURCES})
 add_custom_target(kernel.elf ALL
     COMMAND "/usr/bin/ld.lld"
         -T ${CMAKE_CURRENT_SOURCE_DIR}/platform/${TARGET_PLATFORM}/${TARGET_ARCH}.ld
-        $<TARGET_FILE:kernel> $<TARGET_FILE:arch> $<TARGET_FILE:platform>
+        $<TARGET_FILE:baselib> $<TARGET_FILE:kernel> $<TARGET_FILE:arch> $<TARGET_FILE:platform>
         -o ${CMAKE_CURRENT_BINARY_DIR}/kernel.elf
-    DEPENDS kernel arch platform
+    DEPENDS kernel arch platform baselib
 )
 
 add_custom_target(rootfs ALL

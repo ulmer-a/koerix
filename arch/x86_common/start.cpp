@@ -1,10 +1,12 @@
-#include <ktypes.h>
+#include <types.h>
 #include <platform.h>
 #include <x86/stivale.h>
 
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 8192;
 static uint8_t _INIT setup_stack[SETUP_STACK_SIZE];
+
+extern void create_page_bitmap(struct stivale_struct *stivale_info);
 
 _SECTION(".stivalehdr")
 static struct stivale_header stivale_hdr = {
@@ -25,9 +27,16 @@ static struct stivale_header stivale_hdr = {
     .entry_point = 0
 };
 
-void _NORETURN _start(struct stivale_struct *stivale_info)
+extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 {
     nprint("Hello, world!\n");
+
+    // memory map
+    create_page_bitmap(stivale_info);
+
+    // interrupts
+
+    // enable scheduler
 
     for (;;) {
         // Panic

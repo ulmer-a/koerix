@@ -30,7 +30,7 @@
  */
 
 #pragma once
-#include <ktypes.h>
+#include <types.h>
 
 // Anchor for non ELF kernels
 struct stivale_anchor {
