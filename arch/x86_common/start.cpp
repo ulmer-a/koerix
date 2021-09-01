@@ -28,15 +28,20 @@ static struct stivale_header stivale_hdr = {
     .entry_point = 0
 };
 
+extern "C" void setup_gdt();
+
 extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 {
     debug() << "Hello, world!\n";
 
+    /* Load our own Global Descriptor Table */
+    debug() << "Setting up Global Descriptor Table ...";
+    setup_gdt();
+    debug() << " done\n";
+
     /* Create a map of free pages from the stivale
      * memory map. */
     create_page_bitmap(stivale_info);
-
-    /* Load our own Global Descriptor Table */
 
     /* Load an interrupt descriptor table */
 

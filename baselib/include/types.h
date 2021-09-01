@@ -20,7 +20,7 @@ typedef unsigned long size_t;
 #define _SECTION(s) __attribute__((section(s), used))
 
 
-#define BIT(x) (1 << (x))
+#define BIT(x) (1ul << (x))
 
 
 #define assert(x)
