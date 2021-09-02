@@ -38,8 +38,7 @@ static size_t getFirstNFreePages(stivale_struct* stivale_info, size_t n)
     auto mmap = (stivale_mmap_entry*)stivale_info->memory_map_addr;
     for (int i = 0; i < stivale_info->memory_map_entries; i++)
     {
-        if (mmap[i].type == MEM_USABLE ||
-            mmap[i].type == MEM_LOADER_RECLAIMABLE)
+        if (mmap[i].type == MEM_USABLE)
         {
             if (mmap[i].length >= (n << PAGE_SHIFT))
             {

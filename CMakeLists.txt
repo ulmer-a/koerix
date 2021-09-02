@@ -14,12 +14,12 @@ message(STATUS "UlmerOS v${CMAKE_PROJECT_VERSION}")
 message(STATUS "Building for ${TARGET_ARCH}-${TARGET_PLATFORM}")
 
 set(CMAKE_C_FLAGS "--target=${TARGET_ARCH}-none-eabi \
-    -ffreestanding -fno-rtti -fno-exceptions \
+    -ffreestanding -fno-rtti -fno-exceptions -fPIC \
     -nostdlib -nostdinc -fno-stack-protector \
     ${ARCH_FLAGS}"
 )
 set(CMAKE_CXX_FLAGS "--target=${TARGET_ARCH}-none-eabi \
-    -ffreestanding -fno-rtti -fno-exceptions \
+    -ffreestanding -fno-rtti -fno-exceptions -fPIC \
     -nostdlib -nostdinc -fno-stack-protector \
     ${ARCH_FLAGS}"
 )

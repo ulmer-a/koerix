@@ -1,5 +1,6 @@
 #include <addr_space.h>
 #include <debug.h>
+#include <string.h>
 #include <mm.h>
 
 #define IDENT_OFFSET 0xffff800000000000ul
@@ -25,6 +26,11 @@ struct GenericPagingTable
 
 AddrSpace s_kernelAddrSpace;
 
+AddrSpace::AddrSpace()
+{
+    m_pml4 = PageMap::get().alloc();
+}
+
 void AddrSpace::setup()
 {
     assert(sizeof(GenericPagingTable) == 8);
@@ -35,14 +41,15 @@ void AddrSpace::setup()
 
     /* map the whole physical memory to the upper half */
     debug() << "mapping physical memory to the upper half...";
-    auto pageMap = PageMap::get();
+    const size_t totalPages = PageMap::get().getTotalPageCount();
     const size_t ident_page_offset = IDENT_OFFSET >> PAGE_SHIFT;
-    for (size_t page = 0; page < pageMap.getTotalPageCount(); page++)
-        kernelSpace->map(page + ident_page_offset, page);
+    for (size_t page = 0; page < totalPages; page++)
+        kernelSpace->map(page + ident_page_offset, page, MAP_WRITE);
     debug() << " done\n";
 
     /* Switch to the newly created address space. */
-    //kernelSpace->apply();
+    kernelSpace->apply();
+    debug() << "successfully written %cr3\n";
 }
 
 void AddrSpace::apply()
@@ -59,6 +66,66 @@ static inline void tlb_invalidate(size_t virt)
     __asm__ volatile ("invlpg (%0)" : : "b"(virt) : "memory");
 }
 
-void AddrSpace::map(size_t virt, size_t phys)
+static inline void* ppn_to_virt(size_t ppn)
 {
+    return (void*)((ppn << PAGE_SHIFT) + IDENT_OFFSET);
+}
+
+void AddrSpace::map(size_t virt, size_t phys, int flags)
+{
+    auto pageMap = PageMap::get();
+
+    /* first, pre-compute all the indices into the different
+     * page tables. for example tableIndices[3] will be the
+     * index into the PML4 table, whereas tableIndex[0] will
+     * be the index into the page table. */
+    size_t tableIndices[4];
+    tableIndices[3] = (virt >> 27) & 0x1ff;     // PML4
+    tableIndices[2] = (virt >> 18) & 0x1ff;     // PDPT
+    tableIndices[1] = (virt >> 9) & 0x1ff;      // PDIR
+    tableIndices[0] = (virt) & 0x1ff;           // PTAB
+
+    size_t currentTablePPN = m_pml4;
+    for (int level = 3; level >= 0; level--)
+    {
+        /* Compute a reference to the entry in the current table */
+        auto& currentLevelTableEntry =
+            ((GenericPagingTable*)ppn_to_virt(currentTablePPN))[tableIndices[level]];
+
+        /* Check if an entry is present for the current table,
+         * if not, we'll have to add one and allocate a new sub-table. */
+        if (!currentLevelTableEntry.present)
+        {
+            size_t newTablePPN = phys;
+            if (level != 0)
+            {
+                /* in case we're not yet at the page table level,
+                 * we need to allocate and clear a new page table
+                 * and clear it instead of just assigning the phys PPN. */
+                newTablePPN = pageMap.alloc();
+                memset(ppn_to_virt(newTablePPN), 0, PAGE_SIZE);
+            }
+
+            /* clear the entry and fill with new data */
+            *((uint64_t*)&currentLevelTableEntry) = 0;
+            currentLevelTableEntry.present = 1;
+            currentLevelTableEntry.ppn = newTablePPN;
+
+            if (level == 0)
+            {
+                /* only set protections for actual pages */
+                if (flags & MAP_WRITE)  currentLevelTableEntry.write = 1;
+                if (flags & MAP_USER)   currentLevelTableEntry.user = 1;
+                if (flags & MAP_NOEXEC) currentLevelTableEntry.no_exec = 1;
+            }
+            else
+            {
+                /* be generous on the upper levels */
+                currentLevelTableEntry.write = 1;
+                currentLevelTableEntry.user = 1;
+            }
+        }
+
+        currentTablePPN = currentLevelTableEntry.ppn;
+    }
 }
