@@ -19,6 +19,7 @@ class AddrSpace
     ~AddrSpace() = default;
 
     static void setup();
+    static AddrSpace& kernel();
 
     void apply();
 

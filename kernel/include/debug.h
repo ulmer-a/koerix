@@ -2,6 +2,14 @@
 
 #include <types.h>
 
+void panic(const char* msg);
+
+#define assert(x) if (!(x)) { \
+    debug() << "****\n" \
+               "**** in " << __func__ << "() on " << __LINE__ << ":"; \
+    panic("assertion failed"); \
+}
+
 #define DEBUG_HEX debugging::DebugStream::HEX
 #define DEBUG_DEC debugging::DebugStream::HEX
 

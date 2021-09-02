@@ -56,6 +56,11 @@ void AddrSpace::setup()
     debug() << "successfully written %cr3\n";
 }
 
+AddrSpace &AddrSpace::kernel()
+{
+    return s_kernelAddrSpace;
+}
+
 void AddrSpace::apply()
 {
     /* Switch to the virtual address space represented by this class */
@@ -132,4 +137,9 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
 
         currentTablePPN = currentLevelTableEntry.ppn;
     }
+}
+
+void AddrSpace::unmap(size_t virt)
+{
+    assert(false);
 }

@@ -1,4 +1,5 @@
 #include <pagemap.h>
+#include <debug.h>
 
 PageMap::PageMap()
     : m_pagemap(nullptr)

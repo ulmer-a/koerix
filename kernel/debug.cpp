@@ -4,6 +4,12 @@
 
 using namespace debugging;
 
+void panic(const char* message)
+{
+    debug() << "kernel panic: " << message << "\n";
+    for (;;) { hlt(); }
+}
+
 DebugStream::DebugStream()
     : m_currentMode(DEC)
 {
@@ -64,6 +70,13 @@ DebugStream& DebugStream::operator<<(void* p)
 DebugStream& DebugStream::operator<<(int32_t i)
 {
     m_destPtr = itoa(i, m_destPtr, getBase());
+    m_destPtr = m_buffer + strlen(m_buffer);
+    return *this;
+}
+
+DebugStream &DebugStream::operator<<(uint32_t i)
+{
+    m_destPtr = utoa(i, m_destPtr, getBase());
     m_destPtr = m_buffer + strlen(m_buffer);
     return *this;
 }

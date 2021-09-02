@@ -24,6 +24,3 @@ typedef unsigned long size_t;
 
 
 #define BIT(x) (1ul << (x))
-
-
-#define assert(x)

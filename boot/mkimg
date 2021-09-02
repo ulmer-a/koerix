@@ -48,6 +48,7 @@ cp ${limine}/bin/limine.sys ${sysroot}/boot/limine.sys
 cp ${srcdir}/limine.cfg ${sysroot}/boot/limine.cfg
 sudo cp -R ${sysroot}/* ${mount_dir}
 
+sync
 sudo umount /dev/loop99
 sudo losetup -d /dev/loop99
 
