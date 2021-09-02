@@ -88,7 +88,7 @@ void create_page_bitmap(stivale_struct *stivale_info)
 
     /* Get a memory location to store the page bitmap */
     const size_t pagemap_start_page = getFirstNFreePages(stivale_info, pagemap_pages);
-    const auto pagemap = (uint8_t*)(pagemap_start_page << PAGE_SHIFT);
+    const auto pagemap = (uint8_t*)PPN_TO_VIRT(pagemap_start_page);
     debug() << "PageMap: stored at " << (void*)pagemap << "\n";
 
     /* Set initial refcount for all pages to 0xff (max) */

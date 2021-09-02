@@ -2,9 +2,8 @@
 #include <debug.h>
 #include <string.h>
 #include <mm.h>
+#include <asm.h>
 
-#define IDENT_OFFSET 0xffff800000000000ul
-#define PPN_TO_PTR(x) ((void*)((x) << PAGE_SHIFT))
 
 struct GenericPagingTable
 {
@@ -51,6 +50,9 @@ void AddrSpace::setup()
         kernelSpace->map(page + ident_page_offset, page, MAP_WRITE);
     debug() << " done\n";
 
+    /* Enable support for NX pages */
+    enable_nx();
+
     /* Switch to the newly created address space. */
     kernelSpace->apply();
     debug() << "successfully written %cr3\n";
@@ -75,11 +77,6 @@ static inline void tlb_invalidate(size_t virt)
     __asm__ volatile ("invlpg (%0)" : : "b"(virt) : "memory");
 }
 
-static inline void* ppn_to_virt(size_t ppn)
-{
-    return (void*)((ppn << PAGE_SHIFT) + IDENT_OFFSET);
-}
-
 void AddrSpace::map(size_t virt, size_t phys, int flags)
 {
     auto pageMap = PageMap::get();
@@ -99,7 +96,7 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
     {
         /* Compute a reference to the entry in the current table */
         auto& currentLevelTableEntry =
-            ((GenericPagingTable*)ppn_to_virt(currentTablePPN))[tableIndices[level]];
+            ((GenericPagingTable*)PPN_TO_VIRT(currentTablePPN))[tableIndices[level]];
 
         /* Check if an entry is present for the current table,
          * if not, we'll have to add one and allocate a new sub-table. */
@@ -112,7 +109,7 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
                  * we need to allocate and clear a new page table
                  * and clear it instead of just assigning the phys PPN. */
                 newTablePPN = pageMap.alloc();
-                memset(ppn_to_virt(newTablePPN), 0, PAGE_SIZE);
+                memset(PPN_TO_VIRT(newTablePPN), 0, PAGE_SIZE);
             }
 
             /* clear the entry and fill with new data */
