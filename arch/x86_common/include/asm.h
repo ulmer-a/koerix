@@ -1,5 +1,7 @@
 #pragma once
 
+#include <types.h>
+
 static inline void hlt()
 {
     __asm__ volatile ("hlt");
@@ -16,3 +18,6 @@ static inline void arch_yield()
 }
 
 extern "C" void enable_nx();
+
+size_t xchg(size_t val, size_t* mem);
+size_t atomic_add(size_t* mem, ssize_t increment);

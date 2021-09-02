@@ -1,25 +1,117 @@
 #include <scheduler.h>
 #include <asm.h>
+#include <list.h>
+#include <task.h>
+#include <context.h>
+#include <mm.h>
+#include <kernel_task.h>
+#include <addr_space.h>
 
 static bool s_schedEnable = false;
+static ktl::List<Task*> s_taskList;
+static Task* s_currentTask;
+
+/* sets the stack pointer that will be used
+ * when the thread returns to kernel code */
+extern "C" void setKernelStackPtr(size_t stackptr);
+
+static void idle_task()
+{
+  debug() << "Welcome from the idle task!\n";
+  for (;;) { hlt(); }
+}
 
 namespace sched {
 
-void yield()
-{
+  void yield()
+  {
     arch_yield();
-}
+  }
 
-namespace init {
-    void enable()
+  namespace init {
+    void setup()
     {
-        s_schedEnable = true;
+      new (&s_taskList) ktl::List<Task*>();
+      insertTask(new KernelTask(idle_task));
     }
-}
 
-void schedule()
-{
+    void insertTask(Task* task)
+    {
+      assert(!s_schedEnable);
+      s_taskList.push_back(task);
+    }
+  }
 
-}
+  void enable() {
+    s_schedEnable = true;
+  }
+
+  void disable() {
+    s_schedEnable = false;
+  }
+
+  Task* getNextTask()
+  {
+    Task* task;
+    do {
+      s_taskList.rotate();
+      task = s_taskList.front();
+      assert(task != nullptr);
+
+      if (task->state() == Task::KILLED)
+      {
+        /* if the task was killed, remove it from the
+         * scheduler to cleanup the scheduler task list */
+        s_taskList.remove(s_taskList.find(task));
+      }
+
+    } while (!task->schedulable());
+    return task;
+  }
+
+  IrqContext* schedule(IrqContext *ctx)
+  {
+    if (!s_schedEnable)
+      return ctx;
+
+    auto nextTask = getNextTask();
+    if (nextTask != s_currentTask)
+    {
+      if (s_currentTask)
+      {
+        s_currentTask->setContext(ctx);
+
+        if (s_currentTask->state() == Task::KILLED)
+          s_taskList.remove(s_taskList.find(s_currentTask));
+      }
+
+      ctx = nextTask->context();
+
+      if (!s_currentTask ||
+          &s_currentTask->addrSpace() != &nextTask->addrSpace())
+      {
+        nextTask->addrSpace().apply();
+      }
+
+      setKernelStackPtr(nextTask->kernelStackPtr());
+
+      s_currentTask = nextTask;
+    }
+
+    return ctx;
+  }
+
+  void insertTask(Task *task)
+  {
+    assert(s_schedEnable);
+    s_schedEnable = false;
+    s_taskList.push_back(task);
+    s_schedEnable = true;
+  }
+
+  Task* currentTask()
+  {
+    return s_currentTask;
+  }
 
 }

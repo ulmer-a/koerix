@@ -4,6 +4,12 @@
 #include <addr_space.h>
 #include <scheduler.h>
 #include <x86/stivale.h>
+#include <kernel_task.h>
+
+static void setup_task()
+{
+
+}
 
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 1024*16;
@@ -52,8 +58,10 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
      * setup the kernel heap */
     AddrSpace::setup();
 
-    /* Enable scheduling */
-    sched::init::enable();
+    /* Create kernel setup task and enable scheduling */
+    sched::init::setup();
+    sched::init::insertTask(new KernelTask(setup_task));
+    sched::enable();
     sched::yield();
 
     /* This will never be reached */

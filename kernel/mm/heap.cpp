@@ -95,7 +95,7 @@ static void* kbrk(ssize_t increment)
       first_unmap += 1;
     size_t last_unmap = (size_t)orig_brk / PAGE_SIZE;
 
-    debug() << "kheap: freeing pages " << first_unmap << " to " << last_unmap << "\n";
+    // debug() << "kheap: freeing pages " << first_unmap << " to " << last_unmap << "\n";
     for (size_t page = first_unmap; page <= last_unmap; page++)
       AddrSpace::kernel().unmap(page);
   }
@@ -106,9 +106,9 @@ static void* kbrk(ssize_t increment)
       first_map += 1;
     size_t last_map = (size_t)kheap_break_ >> PAGE_SHIFT;
 
-    debug() << "kheap: alloc " << (last_map - first_map + 1)
-            << " pages @ "
-            << (void*)(first_map << PAGE_SHIFT) << "\n";
+    //debug() << "kheap: alloc " << (last_map - first_map + 1)
+    //        << " pages @ "
+    //        << (void*)(first_map << PAGE_SHIFT) << "\n";
     for (size_t page = first_map; page <= last_map; page++)
     {
         AddrSpace::kernel().map(page, PageMap::get().alloc(),
@@ -158,7 +158,7 @@ void *kmalloc(size_t size)
   debug(KHEAP, "kmalloc(): size %zd from %s():%u\n", size, function, line);
 #endif
 
-  debug() << "kmalloc(): " << size << "B\n";
+  //debug() << "kmalloc(): " << size << "B\n";
 
   s_heapMutex.lock();
 
@@ -233,7 +233,7 @@ static void mergeBlocks(HeapBlock *first, HeapBlock *second)
 
 void kfree(void *ptr)
 {
-  debug() << "kfree(): " << ptr << "\n";
+  //debug() << "kfree(): " << ptr << "\n";
 
   if (ptr == nullptr) {
     return;

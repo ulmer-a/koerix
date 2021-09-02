@@ -146,7 +146,7 @@ void setup_gdt()
   setup_tss((tssd_t*)&s_gdt[TSS_INDEX]);
 }
 
-void set_kernel_sp(uint64_t sp)
+void setKernelStackPtr(size_t stackptr)
 {
-  s_tss.rsp0 = sp;
+  s_tss.rsp0 = stackptr;
 }

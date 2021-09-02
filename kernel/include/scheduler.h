@@ -1,11 +1,20 @@
 #pragma once
 
+class Task;
+
 namespace sched {
 
     namespace init {
-        void enable();
+        void setup();
+        void insertTask(Task* task);
     }
 
+    void enable();
+    void disable();
+
     void yield();
+
+    Task* currentTask();
+    void insertTask(Task* task);
 
 }
