@@ -117,7 +117,7 @@ void *memchr(const void *block, uint8_t c, size_t size)
      return (void*)src;
     src++;
   }
-  return nullptr;
+  return NULL;
 }
 
 void *memrchr(const void *block, uint8_t c, size_t size);

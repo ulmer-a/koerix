@@ -5,6 +5,10 @@
 #include <types.h>
 #include <stdarg.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 size_t strlen(const char* str);
 size_t strnlen(const char *src, size_t n);
 void *memcpy(void *dest, const void *src, size_t length);
@@ -38,3 +42,7 @@ const char *strerror(unsigned err);
 
 extern void sprintf(char* dest, const char* fmt, ...);
 extern void _sprintf(char* dest, const char* fmt, va_list args);
+
+#ifdef __cplusplus
+}
+#endif
