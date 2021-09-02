@@ -2,6 +2,7 @@
 #include <platform.h>
 #include <debug.h>
 #include <addr_space.h>
+#include <scheduler.h>
 #include <x86/stivale.h>
 
 // setup stack allocation
@@ -52,9 +53,8 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
     AddrSpace::setup();
 
     /* Enable scheduling */
-    // auto& sched = Scheduler::get();
-    // sched.enableScheduling();
-    // sched.yield();
+    sched::init::enable();
+    sched::yield();
 
     /* This will never be reached */
     for (;;) { hlt(); }

@@ -28,7 +28,11 @@ AddrSpace s_kernelAddrSpace;
 
 AddrSpace::AddrSpace()
 {
+    /* Create a new address space by allocating
+     * a fresh Page Map Level 4 */
     m_pml4 = PageMap::get().alloc();
+
+    // TODO: copy kernel mappings in here
 }
 
 void AddrSpace::setup()
