@@ -1,6 +1,7 @@
 #include <types.h>
 #include <platform.h>
 #include <debug.h>
+#include <addr_space.h>
 #include <x86/stivale.h>
 
 // setup stack allocation
@@ -48,6 +49,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 
     /* Create the kernel virtual memory address space and
      * setup the kernel heap */
+    AddrSpace::setup();
 
     /* Enable scheduling */
     // auto& sched = Scheduler::get();

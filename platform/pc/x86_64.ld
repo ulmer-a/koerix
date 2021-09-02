@@ -16,12 +16,13 @@ SECTIONS
 {
     /* relocate to the higher half */
     . = 0xffffffff80100000;
+    _kernel_start = .;
  
     .text : {
         *(.text*)
     } :text
  
-    . += 0x1000;
+    . = ALIGN(4096);
  
     /* We place the .stivalehdr section containing the header in its own section, */
     /* and we use the KEEP directive on it to make sure it doesn't get discarded. */
@@ -34,7 +35,7 @@ SECTIONS
     } :rodata
  
     /* Move to the next memory page for .data */
-    . += 0x1000;
+    . = ALIGN(4096);
  
     .data : {
         *(.data*)
@@ -49,4 +50,7 @@ SECTIONS
         *(COMMON)
         *(.bss*)
     } :data
+
+    . = ALIGN(4096);
+    _kernel_end = .;
 }

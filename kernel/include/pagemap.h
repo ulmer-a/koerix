@@ -16,6 +16,10 @@ class PageMap
     size_t alloc();
     void free(size_t ppn);
 
+    size_t getTotalPageCount() { return m_totalPages; }
+    size_t getFreePageCount() { return m_freePageCount; }
+    size_t getUsedPageCount() { return m_totalPages - m_freePageCount; }
+
     uint64_t getTotalMemory() { return m_totalPages << PAGE_SHIFT; }
     uint64_t getFreeMemory() { return m_freePageCount << PAGE_SHIFT; }
     uint64_t getUsedMemory() { return (m_totalPages - m_freePageCount) << PAGE_SHIFT; }

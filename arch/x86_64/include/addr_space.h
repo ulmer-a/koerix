@@ -11,6 +11,10 @@ class AddrSpace
     AddrSpace() = default;
     ~AddrSpace() = default;
 
+    static void setup();
+
+    void apply();
+
     void map(size_t virt, size_t phys);
     void unmap(size_t virt);
 
