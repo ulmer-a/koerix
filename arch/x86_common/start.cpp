@@ -27,6 +27,7 @@ static struct stivale_header stivale_hdr = {
 };
 
 extern "C" void setup_gdt();
+extern "C" void x86_irq_init();
 extern void create_page_bitmap(struct stivale_struct *stivale_info);
 
 extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
@@ -43,6 +44,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
     create_page_bitmap(stivale_info);
 
     /* Load an interrupt descriptor table */
+    x86_irq_init();
 
     /* Create the kernel virtual memory address space and
      * setup the kernel heap */

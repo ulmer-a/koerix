@@ -4,6 +4,7 @@ set(CMAKE_C_COMPILER "/usr/bin/clang")
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 project(UlmerOS VERSION 0.1)
+enable_language(ASM)
 
 set(TARGET_ARCH "x86_64")
 set(TARGET_PLATFORM "pc")
@@ -47,6 +48,7 @@ add_library(baselib STATIC ${BASELIB_SOURCES})
 file(GLOB_RECURSE ARCH_SOURCES FOLLOW_SYMLINKS
     ${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/*.S
 )
 add_library(arch STATIC ${ARCH_SOURCES})
 
