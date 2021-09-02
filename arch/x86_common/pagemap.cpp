@@ -22,7 +22,7 @@ static size_t getSystemPageCount(stivale_struct* stivale_info)
 
     for (int i = stivale_info->memory_map_entries - 1; i >= 0; i--)
     {
-        if (mmap[i].type == MEM_RESERVED)
+        if (mmap[i].type != MEM_USABLE && mmap[i].type != MEM_LOADER_RECLAIMABLE)
             continue;
         auto& last_usable_entry = mmap[i];
         return ((last_usable_entry.base + last_usable_entry.length)
@@ -61,8 +61,9 @@ static const char* get_mmap_type_str(uint32_t type)
     case MEM_BAD: return "bad memory";
     case MEM_ACPI_NVS:
     case MEM_ACPI_RECLAIMABLE: return "ACPI";
-    case MEM_KERNEL_CODE: return "kernel code";
+    case MEM_KERNEL: return "kernel/module code, data";
     case MEM_LOADER_RECLAIMABLE: return "bootloader reclaimable";
+    case MEM_FRAMEBUFFER: return "framebuffer";
     default: return "unknown";
     }
 }
