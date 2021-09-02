@@ -25,8 +25,7 @@ static size_t getSystemPageCount(stivale_struct* stivale_info)
         if (mmap[i].type != MEM_USABLE && mmap[i].type != MEM_LOADER_RECLAIMABLE)
             continue;
         auto& last_usable_entry = mmap[i];
-        return ((last_usable_entry.base + last_usable_entry.length)
-                >> PAGE_SHIFT) + 1;
+        return (last_usable_entry.base + last_usable_entry.length) >> PAGE_SHIFT;
     }
 
     assert(false);
