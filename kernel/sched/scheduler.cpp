@@ -15,7 +15,7 @@ static Task* s_currentTask;
  * when the thread returns to kernel code */
 extern "C" void setKernelStackPtr(size_t stackptr);
 
-static void idle_task()
+static void idle_task(void* arg)
 {
   debug() << "Welcome from the idle task!\n";
   for (;;) { hlt(); }

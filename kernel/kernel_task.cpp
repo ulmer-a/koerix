@@ -3,16 +3,17 @@
 #include <context.h>
 #include <debug.h>
 
-static void ktask_runtime(KernelTask* task, void(*func)())
+static void ktask_runtime(KernelTask* task, void(*func)(void*))
 {
   debug() << "kernel task #" << task->tid() << " started executing\n";
-  func();
+  func(task->arg());
   task->exit();
   debug() << "kernel task #" << task->tid() << " terminated\n";
 }
 
-KernelTask::KernelTask(void(*entry)())
+KernelTask::KernelTask(void(*entry)(void* arg), void* arg)
   : Task(AddrSpace::kernel())
+  , m_argument(arg)
 {
   auto ctx = context();
   setInstructionPointer(ctx, (size_t)ktask_runtime);

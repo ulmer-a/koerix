@@ -5,11 +5,12 @@
 class KernelTask : public Task
 {
   public:
-    KernelTask(void(*entry)());
+    KernelTask(void(*entry)(void*), void* arg = nullptr);
     ~KernelTask() = default;
 
     bool isUserTask() const { return false; }
+    void* arg() const { return m_argument; }
 
   private:
-
+    void* m_argument;
 };

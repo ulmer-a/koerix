@@ -29,9 +29,9 @@ static struct stivale_header stivale_hdr = {
     .entry_point = 0
 };
 
-extern void kernel_init();
-static void setup_task() {
-  kernel_init();
+extern void kernel_init(const char* cmdline);
+static void setup_task(void* cmdline) {
+  kernel_init((char*)cmdline);
 }
 
 extern void initHeap();
@@ -62,7 +62,8 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 
     /* Create kernel setup task and enable scheduling */
     sched::init::setup();
-    sched::init::insertTask(new KernelTask(setup_task));
+    sched::init::insertTask(new KernelTask(
+        setup_task, (void*)stivale_info->cmdline));
     sched::enable();
     sched::yield();
 
