@@ -1,5 +1,5 @@
 #include <scheduler.h>
-#include <asm.h>
+#include <arch/asm.h>
 #include <list.h>
 #include <task.h>
 #include <context.h>

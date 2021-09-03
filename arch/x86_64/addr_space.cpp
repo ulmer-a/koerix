@@ -2,7 +2,7 @@
 #include <debug.h>
 #include <string.h>
 #include <mm.h>
-#include <asm.h>
+#include <arch/asm.h>
 
 
 struct GenericPagingTable

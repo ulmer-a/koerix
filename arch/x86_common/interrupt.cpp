@@ -2,7 +2,7 @@
 #include <debug.h>
 #include <context.h>
 #include <platform.h>
-#include <asm.h>
+#include <arch/asm.h>
 
 static void* getPageFaultAddr()
 {

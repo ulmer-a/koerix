@@ -1,4 +1,4 @@
-#include <asm.h>
+#include <arch/asm.h>
 
 size_t xchg(size_t val, size_t* mem)
 {

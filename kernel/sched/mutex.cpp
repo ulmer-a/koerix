@@ -1,5 +1,5 @@
 #include <mutex.h>
-#include <asm.h>
+#include <arch/asm.h>
 #include <task.h>
 #include <scheduler.h>
 

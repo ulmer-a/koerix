@@ -1,11 +1,8 @@
 #pragma once
 
 #include <types.h>
+#include <offsets.h>
 
-#define PAGE_SHIFT 12
-#define PAGE_SIZE 4096
-
-#define IDENT_OFFSET    0xffff800000000000ul
 #define PPN_TO_PTR(x)   ((void*)((x) << PAGE_SHIFT))
 #define PPN_TO_VIRT(x)  ((void*)(((x) << PAGE_SHIFT) + IDENT_OFFSET))
 

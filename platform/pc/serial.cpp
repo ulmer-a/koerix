@@ -2,7 +2,7 @@
 #include <x86/ports.h>
 #include <errno.h>
 #include <debug.h>
-#include <asm.h>
+#include <arch/asm.h>
 #include <string.h>
 #include <interrupt.h>
 
@@ -43,7 +43,8 @@ SerialPort::SerialPort(SerialPort::Port port)
   outb(m_port + 0x04, 0b00001111);
 
   /* enable interrupts */
-  registerIrq(port == COM1 ? 4 : 5, (void*)irq_handler, (void*)this);
+  uint8_t irq = (port == COM1) ? 4 : 5;
+  registerIrq(irq, (void*)irq_handler, (void*)this);
   setIrqMode(true, false);
 }
 

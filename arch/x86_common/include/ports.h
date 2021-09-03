@@ -2,16 +2,6 @@
 
 #include <types.h>
 
-static inline void cli()
-{
-  __asm__ volatile ("cli");
-}
-
-static inline void sti()
-{
-  __asm__ volatile ("sti");
-}
-
 static inline uint8_t inb(uint16_t port)
 {
     uint8_t ret_val;

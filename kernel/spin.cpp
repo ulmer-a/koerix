@@ -1,5 +1,5 @@
 #include <spin.h>
-#include <asm.h>
+#include <arch/asm.h>
 #include <scheduler.h>
 
 Spinlock::Spinlock()
