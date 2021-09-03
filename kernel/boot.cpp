@@ -2,6 +2,7 @@
 #include <term.h>
 #include <dev/devices.h>
 #include <fs/file.h>
+#include <module.h>
 
 void kernel_init(const char* cmdline)
 {
@@ -17,4 +18,7 @@ void kernel_init(const char* cmdline)
   Terminal::setMainTerm(mainTerm);
 
   debug() << "welcome on uart!\n";
+
+  void* init_bin = find_module("init.elf");
+  assert(init_bin != nullptr);
 }

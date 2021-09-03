@@ -8,6 +8,7 @@
 #include <x86/stivale.h>
 
 static PageMap s_pagemap;
+extern stivale_struct* s_stivale;
 
 PageMap& PageMap::get()
 {
@@ -15,12 +16,12 @@ PageMap& PageMap::get()
     return s_pagemap;
 }
 
-static size_t getSystemPageCount(stivale_struct* stivale_info)
+static size_t getSystemPageCount()
 {
     /* Compute the amount of page frames present in system RAM */
-    auto mmap = (stivale_mmap_entry*)stivale_info->memory_map_addr;
+    auto mmap = (stivale_mmap_entry*)s_stivale->memory_map_addr;
 
-    for (int i = stivale_info->memory_map_entries - 1; i >= 0; i--)
+    for (int i = s_stivale->memory_map_entries - 1; i >= 0; i--)
     {
         if (mmap[i].type != MEM_USABLE && mmap[i].type != MEM_LOADER_RECLAIMABLE)
             continue;
@@ -32,11 +33,11 @@ static size_t getSystemPageCount(stivale_struct* stivale_info)
     return 0;
 }
 
-static size_t getFirstNFreePages(stivale_struct* stivale_info, size_t n)
+static size_t getFirstNFreePages(size_t n)
 {
     /* Find first consecutive n free pages */
-    auto mmap = (stivale_mmap_entry*)stivale_info->memory_map_addr;
-    for (int i = 0; i < stivale_info->memory_map_entries; i++)
+    auto mmap = (stivale_mmap_entry*)s_stivale->memory_map_addr;
+    for (int i = 0; i < s_stivale->memory_map_entries; i++)
     {
         if (mmap[i].type == MEM_USABLE)
         {
@@ -73,10 +74,10 @@ static void print_mmap_entry(stivale_mmap_entry& entry)
             << ": " << get_mmap_type_str(entry.type) << "\n";
 }
 
-void create_page_bitmap(stivale_struct *stivale_info)
+void create_page_bitmap()
 {
     /* Compute total RAM size */
-    const auto total_pages = getSystemPageCount(stivale_info);
+    const auto total_pages = getSystemPageCount();
     debug() << "Total RAM size: " << (total_pages >> 8) << "MB ("
             << total_pages << " page frames)\n";
 
@@ -87,7 +88,7 @@ void create_page_bitmap(stivale_struct *stivale_info)
     debug() << "PageMap: ref counter size: ~" << (total_pages >> 10) << "KB\n";
 
     /* Get a memory location to store the page bitmap */
-    const size_t pagemap_start_page = getFirstNFreePages(stivale_info, pagemap_pages);
+    const size_t pagemap_start_page = getFirstNFreePages(pagemap_pages);
     const auto pagemap = (uint8_t*)PPN_TO_VIRT(pagemap_start_page);
     debug() << "PageMap: stored at " << (void*)pagemap << "\n";
 
@@ -95,8 +96,8 @@ void create_page_bitmap(stivale_struct *stivale_info)
     memset(pagemap, 0xff, total_pages);
 
     size_t free_pages = 0;
-    auto mmap = (stivale_mmap_entry*)stivale_info->memory_map_addr;
-    for (int i = 0; i < stivale_info->memory_map_entries; i++)
+    auto mmap = (stivale_mmap_entry*)s_stivale->memory_map_addr;
+    for (int i = 0; i < s_stivale->memory_map_entries; i++)
     {
         print_mmap_entry(mmap[i]);
 

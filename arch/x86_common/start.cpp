@@ -9,6 +9,7 @@
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 1024*16;
 static uint8_t _INIT setup_stack[SETUP_STACK_SIZE];
+stivale_struct* s_stivale;
 
 _SECTION(".stivalehdr")
 static struct stivale_header stivale_hdr = {
@@ -34,13 +35,14 @@ static void setup_task(void* cmdline) {
   kernel_init((char*)cmdline);
 }
 
-extern void initHeap();
 extern "C" void setup_gdt();
 extern "C" void x86_irq_init();
-extern void create_page_bitmap(struct stivale_struct *stivale_info);
+extern void initHeap();
+extern void create_page_bitmap();
 
-extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
+extern "C" void _NORETURN _start(struct stivale_struct *stivale)
 {
+  s_stivale = stivale;
   debug() << "Hello, world!\n";
 
   /* Load our own Global Descriptor Table */
@@ -50,7 +52,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
 
   /* Create a map of free pages from the stivale
    * memory map. */
-  create_page_bitmap(stivale_info);
+  create_page_bitmap();
 
   /* Load an interrupt descriptor table */
   x86_irq_init();
@@ -63,7 +65,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
   /* Create kernel setup task and enable scheduling */
   sched::init::setup();
   sched::init::insertTask(new KernelTask(
-      setup_task, (void*)stivale_info->cmdline));
+      setup_task, (void*)stivale->cmdline));
   sched::enable();
   sched::yield();
 
