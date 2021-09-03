@@ -35,7 +35,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
   }
   else if (ctx->irq < 48)
   {
-    size_t irq_id = ctx->irq - 48;
+    size_t irq_id = ctx->irq - 32;
     if (irq_id == 0)
     {
       ctx = sched::schedule(ctx);

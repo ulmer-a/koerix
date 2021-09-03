@@ -58,6 +58,9 @@ static inline void initKernelContext(IrqContext* ctx, size_t ip,
   ctx->rdi = arg1;
   ctx->rsi = arg2;
 
+  /* enable interrupts */
+  ctx->rflags = 0x0200;
+
   /* All other registers have been initialized with zeroes
    * before by the Task class constructor */
 }

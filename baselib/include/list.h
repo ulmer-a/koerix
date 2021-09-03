@@ -84,6 +84,7 @@ namespace ktl {
           if (it == m_last)
             m_last = it->prev;
 
+          m_size -= 1;
           delete it;
         }
 

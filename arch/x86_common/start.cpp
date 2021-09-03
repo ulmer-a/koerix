@@ -65,7 +65,6 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
     sched::init::insertTask(new KernelTask(
         setup_task, (void*)stivale_info->cmdline));
     sched::enable();
-    sti();
     sched::yield();
 
     /* This will never be reached */
