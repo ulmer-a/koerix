@@ -6,7 +6,8 @@ void panic(const char* msg);
 
 #define assert(x) if (!(x)) { \
     debug() << "****\n" \
-               "**** in " << __func__ << "() on " << __LINE__ << ":"; \
+               "**** in " << __FILE__ << ": " \
+            << __func__ << "(), line " << __LINE__ << "\n"; \
     panic("assertion failed"); \
 }
 

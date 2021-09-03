@@ -9,8 +9,9 @@ inline void* operator new[] (size_t, void* p) noexcept	{ return p; }
 
 /* heap allocation */
 #ifdef DEBUG
-    #error first implement malloc()!
+  #define kmalloc(n) _kmalloc((n), __LINE__, __func__)
+  void* _kmalloc(size_t n, unsigned line, const char* function);
 #else
-    void* kmalloc(size_t n);
+  void* kmalloc(size_t n);
 #endif
 void kfree(void* ptr);

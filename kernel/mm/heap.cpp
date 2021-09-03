@@ -30,11 +30,11 @@ char* kheap_break_ = (char*)KHEAP_START;
 
 static HeapBlock *heap_start = nullptr;
 static HeapBlock *heap_last = nullptr;
-static Mutex s_heapMutex;
+static Spinlock s_heapMutex;
 
-static void initHeap()
+void initHeap()
 {
-    new (&s_heapMutex) Mutex();
+    new (&s_heapMutex) Spinlock();
 }
 
 void kheap_print()
@@ -58,10 +58,10 @@ void kheap_print()
     else
     {
 #ifdef DEBUG
-      debug(loglevel, "  @ %p: %zu bytes (%s:%u)\n", entry + 1, entry->size,
-            entry->function, entry->line);
+      debug() << "  @ " << (entry + 1) << ": " << entry->size
+              << "B [used " << entry->function << "():" << entry->line << "]\n";
 #else
-        debug() << "  @ " << (entry + 1) << ": " << entry->size << "B [used]\n";
+      debug() << "  @ " << (entry + 1) << ": " << entry->size << "B [used]\n";
 #endif
     }
   }
@@ -154,12 +154,6 @@ void *_kmalloc(size_t size, unsigned line, const char* function)
 void *kmalloc(size_t size)
 #endif
 {
-#ifdef DEBUG
-  debug(KHEAP, "kmalloc(): size %zd from %s():%u\n", size, function, line);
-#endif
-
-  //debug() << "kmalloc(): " << size << "B\n";
-
   s_heapMutex.lock();
 
   HeapBlock *entry;

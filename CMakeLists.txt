@@ -10,6 +10,10 @@ set(TARGET_ARCH "x86_64")
 set(TARGET_PLATFORM "pc")
 set(ARCH_FLAGS -mno-red-zone)
 
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+endif()
+
 message(STATUS "UlmerOS v${CMAKE_PROJECT_VERSION}")
 message(STATUS "Building for ${TARGET_ARCH}-${TARGET_PLATFORM}")
 

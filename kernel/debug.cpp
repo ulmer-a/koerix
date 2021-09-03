@@ -1,101 +1,40 @@
 #include <debug.h>
 #include <string.h>
 #include <platform.h>
+#include <term.h>
+#include <spin.h>
+#include <mm.h>
 
 using namespace debugging;
 
+static Spinlock s_debugLock;
+static bool s_debugInitialized = false;
+
 void panic(const char* message)
 {
-    debug() << "kernel panic: " << message << "\n";
-    for (;;) { hlt(); }
-}
-
-DebugStream::DebugStream()
-    : m_currentMode(DEC)
-{
-    m_buffer[0] = 0;
-    m_destPtr = m_buffer;
+  debug() << "**** kernel panic: " << message << "\n\n\n";
+  for (;;) { hlt(); }
 }
 
 DebugStream::~DebugStream()
 {
-    nprint(m_buffer);
-}
+  if (!s_debugInitialized) {
+    new (&s_debugLock) Spinlock();
+  }
 
-DebugStream& DebugStream::operator<<(const char* str)
-{
-    strcat(m_destPtr, str);
-    m_destPtr += strlen(str);
-    return *this;
-}
+  s_debugLock.lock();
+#ifdef DEBUG
+  /* only print to QEMU debug IO port in debug mode */
+  qemu_print(m_buffer);
+#endif
 
-static char hex_char(size_t nibble)
-{
-  if (nibble > 0xF)
-    return '*';
-  if (nibble >= 0xA)
-    return 'a' + nibble - 0xA;
-  return '0' + nibble;
-}
-
-int DebugStream::getBase()
-{
-    switch (m_currentMode)
-    {
-    case HEX:
-        *m_destPtr++ = '0';
-        *m_destPtr++ = 'x';
-        return 16;
-    case DEC:
-        return 10;
-    }
-}
-
-DebugStream& DebugStream::operator<<(void* p)
-{
-    *m_destPtr++ = '0';
-    *m_destPtr++ = 'x';
-
-    ssize_t ptr_nibbles = sizeof(void*) * 2;
-    const size_t ptr = (size_t)p;
-    while (--ptr_nibbles >= 0)
-    {
-        size_t nibble = (ptr >> (ptr_nibbles * 4)) & 0xf;
-        *m_destPtr++ = hex_char(nibble);
-    }
-    *m_destPtr = 0;
-    return *this;
-}
-
-DebugStream& DebugStream::operator<<(int32_t i)
-{
-    m_destPtr = itoa(i, m_destPtr, getBase());
-    m_destPtr = m_buffer + strlen(m_buffer);
-    return *this;
-}
-
-DebugStream &DebugStream::operator<<(uint32_t i)
-{
-    m_destPtr = utoa(i, m_destPtr, getBase());
-    m_destPtr = m_buffer + strlen(m_buffer);
-    return *this;
-}
-
-DebugStream& DebugStream::operator<<(uint64_t i)
-{
-    /* TODO: will probably cause problems on 32bit archs */
-    return operator<<((size_t)i);
-}
-
-DebugStream& DebugStream::operator<<(size_t i)
-{
-    ultoa(i, m_destPtr, getBase());
-    m_destPtr = m_buffer + strlen(m_buffer);
-    return *this;
-}
-
-DebugStream& DebugStream::operator<<(Modifier modif)
-{
-    m_currentMode = modif;
-    return *this;
+  /* kernel output will always go to the main terminal,
+   * if there is one. */
+  auto mainTerm = Terminal::getMainTerm();
+  if (mainTerm != nullptr)
+  {
+    size_t len = strlen(m_buffer);
+    mainTerm->write(m_buffer, len);
+  }
+  s_debugLock.unlock();
 }

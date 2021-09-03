@@ -49,7 +49,7 @@ cp ${srcdir}/limine.cfg ${sysroot}/boot/limine.cfg
 sudo cp -R ${sysroot}/* ${mount_dir}
 
 sync
-sudo umount /dev/loop99
+sudo umount ${mount_dir}
 sudo losetup -d /dev/loop99
 
 ${limine}/bin/limine-install disk.img

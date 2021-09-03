@@ -34,6 +34,7 @@ static struct stivale_header stivale_hdr = {
     .entry_point = 0
 };
 
+extern void initHeap();
 extern "C" void setup_gdt();
 extern "C" void x86_irq_init();
 extern void create_page_bitmap(struct stivale_struct *stivale_info);
@@ -57,6 +58,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale_info)
     /* Create the kernel virtual memory address space and
      * setup the kernel heap */
     AddrSpace::setup();
+    initHeap();
 
     /* Create kernel setup task and enable scheduling */
     sched::init::setup();

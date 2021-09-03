@@ -25,7 +25,8 @@ namespace sched {
 
   void yield()
   {
-    arch_yield();
+    if (s_schedEnable)
+      arch_yield();
   }
 
   namespace init {
