@@ -1,5 +1,7 @@
 #include <debug.h>
-#include <platform.h>
+#include <term.h>
+#include <dev/devices.h>
+#include <fs/file.h>
 
 void kernel_init(const char* cmdline)
 {
@@ -7,5 +9,12 @@ void kernel_init(const char* cmdline)
    * kernel boot code. page map, virtual memory and kernel heap
    * as well as scheduling are already up and running at this point. */
 
-  init_drivers();
+  dev::setup();
+
+  auto uart0 = (fs::File*)dev::findDevice("uart0");
+  fs::FileDesc serialPort{ *uart0 };
+  auto mainTerm = new Terminal(serialPort);
+  Terminal::setMainTerm(mainTerm);
+
+  debug() << "welcome on uart!\n";
 }

@@ -1,19 +1,26 @@
 #pragma once
 
 #include <types.h>
+#include <fs/fd.h>
 
 class Terminal
 {
   public:
-    Terminal();
-    ~Terminal();
+    Terminal(fs::FileDesc& fd);
+    ~Terminal() = default;
 
     ssize_t read(char* buffer, size_t len);
-    ssize_t write(const char* buffer, size_t len) {
-      return len;
+    ssize_t write(char* buffer, size_t len);
+
+    static inline Terminal* getMainTerm() {
+      return s_mainTerm;
     }
 
-    static Terminal* getMainTerm() {
-      return nullptr;
+    static inline void setMainTerm(Terminal* term) {
+      s_mainTerm = term;
     }
+
+  private:
+    fs::FileDesc m_fd;
+    static Terminal* s_mainTerm;
 };

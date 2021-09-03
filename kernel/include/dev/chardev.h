@@ -1,18 +1,15 @@
 #pragma once
 
 #include <types.h>
+#include <fs/async_file.h>
 
 namespace dev {
 
-  class CharDev
+  class CharDev : public fs::AsyncFile
   {
     public:
       CharDev() = default;
       virtual ~CharDev() = default;
-
-    protected:
-      virtual int ioctrl(size_t cmd, size_t* arg) = 0;
-      virtual ssize_t write(const char* buffer, size_t len) = 0;
   };
 
 }

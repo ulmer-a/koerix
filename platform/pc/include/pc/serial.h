@@ -54,8 +54,10 @@ namespace pc {
       SerialPort(Port port);
       ~SerialPort() = default;
 
-      int ioctrl(size_t cmd, size_t *arg) final;
-      ssize_t write(const char* buffer, size_t len) final;
+      int ioctrl(size_t cmd, size_t *arg);
+      ssize_t write(char* buffer, size_t len) final;
+
+      const char* getName() const final;
 
     private:
       void setIrqMode(bool dataReadyIrq, bool txEmptyIrq);
@@ -63,8 +65,11 @@ namespace pc {
                    StopBitMode stop);
       void setBaudRate(BaudRate baud);
 
+      void handleIrq();
+
       uint16_t m_port;
       size_t m_minor;
+      char m_name[16];
       static size_t s_minorCounter;
   };
 

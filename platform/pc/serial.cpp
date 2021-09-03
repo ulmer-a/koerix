@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <debug.h>
 #include <asm.h>
+#include <string.h>
 
 using namespace pc;
 
@@ -14,6 +15,12 @@ SerialPort::SerialPort(SerialPort::Port port)
 {
   debug() << "init PC serial port #" << m_minor
           << " at port " << DEBUG_HEX << (size_t)port << "\n";
+
+  /* generate device name */
+  m_name[0] = 0;
+  char int_buffer[10];
+  strcpy(m_name, "uart");
+  strcat(m_name, utoa(m_minor, int_buffer, 10));
 
   /* temporarily disable all IRQs */
   setIrqMode(false, false);
@@ -53,7 +60,7 @@ int SerialPort::ioctrl(size_t cmd, size_t* arg)
   return -ENOTSUP;
 }
 
-ssize_t SerialPort::write(const char* buffer, size_t len)
+ssize_t SerialPort::write(char* buffer, size_t len)
 {
   while (len--)
   {
@@ -65,6 +72,11 @@ ssize_t SerialPort::write(const char* buffer, size_t len)
     outb(m_port, *buffer++);
   }
   return len;
+}
+
+const char* SerialPort::getName() const
+{
+  return m_name;
 }
 
 void SerialPort::setIrqMode(bool dataReadyIrq, bool txEmptyIrq)
@@ -100,5 +112,21 @@ void SerialPort::setBaudRate(SerialPort::BaudRate baud)
 
   debug() << "uart" << m_minor << ": baud_rate="
           << (115200 / baud) << "\n";
+}
+
+void SerialPort::handleIrq()
+{
+  char buffer[128];
+  size_t bytes_received = 0;
+  while (inb(m_port + 5) & 1)
+  {
+    if (bytes_received == 128)
+    {
+      onRead(buffer, bytes_received);
+      bytes_received = 0;
+    }
+
+    buffer[bytes_received++] = inb(m_port);
+  }
 }
 

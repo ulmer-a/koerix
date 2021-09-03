@@ -12,6 +12,14 @@ namespace ktl {
           T item;
           ListItem<T>* next;
           ListItem<T>* prev;
+
+          T& operator->() {
+            return item;
+          }
+
+          T& operator*() {
+            return item;
+          }
         };
     }
 
@@ -112,6 +120,14 @@ namespace ktl {
           verify();
           assert(m_last && m_size > 0);
           return m_last->item;
+        }
+
+        _internal::ListItem<T>* begin() {
+          return m_first;
+        }
+
+        _internal::ListItem<T>* end() {
+          return m_last;
         }
 
       private:
