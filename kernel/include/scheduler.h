@@ -9,6 +9,7 @@ namespace sched {
         void insertTask(Task* task);
     }
 
+    bool isEnabled();
     void enable();
     void disable();
 

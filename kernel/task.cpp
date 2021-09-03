@@ -17,16 +17,10 @@ Task::Task(AddrSpace& vspace)
    * point to a location on the top. the derived class is
    * responsible for filling in the struct with data by
    * writing the fields in m_context. */
-  m_kernelStackBase = (uint8_t*)kmalloc(KERNEL_STACK_SIZE);
-  m_kernelStackTop = m_kernelStackBase + KERNEL_STACK_SIZE;
+  m_kernelStack = kmalloc(KERNEL_STACK_SIZE);
+  m_kernelStackTop = (size_t)m_kernelStack.get() + KERNEL_STACK_SIZE;
   m_context = (IrqContext*)m_kernelStackTop - 1;
   memset((void*)m_context, 0, sizeof(IrqContext));
-}
-
-Task::~Task()
-{
-  /* release the kernel stack memory */
-  kfree(m_kernelStackBase);
 }
 
 void Task::exit()
@@ -34,6 +28,23 @@ void Task::exit()
   assert(sched::currentTask() == this);
   m_state = KILLED;
   sched::yield();
+}
+
+void Task::sleep()
+{
+  assert(m_state == RUNNING);
+  assert(sched::currentTask() == this);
+  m_state = SLEEPING;
+
+  if (sched::isEnabled())
+    sched::yield();
+}
+
+void Task::resume()
+{
+  assert(m_state == SLEEPING);
+  assert(sched::currentTask() != this);
+  m_state = RUNNING;
 }
 
 bool Task::schedulable()

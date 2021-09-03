@@ -1,7 +1,7 @@
 #pragma once
 
 #include <types.h>
-#include <sanity.h>
+#include <canary.h>
 
 namespace ktl {
 
@@ -16,7 +16,7 @@ namespace ktl {
     }
 
     template<typename T>
-    class List : public SanityCheckObj
+    class List : public Canary
     {
       public:
         List() = default;
@@ -98,6 +98,14 @@ namespace ktl {
           verify();
           assert(m_first && m_size > 0);
           return m_first->item;
+        }
+
+        T pop_front() {
+          verify();
+          assert(m_first && m_size > 0);
+          T item = m_first->item;
+          remove(m_first);
+          return item;
         }
 
         T back() {

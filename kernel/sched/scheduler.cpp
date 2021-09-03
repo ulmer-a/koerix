@@ -114,4 +114,9 @@ namespace sched {
     return s_currentTask;
   }
 
+  bool isEnabled()
+  {
+    return s_schedEnable;
+  }
+
 }
