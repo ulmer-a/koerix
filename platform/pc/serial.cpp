@@ -92,7 +92,7 @@ void SerialPort::setIrqMode(bool dataReadyIrq, bool txEmptyIrq)
   uint8_t ier = 0x00;
   if (dataReadyIrq) ier |= 0x01;
   if (txEmptyIrq)   ier |= 0x02;
-  outb(m_port, ier);
+  outb(m_port + 0x01, ier);
 }
 
 void SerialPort::setMode(SerialPort::BitMode bit,
@@ -123,17 +123,13 @@ void SerialPort::setBaudRate(SerialPort::BaudRate baud)
 
 void SerialPort::handleIrq()
 {
-  char buffer[128];
+  /* read 32 bytes from the serial's FIFO. if there's
+   * more than that in the FIFO, we get another interrupt
+   * right away and start over again. */
+  char buffer[32];
   size_t bytes_received = 0;
-  while (inb(m_port + 5) & 1)
-  {
-    if (bytes_received == 128)
-    {
-      onRead(buffer, bytes_received);
-      bytes_received = 0;
-    }
-
+  while ((inb(m_port + 5) & 1) && bytes_received < 32)
     buffer[bytes_received++] = inb(m_port);
-  }
+  onRead(buffer, bytes_received);
 }
 
