@@ -21,8 +21,6 @@ int DebugStream::getBase()
     switch (m_currentMode)
     {
     case HEX:
-        *m_destPtr++ = '0';
-        *m_destPtr++ = 'x';
         return 16;
     case DEC:
         return 10;
@@ -38,6 +36,15 @@ static char hex_char(size_t nibble)
   return '0' + nibble;
 }
 
+void DebugStream::basePrefix()
+{
+  if (getBase() == 16)
+  {
+    *m_destPtr++ = '0';
+    *m_destPtr++ = 'x';
+  }
+}
+
 DebugStream& DebugStream::operator<<(const char* str)
 {
     strcat(m_destPtr, str);
@@ -47,9 +54,10 @@ DebugStream& DebugStream::operator<<(const char* str)
 
 DebugStream& DebugStream::operator<<(size_t i)
 {
-    ultoa(i, m_destPtr, getBase());
-    m_destPtr = m_buffer + strlen(m_buffer);
-    return *this;
+  basePrefix();
+  ultoa(i, m_destPtr, getBase());
+  m_destPtr = m_buffer + strlen(m_buffer);
+  return *this;
 }
 
 DebugStream& DebugStream::operator<<(void* p)
@@ -70,20 +78,22 @@ DebugStream& DebugStream::operator<<(void* p)
 
 DebugStream& DebugStream::operator<<(int32_t i)
 {
-    m_destPtr = itoa(i, m_destPtr, getBase());
-    m_destPtr = m_buffer + strlen(m_buffer);
-    return *this;
+  basePrefix();
+  m_destPtr = itoa(i, m_destPtr, getBase());
+  m_destPtr = m_buffer + strlen(m_buffer);
+  return *this;
 }
 
 DebugStream &DebugStream::operator<<(uint32_t i)
 {
-    m_destPtr = utoa(i, m_destPtr, getBase());
-    m_destPtr = m_buffer + strlen(m_buffer);
-    return *this;
+  basePrefix();
+  m_destPtr = utoa(i, m_destPtr, getBase());
+  m_destPtr = m_buffer + strlen(m_buffer);
+  return *this;
 }
 
 DebugStream& DebugStream::operator<<(uint64_t i)
 {
-    /* TODO: will probably cause problems on 32bit archs */
-    return operator<<((size_t)i);
+  /* TODO: will probably cause problems on 32bit archs */
+  return operator<<((size_t)i);
 }

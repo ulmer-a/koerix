@@ -39,6 +39,7 @@ namespace debugging {
 
       private:
         int getBase();
+        void basePrefix();
 
         char *m_destPtr;
         Modifier m_currentMode;
