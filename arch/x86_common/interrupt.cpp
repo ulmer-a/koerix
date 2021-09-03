@@ -15,6 +15,8 @@ namespace sched {
   IrqContext* schedule(IrqContext* ctx);
 }
 
+extern void handle_irq(size_t id);
+
 extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
 {
   if (ctx->irq < 32)
@@ -38,6 +40,8 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     {
       ctx = sched::schedule(ctx);
     }
+
+    handle_irq(irq_id);
 
     if (irq_id >= 8)
       outb(0xa0, 0x20);

@@ -59,13 +59,13 @@ namespace pc {
 
       const char* getName() const final;
 
+      void handleIrq();
+
     private:
       void setIrqMode(bool dataReadyIrq, bool txEmptyIrq);
       void setMode(BitMode bit, ParityMode parity,
                    StopBitMode stop);
       void setBaudRate(BaudRate baud);
-
-      void handleIrq();
 
       uint16_t m_port;
       size_t m_minor;

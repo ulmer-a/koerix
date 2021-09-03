@@ -4,10 +4,16 @@
 #include <debug.h>
 #include <asm.h>
 #include <string.h>
+#include <interrupt.h>
 
 using namespace pc;
 
 size_t SerialPort::s_minorCounter = 0;
+
+static void irq_handler(SerialPort* this_ptr)
+{
+  this_ptr->handleIrq();
+}
 
 SerialPort::SerialPort(SerialPort::Port port)
   : m_port(port)
@@ -37,7 +43,8 @@ SerialPort::SerialPort(SerialPort::Port port)
   outb(m_port + 0x04, 0b00001111);
 
   /* enable interrupts */
-  //setIrqMode(true, false);
+  registerIrq(port == COM1 ? 4 : 5, (void*)irq_handler, (void*)this);
+  setIrqMode(true, false);
 }
 
 int SerialPort::ioctrl(size_t cmd, size_t* arg)
@@ -81,7 +88,7 @@ const char* SerialPort::getName() const
 
 void SerialPort::setIrqMode(bool dataReadyIrq, bool txEmptyIrq)
 {
-  /* Write to the Interrupt Enable Register (IER)*/
+  /* Write to the Interrupt Enable Register (IER) */
   uint8_t ier = 0x00;
   if (dataReadyIrq) ier |= 0x01;
   if (txEmptyIrq)   ier |= 0x02;
