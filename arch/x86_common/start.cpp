@@ -6,11 +6,6 @@
 #include <x86/stivale.h>
 #include <kernel_task.h>
 
-static void setup_task()
-{
-
-}
-
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 1024*16;
 static uint8_t _INIT setup_stack[SETUP_STACK_SIZE];
@@ -33,6 +28,11 @@ static struct stivale_header stivale_hdr = {
     // entry point as in the corresponding ELF field
     .entry_point = 0
 };
+
+extern void kernel_init();
+static void setup_task() {
+  kernel_init();
+}
 
 extern void initHeap();
 extern "C" void setup_gdt();
