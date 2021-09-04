@@ -59,8 +59,11 @@ void Mutex::unlock()
   /* wakeup some task from the list of waiting
    * tasks so that they can go for the lock again. */
   m_waitingTasksLock.lock();
-  auto task = m_waitingTasks.pop_front();
-  task->resume();
+  if (m_waitingTasks.size() > 0)
+  {
+    auto task = m_waitingTasks.pop_front();
+    task->resume();
+  }
   m_waitingTasksLock.unlock();
 }
 

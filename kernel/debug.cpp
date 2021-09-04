@@ -12,6 +12,7 @@ static bool s_debugInitialized = false;
 
 void panic(const char* message)
 {
+  cli();
   debug() << "**** kernel panic: " << message << "\n\n\n";
   for (;;) { hlt(); }
 }

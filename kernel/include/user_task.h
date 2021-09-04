@@ -15,6 +15,7 @@ class UserTask : public Task
     void initContext(size_t entryPoint);
 
     bool isUserTask() const final { return true; }
+    UserProcess& getProcess() const { return m_process; }
 
   private:
     UserProcess& m_process;

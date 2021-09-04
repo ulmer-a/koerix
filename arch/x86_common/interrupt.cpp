@@ -3,6 +3,9 @@
 #include <context.h>
 #include <platform.h>
 #include <arch/asm.h>
+#include <page_fault.h>
+#include <string.h>
+#include <arch/asm.h>
 
 static void* getPageFaultAddr()
 {
@@ -27,10 +30,26 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     }
     else
     {
-      debug() << "exception! (#" << ctx->irq << ")!\n";
-      debug() << "code location: " << (void*)ctx->rip << ", error=" << ctx->error << "\n";
-      debug() << "fault addr: " << getPageFaultAddr() << "\n";
-      for (;;) { hlt(); }
+      if (ctx->irq == 14)
+      {
+        sti();
+        void* addr = getPageFaultAddr();
+        if (handlePageFault((size_t)getPageFaultAddr(), (FaultFlags)ctx->error)) {
+          cli();
+          return ctx;
+        }
+
+        debug() << "unhandled page fault @ " << addr << "\n";
+        debug() << "present=" << (ctx->error & PF_PRESENT ? "y" : "n")
+                << ", user=" << (ctx->error & PF_USER ? "y" : "n")
+                << ", write=" << (ctx->error & PF_WRITE ? "y" : "n")
+                << ", reserved=" << (ctx->error & PF_RESERVED ? "y" : "n")
+                << ", data=" << (ctx->error & PF_CODE ? "n" : "y") << "\n";
+      }
+
+      debug() << "(!!) exception #" << ctx->irq << " (" << strexcept(ctx->irq) << ")\n";
+      debug() << DEBUG_HEX << "rip=" << ctx->rip << ", rsp=" << ctx->rsp << "err=" << ctx->error << "\n";
+      panic("unhandled exception");
     }
   }
   else if (ctx->irq < 48)

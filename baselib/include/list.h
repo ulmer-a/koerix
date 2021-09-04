@@ -111,7 +111,8 @@ namespace ktl {
 
         T pop_front() {
           verify();
-          assert(m_first && m_size > 0);
+          if (!m_first || m_size == 0)
+            assert(false);
           T item = m_first->item;
           remove(m_first);
           return item;

@@ -2,7 +2,7 @@
 
 #include <types.h>
 
-void panic(const char* msg);
+void _NORETURN panic(const char* msg);
 
 #ifdef DEBUG
 #define assert(x) if (!(x)) { \
