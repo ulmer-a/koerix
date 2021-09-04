@@ -1,0 +1,67 @@
+#! /bin/bash
+
+BINDIR=$1
+SRCDIR=$2
+TARGET_DISK=$3
+
+# Build limine bootloader
+LIMINE_PATH=${SRCDIR}/platform/pc/limine
+LIMINE_BIN=${LIMINE_PATH}/bin
+echo "Building limine bootloader (${LIMINE_PATH})"
+cwd="$(pwd)"
+cd ${LIMINE_PATH}
+make -j > ${BINDIR}/limine_build.log 2>&1
+if [ ! $? -eq 0 ]; then
+
+    cat ${BINDIR}/limine_build.log
+    exit 1
+fi
+cd "$cwd"
+
+# Assemble root filesystem
+SYSROOT=${BINDIR}/rootfs
+echo "Assembling root filesystem (${SYSROOT})"
+mkdir -p ${SYSROOT}/boot
+cp -r ${SRCDIR}/skel/** ${SYSROOT}
+cp -r ${SRCDIR}/platform/pc/skel/** ${SYSROOT}
+cp ${LIMINE_BIN}/limine.sys ${SYSROOT}/boot/limine.sys
+cp ${BINDIR}/vmkoerix ${SYSROOT}/boot/vmkoerix
+
+rm ${TARGET_DISK}
+if [ ! -f ${TARGET_DISK} ]; then
+    echo "Creating disk image ${TARGET_DISK}"
+    dd if=/dev/zero of=${TARGET_DISK} bs=4096 count=5120
+fi
+
+# generate msdos partition table and
+# ext2 partition starting on sector 2048
+echo "creating ext2 partition on ${TARGET_DISK}"
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${TARGET_DISK}
+  o # clear the in memory partition table
+  n # new partition
+  p # primary partition
+  1 # partition number 1
+    # default - start at beginning of disk 
+    # default - use entire disk
+  a # make the partition bootable
+  p # print the in-memory partition table
+  w # write the partition table
+  q # and we're done
+EOF
+
+echo "setup loopback device for ext2 partition and format"
+sudo losetup /dev/loop99 ${TARGET_DISK} -o 1048576
+sudo mkfs.ext2 /dev/loop99
+
+echo "mount and copy rootfs"
+mkdir -p ${BINDIR}/mnt
+sudo mount /dev/loop99 ${BINDIR}/mnt
+sudo cp -r ${SYSROOT}/** ${BINDIR}/mnt
+ls ${BINDIR}/mnt/**
+sync
+sudo umount /dev/loop99
+rm -r ${BINDIR}/mnt
+sudo losetup -d /dev/loop99
+
+echo "install limine bootloader"
+${LIMINE_BIN}/limine-install ${TARGET_DISK}
