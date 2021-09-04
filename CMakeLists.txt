@@ -17,6 +17,9 @@ endif()
 message(STATUS "UlmerOS v${CMAKE_PROJECT_VERSION}")
 message(STATUS "Building for ${TARGET_ARCH}-${TARGET_PLATFORM}")
 
+add_subdirectory(libc)
+add_subdirectory(libkoerix)
+
 set(CMAKE_C_FLAGS "--target=${TARGET_ARCH}-none-eabi \
     -ffreestanding -fno-rtti -fno-exceptions -fPIC \
     -nostdlib -nostdinc -fno-stack-protector \
