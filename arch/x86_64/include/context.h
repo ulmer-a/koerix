@@ -35,14 +35,14 @@ static inline void setInstructionPointer(IrqContext* ctx, size_t ip)
   ctx->rip = ip;
 }
 
-static inline void initKernelContext(IrqContext* ctx, size_t ip,
-                size_t kernel_sp, size_t arg1, size_t arg2)
+static inline void initArchContext(IrqContext* ctx, size_t ip,
+                size_t sp, size_t arg1, size_t arg2)
 {
   /* The instruction pointer is initialized with the entry
    * address, the stack pointer with the top of the kernel
    * stack. */
   ctx->rip = ip;
-  ctx->rsp = kernel_sp;
+  ctx->rsp = sp;
 
   /* Code and data segment selectors. The GDT is setup
    * in a way so that 0x08 will always point to a descriptor

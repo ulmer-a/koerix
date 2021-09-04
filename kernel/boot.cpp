@@ -3,6 +3,9 @@
 #include <dev/devices.h>
 #include <fs/file.h>
 #include <module.h>
+#include <shared_ptr.h>
+#include <loader.h>
+#include <user_proc.h>
 
 void kernel_init(const char* cmdline)
 {
@@ -21,4 +24,7 @@ void kernel_init(const char* cmdline)
 
   void* init_bin = find_module("init.elf");
   assert(init_bin != nullptr);
+  auto loader = ktl::shared_ptr<Loader>(
+        new Loader(init_bin));
+  new UserProcess(loader);
 }

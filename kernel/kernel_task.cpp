@@ -7,8 +7,8 @@ static void ktask_runtime(KernelTask* task, void(*func)(void*))
 {
   debug() << "kernel task #" << task->tid() << " started executing\n";
   func(task->arg());
-  task->exit();
   debug() << "kernel task #" << task->tid() << " terminated\n";
+  task->exit();
 }
 
 KernelTask::KernelTask(void(*entry)(void* arg), void* arg)
@@ -16,9 +16,7 @@ KernelTask::KernelTask(void(*entry)(void* arg), void* arg)
   , m_argument(arg)
 {
   auto ctx = context();
-  setInstructionPointer(ctx, (size_t)ktask_runtime);
-
-  initKernelContext(ctx,
+  initArchContext(ctx,
     (size_t)ktask_runtime,  // entry point
     kernelStackPtr(),       // stack pointer
     (size_t)this,           // first argument

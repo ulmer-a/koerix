@@ -59,6 +59,7 @@ sudo mount /dev/loop99 ${BINDIR}/mnt
 sudo cp -r ${SYSROOT}/** ${BINDIR}/mnt
 ls ${BINDIR}/mnt/**
 sync
+sleep 1
 sudo umount /dev/loop99
 rm -r ${BINDIR}/mnt
 sudo losetup -d /dev/loop99

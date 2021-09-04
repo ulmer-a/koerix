@@ -4,12 +4,18 @@
 
 void panic(const char* msg);
 
+#ifdef DEBUG
 #define assert(x) if (!(x)) { \
     debug() << "****\n" \
                "**** in " << __FILE__ << ": " \
             << __func__ << "(), line " << __LINE__ << "\n"; \
     panic("assertion failed"); \
 }
+#define assert_verify(x) assert(x)
+#else
+#define assert(x)
+#define assert_verify(x) (x)
+#endif
 
 #define DEBUG_HEX debugging::DebugStream::HEX
 #define DEBUG_DEC debugging::DebugStream::HEX

@@ -8,7 +8,7 @@ class KernelTask : public Task
     KernelTask(void(*entry)(void*), void* arg = nullptr);
     ~KernelTask() = default;
 
-    bool isUserTask() const { return false; }
+    bool isUserTask() const final { return false; }
     void* arg() const { return m_argument; }
 
   private:
