@@ -35,8 +35,8 @@ static inline void setInstructionPointer(IrqContext* ctx, size_t ip)
   ctx->rip = ip;
 }
 
-static inline void initArchContext(IrqContext* ctx, size_t ip,
-                size_t sp, size_t arg1, size_t arg2)
+static inline void initArchContext(IrqContext* ctx, bool userMode,
+                size_t ip, size_t sp, size_t arg1, size_t arg2)
 {
   /* The instruction pointer is initialized with the entry
    * address, the stack pointer with the top of the kernel
@@ -47,11 +47,18 @@ static inline void initArchContext(IrqContext* ctx, size_t ip,
   /* Code and data segment selectors. The GDT is setup
    * in a way so that 0x08 will always point to a descriptor
    * for kernel code and 0x10 will always point to one
-   * for kernel data. */
-  ctx->cs = 0x08;
-  ctx->ss = 0x10;
-  ctx->fs = 0x10;
-  ctx->gs = 0x10;
+   * for kernel data. see gdt.c */
+  if (userMode) {
+    ctx->cs = 0x1b;
+    ctx->ss = 0x23;
+    ctx->fs = 0x23;
+    ctx->gs = 0x23;
+  } else {
+    ctx->cs = 0x08;
+    ctx->ss = 0x10;
+    ctx->fs = 0x10;
+    ctx->gs = 0x10;
+  }
 
   /* Arguments: Calling convention implies that argument 1 and
    * two must be located in %rdi, %rsi registers. */

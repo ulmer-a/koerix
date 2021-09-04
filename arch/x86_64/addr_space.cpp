@@ -24,6 +24,7 @@ struct GenericPagingTable
 } _PACKED;
 
 AddrSpace s_kernelAddrSpace;
+bool s_initialized = false;
 
 AddrSpace::AddrSpace()
 {
@@ -31,7 +32,7 @@ AddrSpace::AddrSpace()
      * a fresh Page Map Level 4 */
     m_pml4 = PageMap::get().alloc();
 
-    // TODO: copy kernel mappings in here
+    updateKernelMappings();
 }
 
 void AddrSpace::setup()
@@ -55,6 +56,7 @@ void AddrSpace::setup()
 
     /* Switch to the newly created address space. */
     kernelSpace->apply();
+    s_initialized = true;
     debug() << "successfully written %cr3\n";
 }
 
@@ -138,5 +140,19 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
 
 void AddrSpace::unmap(size_t virt)
 {
-    assert(false);
+  assert(false);
+}
+
+void AddrSpace::updateKernelMappings()
+{
+  if (!s_initialized)
+    return;
+
+  /* copy upper half of PML4 entries from the kernel's address space
+   * over to this address space. */
+  auto kernelVspace = kernel();
+  auto my_upper_pml4 = (GenericPagingTable*)PPN_TO_VIRT(m_pml4) + 256;
+  auto kernel_upper_pml4 =
+      (GenericPagingTable*)PPN_TO_VIRT(kernelVspace.m_pml4) + 256;
+  memcpy((void*)my_upper_pml4, (void*)kernel_upper_pml4, PAGE_SIZE / 2);
 }

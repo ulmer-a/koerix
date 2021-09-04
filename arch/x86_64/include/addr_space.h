@@ -28,5 +28,7 @@ class AddrSpace
     void unmap(size_t virt);
 
   private:
+    void updateKernelMappings();
+
     size_t m_pml4;
 };

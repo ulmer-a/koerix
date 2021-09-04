@@ -16,7 +16,7 @@ KernelTask::KernelTask(void(*entry)(void* arg), void* arg)
   , m_argument(arg)
 {
   auto ctx = context();
-  initArchContext(ctx,
+  initArchContext(ctx, false,
     (size_t)ktask_runtime,  // entry point
     kernelStackPtr(),       // stack pointer
     (size_t)this,           // first argument

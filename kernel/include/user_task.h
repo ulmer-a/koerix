@@ -9,9 +9,10 @@ class UserTask : public Task
 {
   public:
     UserTask(UserProcess& process);
+    UserTask(UserProcess& process, void* entry);
     ~UserTask() = default;
 
-    void initContext();
+    void initContext(size_t entryPoint);
 
     bool isUserTask() const final { return true; }
 

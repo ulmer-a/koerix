@@ -10,10 +10,10 @@
  * Usable segment selector values
  *  0x08 -> Kernel code segment
  *  0x10 -> Kernel data segment
- *  0x18 -> Long mode user code segment
- *  0x20 -> Long mode user data segment
- *  0x28 -> Compatibility mode user code segment
- *  0x30 -> Compatibility mode user data segment
+ *  0x1b -> Long mode user code segment
+ *  0x23 -> Long mode user data segment
+ *  0x2b -> Compatibility mode user code segment
+ *  0x33 -> Compatibility mode user data segment
  */
 
 #include <types.h>
