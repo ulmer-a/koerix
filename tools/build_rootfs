@@ -1,0 +1,9 @@
+#! /bin/bash
+
+SYSDIR=$1
+SRCDIR=$2
+PLATFORM=$3
+
+cp -r ${SRCDIR}/skel/* ${SYSDIR}/
+cp -r ${SRCDIR}/platform/${PLATFORM}/skel/* ${SYSDIR}/
+
