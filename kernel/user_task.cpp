@@ -25,7 +25,7 @@ void UserTask::initContext(size_t entryPoint)
 {
   /* User stack pointer: subtract a pointer size to
    * make it unambigously identifyable as a stack address */
-  auto userStackPtr = IDENT_OFFSET - sizeof(size_t);
+  auto userStackPtr = USER_BREAK - sizeof(size_t);
 
   auto ctx = context();
   initArchContext(ctx, true,

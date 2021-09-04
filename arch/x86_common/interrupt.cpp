@@ -48,7 +48,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
       }
 
       debug() << "(!!) exception #" << ctx->irq << " (" << strexcept(ctx->irq) << ")\n";
-      debug() << DEBUG_HEX << "rip=" << ctx->rip << ", rsp=" << ctx->rsp << "err=" << ctx->error << "\n";
+      debug() << DEBUG_HEX << "rip=" << ctx->rip << ", rsp=" << ctx->rsp << ", err=" << ctx->error << "\n";
       panic("unhandled exception");
     }
   }

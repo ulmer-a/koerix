@@ -32,8 +32,7 @@ bool handlePageFault(size_t addr, FaultFlags flags)
 
   if (!checkIfValid(addr, flags))
   {
-    panic("PF: cannot recover yet from user page fault");
-    // return false;
+    return false;
   }
 
   // 1. check if COW fault?

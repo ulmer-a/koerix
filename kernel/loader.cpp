@@ -44,18 +44,19 @@ bool Loader::load(size_t addr, AddrSpace& vspace) const
 
     size_t length = PAGE_SIZE;
     size_t page_start_addr = addr & ~0xfff;
-    void* destAddr = (void*)page_start_addr;
+    size_t destAddr = page_start_addr;
     if (phtEntry.p_vaddr > (size_t)destAddr)
     {
-      destAddr = (void*)phtEntry.p_vaddr;
+      destAddr = phtEntry.p_vaddr;
       length = PAGE_SIZE - (phtEntry.p_vaddr - page_start_addr);
     }
 
     size_t file_offset = phtEntry.p_offset
         + ((size_t)destAddr - phtEntry.p_vaddr);
 
-    memcpy(destAddr, (void*)((char*)m_elfBinary + file_offset),
-      PAGE_SIZE - length);
+    size_t destOffset = destAddr & 0xfff;
+    memcpy((void*)(data + destOffset),
+      (void*)((char*)m_elfBinary + file_offset), length);
 
     int flags = AddrSpace::MAP_USER;
     if ((phtEntry.flags & BIT(0)) == 0) flags |= AddrSpace::MAP_NOEXEC;
