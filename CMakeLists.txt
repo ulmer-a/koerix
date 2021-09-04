@@ -70,10 +70,11 @@ add_custom_target(vmkoerix ALL
     DEPENDS kernel arch platform baselib
 )
 
-add_custom_target(diskimage ALL
+add_custom_target(disk
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/platform/pc/build_diskimage
         ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_BINARY_DIR}/disk.img
+    BYPRODUCTS ${CMAKE_BINARY_DIR}/disk.img
     DEPENDS vmkoerix
 )
 
