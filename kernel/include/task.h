@@ -22,7 +22,7 @@ class Task
 
     /* exit will kill the task. this is possible only
      * from within the task itself. */
-    void exit();
+    virtual void exit();
 
     /* go to sleep. this can only be called from within
      * the task itself for now. */

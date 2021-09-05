@@ -8,7 +8,7 @@ static const char *exceptions[] = {
   "Overflow",
   "Bounds check",
   "Invalid opcode",
-  "Device not available",
+  "FPU/SSE register requested",
   "Double fault",
   "Coprocessor segment overrun",
   "Invalid TSS",

@@ -6,6 +6,8 @@
 #include <mm.h>
 #include <kernel_task.h>
 #include <addr_space.h>
+#include <features.h>
+#include <user_task.h>
 
 static bool s_schedEnable = false;
 static ktl::List<Task*> s_taskList;
@@ -94,6 +96,7 @@ namespace sched {
         nextTask->addrSpace().apply();
       }
 
+      resetFpuFlag();
       setKernelStackPtr(nextTask->kernelStackPtr());
 
       s_currentTask = nextTask;
@@ -118,6 +121,12 @@ namespace sched {
   bool isEnabled()
   {
     return s_schedEnable;
+  }
+
+  UserTask* currentUserTask()
+  {
+    assert(s_currentTask->isUserTask());
+    return (UserTask*)s_currentTask;
   }
 
 }

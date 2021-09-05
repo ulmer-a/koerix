@@ -28,6 +28,10 @@ namespace ktl {
         return *this;
       }
 
+      bool operator==(T* ptr) {
+        return ptr == m_ptr;
+      }
+
       T& operator*() {
         return *m_ptr;
       }

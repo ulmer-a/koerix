@@ -6,6 +6,12 @@
 #include <page_fault.h>
 #include <string.h>
 #include <arch/asm.h>
+#include <scheduler.h>
+#include <user_task.h>
+#include <x86/fpu.h>
+
+#define EXC_FPU_SSE     7
+#define EXC_PAGEFAULT   14
 
 static void* getPageFaultAddr()
 {
@@ -30,12 +36,16 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     }
     else
     {
-      if (ctx->irq == 14)
+      if (ctx->irq == EXC_FPU_SSE)
+      {
+        fpuFault();
+        return ctx;
+      }
+      else if (ctx->irq == EXC_PAGEFAULT)
       {
         sti();
         void* addr = getPageFaultAddr();
         if (handlePageFault((size_t)getPageFaultAddr(), (FaultFlags)ctx->error)) {
-          cli();
           return ctx;
         }
 

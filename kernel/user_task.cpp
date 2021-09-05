@@ -5,11 +5,13 @@
 #include <user_proc.h>
 #include <loader.h>
 #include <scheduler.h>
+#include <fpu.h>
 
 UserTask::UserTask(UserProcess& process)
   : Task(process.getAddrSpace())
   , m_stack(process.allocStack())
   , m_process(process)
+  , m_fpuContext(new FpuContext())
 {
   initContext(m_process.getLoader().getEntryPoint());
   sched::insertTask(this);
@@ -30,4 +32,10 @@ void UserTask::initContext(size_t entryPoint)
   );
 
   debug() << "created new user task with TID " << tid() << "\n";
+}
+
+void UserTask::exit()
+{
+  fpuClear();
+  Task::exit();
 }

@@ -6,6 +6,7 @@
 class Loader;
 class UserProcess;
 class UserStack;
+class FpuContext;
 
 class UserTask : public Task
 {
@@ -15,10 +16,23 @@ class UserTask : public Task
 
     void initContext(size_t entryPoint);
 
-    bool isUserTask() const final { return true; }
-    UserProcess& getProcess() const { return m_process; }
+    void exit() override;
+
+    bool isUserTask() const final {
+      return true;
+    }
+
+    inline UserProcess& getProcess() const {
+      return m_process;
+    }
+
+    inline FpuContext& getFpuContext() {
+      return *m_fpuContext;
+    }
 
   private:
     UserProcess& m_process;
     UserStack m_stack;
+
+    ktl::unique_ptr<FpuContext> m_fpuContext;
 };

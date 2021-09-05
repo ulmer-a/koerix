@@ -34,6 +34,7 @@ save_context:
 
     mov %rsp, %rdi
     call x86_irq_handler
+    cli
     mov %rax, %rsp
 
     pop %r15

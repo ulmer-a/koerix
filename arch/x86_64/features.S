@@ -24,7 +24,7 @@ sse_enable:
     mov %cr0, %rax
     btsq $1, %rax   // set monitor co-processor
     btrq $2, %rax   // clear emulation
-    btrq $3, %rax   // clear TS
+    btsq $3, %rax   // set TS
     btsq $5, %rax   // set native exception
     mov %rax, %cr0
     mov %cr4, %rax
@@ -32,6 +32,20 @@ sse_enable:
     btsq $10, %rax  // enable SSE exception
     mov %rax, %cr4
     mov $1, %rax
+    ret
+
+.global resetFpuFlag
+resetFpuFlag:
+    mov %cr0, %rax
+    btsq $3, %rax
+    mov %rax, %cr0
+    ret
+
+.global enableFpuCalls
+enableFpuCalls:
+    mov %cr0, %rax
+    btrq $3, %rax
+    mov %rax, %cr0
     ret
 
 .global avx_enable

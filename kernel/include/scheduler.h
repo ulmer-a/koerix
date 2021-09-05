@@ -1,6 +1,7 @@
 #pragma once
 
 class Task;
+class UserTask;
 
 namespace sched {
 
@@ -16,6 +17,7 @@ namespace sched {
     void yield();
 
     Task* currentTask();
+    UserTask* currentUserTask();
     void insertTask(Task* task);
 
 }
