@@ -30,7 +30,7 @@ void do_syscall(struct IrqContext* ctx)
   /* actually perform the call with the arguments from
    * the interrupt context structure */
   ctx->rax = syscall(
-    ctx->r8,  ctx->r9,  ctx->r10,
-    ctx->r11, ctx->r12, ctx->r13
+    ctx->rdi, ctx->rsi, ctx->rdx,
+    ctx->rcx, ctx->r8,  ctx->r9
   );
 }
