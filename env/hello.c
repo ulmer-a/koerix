@@ -7,7 +7,17 @@
    cp hello_world ../skel/bin/hello_world
 */
 
+void exit(int status) {
+    __asm__ volatile (
+        "mov $0, %%rax;" // system call exit
+        "mov %0, %%rbx;" // parameter status
+        "int $0x80;"     // do system call
+        :                // no output parameters
+        : "g"(status)    // input parameter status
+    );
+}
+
 void _start()
 {
-    __asm__ volatile ( "int $0x80;"); /* system call to kernel to avoid crash */
+    exit(0xbadbeef); /* system call to kernel to avoid crash */
 }
