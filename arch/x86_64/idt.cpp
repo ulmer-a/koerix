@@ -133,7 +133,7 @@ static void setup_idt()
   install_descriptor(47, &irq47, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
 
   /* setup a call gate for the system call handler (int $0x80) */
-  //install_descriptor(0x80, &irq_syscall, IDT_PRESENT | IDT_USER | IDT_GATE, 0);
+  install_descriptor(0x80, &irq_syscall, IDT_PRESENT | IDT_USER | IDT_GATE, 0);
 
   // tell the processor where the IDT is located
   IdtSelector idtSelector;
