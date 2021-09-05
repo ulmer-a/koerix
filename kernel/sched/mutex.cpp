@@ -54,6 +54,7 @@ void Mutex::unlock()
   assert(m_heldBy == sched::currentTask());
 
   /* unlock */
+  m_heldBy = nullptr;
   m_lock = 0;
 
   /* wakeup some task from the list of waiting

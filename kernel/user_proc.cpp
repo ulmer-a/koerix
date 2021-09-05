@@ -1,13 +1,15 @@
 #include <user_proc.h>
-#include <addr_space.h>
 #include <loader.h>
 #include <scheduler.h>
 #include <user_task.h>
+#include <proc_list.h>
 
 UserProcess::UserProcess(ktl::shared_ptr<Loader>& loader)
   : m_addrSpace(new AddrSpace())
   , m_loader(loader)
 {
+  ProcList::get().onAddProcess(this);
+
   assert(m_loader->isValidBinary());
 
   addTask();
@@ -65,6 +67,9 @@ void UserProcess::checkForDeadTasks()
     {
       assert(userTask != sched::currentTask());
 
+      delete userTask;
+      debug() << "tid " << userTask->tid() << ": deleted\n";
+
       auto prev = it->prev;
       m_taskList.remove(it);
       it = prev;
@@ -73,10 +78,11 @@ void UserProcess::checkForDeadTasks()
         if (it == nullptr)
           break;
       }
-
-      delete userTask;
     }
   }
+
+  if (m_taskList.size() == 0)
+    m_state = TO_BE_DELETED;
 }
 
 void UserProcess::addTask()
@@ -132,4 +138,19 @@ void UserProcess::releaseStack(UserStack stack)
     m_stackList.pop_back();
   else
     m_stackList[i] = false;
+}
+
+UserProcess::ProcState UserProcess::state() const
+{
+  return m_state;
+}
+
+AddrSpace& UserProcess::getAddrSpace()
+{
+  return *m_addrSpace;
+}
+
+const Loader& UserProcess::getLoader()
+{
+  return *m_loader;
 }

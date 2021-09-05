@@ -4,9 +4,9 @@
 #include <unique_ptr.h>
 #include <vector.h>
 #include <mutex.h>
+#include <addr_space.h>
 
 class Loader;
-class AddrSpace;
 class UserTask;
 class UserStack;
 
@@ -18,25 +18,21 @@ class UserProcess
     enum ProcState
     {
       RUNNING,
-      KILLED
+      KILLED,
+      TO_BE_DELETED
     };
 
     UserProcess(ktl::shared_ptr<Loader>& loader);
     ~UserProcess() = default;
 
-    inline AddrSpace& getAddrSpace() {
-      return *m_addrSpace;
-    }
-
-    inline const Loader& getLoader() {
-      return *m_loader;
-    }
-
+    ProcState state() const;
     bool isOwnProcess() const;
+    AddrSpace& getAddrSpace();
+    const Loader& getLoader();
     bool isValidStackAddr(size_t addr) const;
-    void exit(int status);
-
     void checkForDeadTasks();
+
+    void exit(int status);
 
   protected: /* UserTask can access  */
     UserStack allocStack();
@@ -46,7 +42,6 @@ class UserProcess
     void addTask();
     void killAllTasks();
 
-  private:
     ProcState m_state;
 
     ktl::unique_ptr<AddrSpace> m_addrSpace;

@@ -7,7 +7,6 @@ static void ktask_runtime(KernelTask* task, void(*func)(void*))
 {
   debug() << "kernel task #" << task->tid() << " started executing\n";
   func(task->arg());
-  debug() << "kernel task #" << task->tid() << " terminated\n";
   task->exit();
 }
 

@@ -8,6 +8,7 @@
 #include <addr_space.h>
 #include <features.h>
 #include <user_task.h>
+#include <proc_list.h>
 
 static bool s_schedEnable = false;
 static ktl::List<Task*> s_taskList;
@@ -19,8 +20,13 @@ extern "C" void setKernelStackPtr(size_t stackptr);
 
 static void idle_task(void* arg)
 {
-  debug() << "Welcome from the idle task!\n";
-  for (;;) { hlt(); }
+  for (;;)
+  {
+    /* when the system is on idle, do some cleanup work */
+    ProcList::get().checkForDeadProcesses();
+
+    hlt();
+  }
 }
 
 namespace sched {
