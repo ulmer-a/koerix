@@ -81,5 +81,5 @@ add_custom_target(disk
 )
 
 add_custom_target(qemu
-    COMMAND qemu-system-x86_64 -debugcon stdio -drive format=raw,file=${CMAKE_BINARY_DIR}/disk.img -m 256 -s
+    COMMAND qemu-system-x86_64 -dserial stdio -drive format=raw,file=${CMAKE_BINARY_DIR}/disk.img -m 256 -s
 )
