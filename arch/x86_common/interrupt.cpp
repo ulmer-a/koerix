@@ -6,6 +6,8 @@
 #include <page_fault.h>
 #include <string.h>
 #include <arch/asm.h>
+#include <scheduler.h>
+#include <user_task.h>
 
 static void* getPageFaultAddr()
 {
@@ -65,6 +67,16 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     if (irq_id >= 8)
       outb(0xa0, 0x20);
     outb(0x20, 0x20);
+  }
+  else if (ctx->irq == 0x80)
+  {
+    debug() << "System call:" << ctx->irq << "\n";
+    if (ctx->rax == 0) {
+      debug() << "Exit with status " << DEBUG_HEX << ctx->rbx << "...\n";
+      auto currentTask = (UserTask*)sched::currentTask();
+      currentTask->exit();
+      sched::yield();
+    }
   }
   else
   {
