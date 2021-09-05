@@ -1,7 +1,6 @@
 #pragma once
 
 #include <types.h>
-#include <bitmap.h>
 #include <addr_space.h>
 
 class PageMap

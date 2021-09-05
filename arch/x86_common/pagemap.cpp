@@ -3,7 +3,6 @@
 #include <string.h>
 #include <debug.h>
 #include <addr_space.h>
-#include <bitmap.h>
 #include <pagemap.h>
 #include <x86/stivale.h>
 
