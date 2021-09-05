@@ -1,0 +1,3 @@
+lld # clang linker
+nasm 
+qemu-system-x86_64
