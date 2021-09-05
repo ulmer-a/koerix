@@ -26,5 +26,3 @@ static inline void arch_yield()
    * triggered the timer irq at this location. */
   __asm__ volatile ("int $0x1f;");
 }
-
-extern "C" void enable_nx();

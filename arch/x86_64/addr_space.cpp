@@ -3,6 +3,7 @@
 #include <string.h>
 #include <mm.h>
 #include <arch/asm.h>
+#include <features.h>
 
 
 struct GenericPagingTable
@@ -25,6 +26,7 @@ struct GenericPagingTable
 
 AddrSpace s_kernelAddrSpace;
 bool s_initialized = false;
+bool s_nxEnabled = false;
 
 AddrSpace::AddrSpace()
 {
@@ -52,7 +54,9 @@ void AddrSpace::setup()
     debug() << " done\n";
 
     /* Enable support for NX pages */
-    enable_nx();
+    s_nxEnabled = enable_nx();
+    debug() << "trying to enable NX: "
+            << (s_nxEnabled ? "ok\n" : "not available\n");
 
     /* Switch to the newly created address space. */
     kernelSpace->apply();

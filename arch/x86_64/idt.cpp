@@ -146,7 +146,4 @@ extern "C" void x86_irq_init()
 {
   setup_pic();
   setup_idt();
-
-  // hardware interrupts left disabled for now
-
 }

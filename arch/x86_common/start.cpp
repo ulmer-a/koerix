@@ -5,6 +5,7 @@
 #include <scheduler.h>
 #include <x86/stivale.h>
 #include <kernel_task.h>
+#include <features.h>
 
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 1024*16;
@@ -40,6 +41,9 @@ extern "C" void x86_irq_init();
 extern void initHeap();
 extern void create_page_bitmap();
 
+bool s_sseEnabled = false;
+bool s_avxEnabled = false;
+
 extern "C" void _NORETURN _start(struct stivale_struct *stivale)
 {
   s_stivale = stivale;
@@ -61,6 +65,15 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
    * setup the kernel heap */
   AddrSpace::setup();
   initHeap();
+
+  /* enable SSE and AVX if available */
+  s_sseEnabled = sse_enable();
+  s_avxEnabled = avx_enable();
+  debug() << "trying to enable SSE: "
+          << (s_sseEnabled ? "ok\n" : "not available\n");
+  s_sseEnabled = sse_enable();
+  debug() << "trying to enable AVX: "
+          << (s_avxEnabled ? "ok\n" : "not available\n");
 
   /* Create kernel setup task and enable scheduling */
   sched::init::setup();
