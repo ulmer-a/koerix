@@ -18,6 +18,8 @@ class Mutex : public ktl::Canary
     /* this function might yield internally */
     Task* getHolder();
 
+    bool isHeld();
+
   private:
     size_t m_lock;
     Task* m_heldBy;

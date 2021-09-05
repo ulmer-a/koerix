@@ -12,11 +12,12 @@ class UserTask : public Task
 {
   public:
     UserTask(UserProcess& process);
-    ~UserTask() = default;
+    ~UserTask();
 
     void initContext(size_t entryPoint);
 
     void exit() override;
+    void asyncExit();
 
     bool isUserTask() const final {
       return true;

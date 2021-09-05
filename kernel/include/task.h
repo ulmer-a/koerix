@@ -12,9 +12,9 @@ class Task
   public:
     enum TaskState
     {
-        RUNNING,
-        SLEEPING,
-        KILLED
+      RUNNING,
+      SLEEPING,
+      KILLED
     };
 
     Task(AddrSpace& vspace);

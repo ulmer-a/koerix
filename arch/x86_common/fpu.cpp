@@ -2,6 +2,7 @@
 #include <mm.h>
 #include <user_task.h>
 #include <scheduler.h>
+#include <x86/asm.h>
 
 static UserTask* s_fpuTask = nullptr;
 
@@ -59,6 +60,11 @@ void FpuContext::restore() const
 
 void fpuClear()
 {
-  s_fpuTask = nullptr;
-  resetFpuFlag();
+  cli();
+  if (s_fpuTask == sched::currentTask())
+  {
+    s_fpuTask = nullptr;
+    resetFpuFlag();
+  }
+  sti();
 }

@@ -82,3 +82,8 @@ Task* Mutex::getHolder()
   }
   return nullptr;
 }
+
+bool Mutex::isHeld()
+{
+  return (sched::currentTask() == getHolder());
+}

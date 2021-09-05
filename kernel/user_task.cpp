@@ -17,6 +17,11 @@ UserTask::UserTask(UserProcess& process)
   sched::insertTask(this);
 }
 
+UserTask::~UserTask()
+{
+  m_process.releaseStack(m_stack);
+}
+
 void UserTask::initContext(size_t entryPoint)
 {
   /* User stack pointer: subtract a pointer size to
@@ -38,4 +43,16 @@ void UserTask::exit()
 {
   fpuClear();
   Task::exit();
+}
+
+void UserTask::asyncExit()
+{
+  auto currentTask = sched::currentTask();
+  assert(currentTask != this);
+
+  /* we cannot just kill another thread, we have to
+   * make the thread kill itself. so we modify the
+   * thread's instruction pointer to generate an
+   * exception when it's next scheduled. */
+  setInstructionPointer(context(), EXIT_ADDR);
 }

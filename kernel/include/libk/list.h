@@ -7,19 +7,20 @@ namespace ktl {
 
     namespace _internal {
         template<typename T>
-        struct ListItem
+        class ListItem
         {
-          T item;
-          ListItem<T>* next;
-          ListItem<T>* prev;
+          public:
+            T item;
+            ListItem<T>* next;
+            ListItem<T>* prev;
 
-          T& operator->() {
-            return item;
-          }
+            T& operator->() {
+              return item;
+            }
 
-          T& operator*() {
-            return item;
-          }
+            T& operator*() {
+              return item;
+            }
         };
     }
 

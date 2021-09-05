@@ -1,6 +1,7 @@
 #include <user_proc.h>
 #include <addr_space.h>
 #include <loader.h>
+#include <scheduler.h>
 #include <user_task.h>
 
 UserProcess::UserProcess(ktl::shared_ptr<Loader>& loader)
@@ -9,7 +10,16 @@ UserProcess::UserProcess(ktl::shared_ptr<Loader>& loader)
 {
   assert(m_loader->isValidBinary());
 
-  addTask(new UserTask(*this));
+  addTask();
+}
+
+bool UserProcess::isOwnProcess() const
+{
+  auto currentTask = sched::currentTask();
+  if (!currentTask->isUserTask())
+    return false;
+  auto userTask = (UserTask*)currentTask;
+  return (&userTask->getProcess() == this);
 }
 
 bool UserProcess::isValidStackAddr(size_t addr) const
@@ -21,10 +31,75 @@ bool UserProcess::isValidStackAddr(size_t addr) const
   return m_stackList[i];
 }
 
-void UserProcess::addTask(UserTask* task)
+void UserProcess::exit(int status)
+{
+  /* acquire the task list lock, so no new tasks can be
+   * added. this will also prevent the process from being
+   * killed multiple times. */
+  m_taskListLock.lock();
+
+  if (m_state != RUNNING)
+  {
+    m_taskListLock.unlock();
+
+    if (isOwnProcess())
+      sched::currentTask()->exit();
+    return;
+  }
+
+  m_state = KILLED;
+  killAllTasks();
+
+  m_taskListLock.unlock();
+  if (isOwnProcess())
+    sched::currentTask()->exit();
+}
+
+void UserProcess::checkForDeadTasks()
 {
   ScopedMutex smtx { m_taskListLock };
+  for (auto it = m_taskList.begin(); it != nullptr; it = it->next)
+  {
+    auto userTask = it->item;
+    if (userTask->state() == Task::KILLED)
+    {
+      assert(userTask != sched::currentTask());
+
+      auto prev = it->prev;
+      m_taskList.remove(it);
+      it = prev;
+      if (it == nullptr) {
+        it = m_taskList.begin();
+        if (it == nullptr)
+          break;
+      }
+
+      delete userTask;
+    }
+  }
+}
+
+void UserProcess::addTask()
+{
+  ScopedMutex smtx { m_taskListLock };
+  auto task = new UserTask(*this);
   m_taskList.push_back(task);
+}
+
+void UserProcess::killAllTasks()
+{
+  assert(m_taskListLock.isHeld());
+
+  for (auto it = m_taskList.begin(); it != nullptr; it = it->next)
+  {
+    if (it->item == sched::currentTask())
+    {
+      /* don't kill ourselves! */
+      continue;
+    }
+
+    (*it)->asyncExit();
+  }
 }
 
 UserStack UserProcess::allocStack()
@@ -53,7 +128,7 @@ void UserProcess::releaseStack(UserStack stack)
   assert(m_stackList.size() > i);
   assert(m_stackList[i] == true);
 
-  if (m_stackList.size() - 1 == i)
+  if (m_stackList.size() == i + 1)
     m_stackList.pop_back();
   else
     m_stackList[i] = false;

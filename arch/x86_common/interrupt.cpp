@@ -80,6 +80,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
   }
   else if (ctx->irq == 0x80)
   {
+    sti();
     do_syscall(ctx);
   }
   else

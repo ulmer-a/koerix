@@ -7,5 +7,6 @@
 #define PAGE_SIZE 4096
 
 #define MIN_LOAD_ADDR   0x100000ul
+#define EXIT_ADDR       0xffff8000deadbeeful
 #define IDENT_OFFSET    0xffff800000000000ul
 #define USER_BREAK      0x0000800000000000ul
