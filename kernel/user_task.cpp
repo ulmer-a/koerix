@@ -8,24 +8,18 @@
 
 UserTask::UserTask(UserProcess& process)
   : Task(process.getAddrSpace())
+  , m_stack(process.allocStack())
   , m_process(process)
 {
   initContext(m_process.getLoader().getEntryPoint());
   sched::insertTask(this);
 }
 
-UserTask::UserTask(UserProcess& process, void* entry)
-  : Task(process.getAddrSpace())
-  , m_process(process)
-{
-  initContext((size_t)entry);
-}
-
 void UserTask::initContext(size_t entryPoint)
 {
   /* User stack pointer: subtract a pointer size to
    * make it unambigously identifyable as a stack address */
-  auto userStackPtr = USER_BREAK - sizeof(size_t);
+  auto userStackPtr = m_stack.getStackPtr() - sizeof(void*);
 
   auto ctx = context();
   initArchContext(ctx, true,

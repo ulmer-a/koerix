@@ -1,15 +1,16 @@
 #pragma once
 
 #include <task.h>
+#include <user_stack.h>
 
 class Loader;
 class UserProcess;
+class UserStack;
 
 class UserTask : public Task
 {
   public:
     UserTask(UserProcess& process);
-    UserTask(UserProcess& process, void* entry);
     ~UserTask() = default;
 
     void initContext(size_t entryPoint);
@@ -19,4 +20,5 @@ class UserTask : public Task
 
   private:
     UserProcess& m_process;
+    UserStack m_stack;
 };

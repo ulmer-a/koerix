@@ -26,11 +26,24 @@ namespace ktl {
         return m_array[index];
       }
 
+      const T& operator[](size_t index) const {
+        assert(index < m_size);
+        return m_array[index];
+      }
+
       void push_back(const T& item) {
         if (m_size + 1 > m_capacity) {
           realloc(m_size + 1);
         }
         m_array[m_size++] = item;
+      }
+
+      T pop_back() {
+        return m_array[--m_size];
+      }
+
+      inline size_t size() const {
+        return m_size;
       }
 
     private:

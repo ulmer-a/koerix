@@ -2,14 +2,18 @@
 
 #include <shared_ptr.h>
 #include <unique_ptr.h>
+#include <vector.h>
 #include <mutex.h>
 
 class Loader;
 class AddrSpace;
 class UserTask;
+class UserStack;
 
 class UserProcess
 {
+    friend class UserTask;
+
   public:
     UserProcess(ktl::shared_ptr<Loader>& loader);
     ~UserProcess() = default;
@@ -22,6 +26,12 @@ class UserProcess
       return *m_loader;
     }
 
+    bool isValidStackAddr(size_t addr) const;
+
+  protected: /* UserTask can access  */
+    UserStack allocStack();
+    void releaseStack(UserStack stack);
+
   private:
     void addTask(UserTask* task);
 
@@ -31,4 +41,7 @@ class UserProcess
 
     Mutex m_taskListLock;
     ktl::List<UserTask*> m_taskList;
+
+    mutable Mutex m_stackListLock;
+    ktl::vector<bool> m_stackList;
 };

@@ -9,6 +9,8 @@
 #include <user_task.h>
 #include <user_proc.h>
 #include <loader.h>
+#include <addr_space.h>
+#include <pagemap.h>
 
 static bool checkIfValid(size_t addr, FaultFlags flags)
 {
@@ -35,12 +37,21 @@ bool handlePageFault(size_t addr, FaultFlags flags)
     return false;
   }
 
-  // 1. check if COW fault?
-  // 2. check if stack fault?
-
   auto currentTask = sched::currentTask();
   assert(currentTask->isUserTask());
   auto& process = ((UserTask*)currentTask)->getProcess();
+
+  // 1. check if COW fault?
+  // 2. check if stack fault?
+
+  if (process.isValidStackAddr(addr))
+  {
+    /* the address is a valid stack address, so map a page at that location
+     * that can be read and written, but not executed. */
+    process.getAddrSpace().map(addr >> PAGE_SHIFT, PageMap::get().alloc(),
+      AddrSpace::MAP_USER | AddrSpace::MAP_WRITE | AddrSpace::MAP_NOEXEC);
+    return true;
+  }
 
   return process.getLoader().load(addr, process.getAddrSpace());
 }

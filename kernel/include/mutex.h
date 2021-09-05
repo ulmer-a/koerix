@@ -27,3 +27,20 @@ class Mutex : public ktl::Canary
     ktl::List<Task*> m_waitingTasks;
     Spinlock m_waitingTasksLock;
 };
+
+class ScopedMutex
+{
+  public:
+    ScopedMutex(Mutex& mtx)
+      : m_mutex(mtx)
+    {
+      m_mutex.lock();
+    }
+
+    ~ScopedMutex() {
+      m_mutex.unlock();
+    }
+
+  private:
+    Mutex& m_mutex;
+};
