@@ -2,3 +2,4 @@
 *.o
 build/
 ulmeros.*
+env/a.out
