@@ -8,7 +8,7 @@ enable_language(ASM)
 
 set(TARGET_ARCH "x86_64")
 set(TARGET_PLATFORM "pc")
-set(ARCH_FLAGS -mno-red-zone)
+set(ARCH_FLAGS "-mno-red-zone -mcmodel=kernel -mno-mmx -mno-sse -mno-avx")
 
 set(CMAKE_BUILD_TYPE Debug)
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
