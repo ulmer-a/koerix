@@ -8,10 +8,12 @@
 #include <arch/asm.h>
 #include <scheduler.h>
 #include <user_task.h>
-#include <x86/fpu.h>
 
 #define EXC_FPU_SSE     7
 #define EXC_PAGEFAULT   14
+
+extern void fpuFault();
+extern void do_syscall(IrqContext* ctx);
 
 static void* getPageFaultAddr()
 {
@@ -78,13 +80,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
   }
   else if (ctx->irq == 0x80)
   {
-    debug() << "System call:" << ctx->irq << "\n";
-    if (ctx->rax == 0) {
-      debug() << "Exit with status " << DEBUG_HEX << ctx->rbx << "...\n";
-      auto currentTask = (UserTask*)sched::currentTask();
-      currentTask->exit();
-      sched::yield();
-    }
+    do_syscall(ctx);
   }
   else
   {

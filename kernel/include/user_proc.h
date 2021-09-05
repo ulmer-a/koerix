@@ -27,6 +27,7 @@ class UserProcess
     }
 
     bool isValidStackAddr(size_t addr) const;
+    void exit(int status);
 
   protected: /* UserTask can access  */
     UserStack allocStack();
