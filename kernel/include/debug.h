@@ -34,6 +34,7 @@ namespace debugging {
         DebugStream();
         ~DebugStream();
 
+        DebugStream& operator<<(char c);
         DebugStream& operator<<(const char* str);
         DebugStream& operator<<(size_t i);
         DebugStream& operator<<(int32_t i);

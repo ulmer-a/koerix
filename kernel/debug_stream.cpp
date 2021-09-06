@@ -52,6 +52,12 @@ DebugStream& DebugStream::operator<<(const char* str)
     return *this;
 }
 
+DebugStream& DebugStream::operator<<(char c)
+{
+  *m_destPtr++ = c;
+  return *this;
+}
+
 DebugStream& DebugStream::operator<<(size_t i)
 {
   basePrefix();
