@@ -54,7 +54,10 @@ int main() {
     pos_x = 0;
     pos_y = 1;
 
+    fb_set_fg(color(0xf5, 0xdf, 0x3b));
     term_puts(banner);
+
+    fb_set_fg(color(0xff, 0xff, 0xff));
     term_puts("Koerix OS Console\n"
               "Copyright (C) 2017-2021 Alexander Ulmer\n\n");
 
@@ -62,6 +65,9 @@ int main() {
               "an ELF program\nwith access to a full C library loaded by "
               "the kernel. My stack\nand data is NX-protected and SSE is "
               "supported.");
+
+    fb_set_fg(color(0xff, 0x00, 0xa0));
+    fb_draw_rect(600, 300, 100, 120);
 
     return 0;
 }

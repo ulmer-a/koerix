@@ -2,6 +2,7 @@
 
 #define __NEED_size_t
 #define __NEED_ssize_t
+#define __NEED_uint32_t
 #include <bits/alltypes.h>
 
 struct __fb_struct
@@ -44,4 +45,7 @@ int fb_init();
     | ((r & 0xff) << 16)  \
 )
 
+void fb_set_bg(uint32_t color);
+void fb_set_fg(uint32_t color);
 void fb_putc(size_t x, size_t y, char c);
+void fb_draw_rect(size_t x, size_t y, size_t width, size_t height);
