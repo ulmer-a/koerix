@@ -25,6 +25,8 @@ typedef struct {
     unsigned char glyphs;
 } __attribute__((packed)) psf_font_t;
 
+
+extern const psf_font_t* __fb_current_font;
 extern struct __fb_struct __fb_info;
 
 #define FB_WIDTH  (__fb_info.width)
@@ -42,4 +44,4 @@ int fb_init();
     | ((r & 0xff) << 16)  \
 )
 
-void fb_putc(const psf_font_t* font, size_t x, size_t y, char c);
+void fb_putc(size_t x, size_t y, char c);

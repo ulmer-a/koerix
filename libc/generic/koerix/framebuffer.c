@@ -11,6 +11,8 @@ enum fb_info_types
 };
 
 struct __fb_struct __fb_info;
+const psf_font_t* __fb_current_font;
+extern psf_font_t __koerix_console_font;
 
 extern ssize_t fb_info(int type);
 
@@ -26,11 +28,14 @@ int fb_init()
   __fb_info.pitch = (size_t)fb_info(FB_INFO_PITCH);
   __fb_info.bpp = (size_t)fb_info(FB_INFO_BPP);
 
+  __fb_current_font = &__koerix_console_font;
   return 0;
 }
 
-void fb_putc(const psf_font_t* font, size_t x, size_t y, char c)
+
+void fb_putc(size_t x, size_t y, char c)
 {
+  const psf_font_t* font = __fb_current_font;
   const size_t bytes_per_line = (font->width + 7)/8;
   const size_t index = (c < font->numglyph) ? c : 0;
   unsigned char* glyph = (unsigned char*)font +
