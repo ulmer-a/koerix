@@ -20,6 +20,7 @@
   \name:
     mov $\id, %rax
     int $0x80
+    mov %rax, %rdi
     call _sys_errno
     ret
 .endmacro
