@@ -4,9 +4,11 @@
 #include <user_task.h>
 #include <proc_list.h>
 
-UserProcess::UserProcess(ktl::shared_ptr<Loader>& loader)
+UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
+                         ktl::shared_ptr<Terminal> term)
   : m_addrSpace(new AddrSpace())
   , m_loader(loader)
+  , m_term(term)
 {
   ProcList::get().onAddProcess(this);
 
@@ -148,6 +150,11 @@ UserProcess::ProcState UserProcess::state() const
 AddrSpace& UserProcess::getAddrSpace()
 {
   return *m_addrSpace;
+}
+
+Terminal& UserProcess::getTerm()
+{
+  return *m_term;
 }
 
 const Loader& UserProcess::getLoader()

@@ -70,7 +70,8 @@ int SerialPort::ioctrl(size_t cmd, size_t* arg)
 
 ssize_t SerialPort::write(char* buffer, size_t len)
 {
-  while (len--)
+  size_t cnt = len;
+  while (cnt--)
   {
     /* wait until new data can be written
      * TODO: make this more efficient, e.g. IRQs? */

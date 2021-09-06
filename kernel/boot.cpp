@@ -17,7 +17,7 @@ void kernel_init(const char* cmdline)
 
   auto uart0 = (fs::File*)dev::findDevice("uart0");
   fs::FileDesc serialPort{ *uart0 };
-  auto mainTerm = new Terminal(serialPort);
+  auto mainTerm = ktl::shared_ptr<Terminal>(new Terminal(serialPort));
   Terminal::setMainTerm(mainTerm);
 
   debug() << "welcome on uart!\n";
@@ -26,5 +26,5 @@ void kernel_init(const char* cmdline)
   assert(init_bin != nullptr);
   auto loader = ktl::shared_ptr<Loader>(
         new Loader(init_bin));
-  auto proc = new UserProcess(loader);
+  auto proc = new UserProcess(loader, mainTerm);
 }

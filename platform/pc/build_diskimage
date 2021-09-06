@@ -66,4 +66,4 @@ rm -r ${BINDIR}/mnt
 sudo losetup -d /dev/loop99
 
 echo "install limine bootloader"
-${LIMINE_BIN}/limine-install ${TARGET_DISK} > /dev/null
+${LIMINE_BIN}/limine-install ${TARGET_DISK} 2> /dev/null

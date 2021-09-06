@@ -1,11 +1,17 @@
 #include <term.h>
+#include <mm.h>
 
-Terminal* Terminal::s_mainTerm = nullptr;
+ktl::shared_ptr<Terminal> Terminal::s_mainTerm;
 
 Terminal::Terminal(fs::FileDesc& fd)
   : m_fd(fd)
 {
 
+}
+
+void Terminal::init()
+{
+  new (&s_mainTerm) ktl::shared_ptr<Terminal>();
 }
 
 ssize_t Terminal::read(char* buffer, size_t len)

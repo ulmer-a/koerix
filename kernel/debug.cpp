@@ -20,7 +20,9 @@ void panic(const char* message)
 DebugStream::~DebugStream()
 {
   if (!s_debugInitialized) {
+    Terminal::init();
     new (&s_debugLock) Spinlock();
+    s_debugInitialized = true;
   }
 
   s_debugLock.lock();

@@ -9,6 +9,7 @@
 class Loader;
 class UserTask;
 class UserStack;
+class Terminal;
 
 class UserProcess
 {
@@ -22,12 +23,14 @@ class UserProcess
       TO_BE_DELETED
     };
 
-    UserProcess(ktl::shared_ptr<Loader>& loader);
+    UserProcess(ktl::shared_ptr<Loader> loader,
+                ktl::shared_ptr<Terminal> term);
     ~UserProcess() = default;
 
     ProcState state() const;
     bool isOwnProcess() const;
     AddrSpace& getAddrSpace();
+    Terminal& getTerm();
     const Loader& getLoader();
     bool isValidStackAddr(size_t addr) const;
     void checkForDeadTasks();
@@ -46,6 +49,7 @@ class UserProcess
 
     ktl::unique_ptr<AddrSpace> m_addrSpace;
     ktl::shared_ptr<Loader> m_loader;
+    ktl::shared_ptr<Terminal> m_term;
 
     Mutex m_taskListLock;
     ktl::List<UserTask*> m_taskList;

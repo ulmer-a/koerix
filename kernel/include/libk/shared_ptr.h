@@ -58,6 +58,7 @@ namespace ktl {
         clear();
         m_data = self.m_data;
         assert_verify(m_data->addRef() != 0);
+        return *this;
       }
 
       shared_ptr& operator=(T* ptr) {
@@ -77,12 +78,14 @@ namespace ktl {
         T* ptr = nullptr;
         if (m_data) {
           ptr = m_data->ptr();
+          assert(ptr);
         }
-        assert(ptr);
         return ptr;
       }
 
       void clear() {
+        if (m_data == nullptr)
+          return;
         if (m_data->release() == 1) {
           delete m_data;
           m_data = nullptr;

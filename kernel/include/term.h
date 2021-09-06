@@ -2,6 +2,7 @@
 
 #include <types.h>
 #include <fs/fd.h>
+#include <shared_ptr.h>
 
 class Terminal
 {
@@ -9,18 +10,20 @@ class Terminal
     Terminal(fs::FileDesc& fd);
     ~Terminal() = default;
 
+    static void init();
+
     ssize_t read(char* buffer, size_t len);
     ssize_t write(char* buffer, size_t len);
 
     static inline Terminal* getMainTerm() {
-      return s_mainTerm;
+      return s_mainTerm.get();
     }
 
-    static inline void setMainTerm(Terminal* term) {
+    static inline void setMainTerm(ktl::shared_ptr<Terminal> term) {
       s_mainTerm = term;
     }
 
   private:
     fs::FileDesc m_fd;
-    static Terminal* s_mainTerm;
+    static ktl::shared_ptr<Terminal> s_mainTerm;
 };
