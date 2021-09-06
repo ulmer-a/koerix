@@ -13,6 +13,18 @@ struct __fb_struct
   void* fb;
 };
 
+typedef struct {
+    unsigned int magic;
+    unsigned int version;
+    unsigned int headersize;
+    unsigned int flags;
+    unsigned int numglyph;
+    unsigned int bytesperglyph;
+    unsigned int height;
+    unsigned int width;
+    unsigned char glyphs;
+} __attribute__((packed)) psf_font_t;
+
 extern struct __fb_struct __fb_info;
 
 #define FB_WIDTH  (__fb_info.width)
@@ -22,3 +34,12 @@ extern struct __fb_struct __fb_info;
 #define FB_PTR    (__fb_info.fb)
 
 int fb_init();
+
+#define framebuffer(x, y) *(((uint32_t*)FB_PTR) + (FB_PITCH * (y)) + (x))
+#define color(r, g, b)  ( \
+       (b & 0xff)         \
+    | ((g & 0xff) << 8)   \
+    | ((r & 0xff) << 16)  \
+)
+
+void fb_putc(const psf_font_t* font, size_t x, size_t y, char c);

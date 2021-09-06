@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(CMAKE_C_FLAGS "-ffreestanding -nostdinc -O3 -fno-pic -fno-stack-protector")
+set(CMAKE_C_FLAGS "-ffreestanding -nostdinc -O0 -g -fno-pic -fno-stack-protector")
 set(BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 add_custom_target(env)
 
-macro(user_prog id sources)
+function(user_prog id sources)
     add_library(env_${id}_lib STATIC
         ${sources}
     )
@@ -19,7 +19,7 @@ macro(user_prog id sources)
     DEPENDS koerix env_${id}_lib
     )
     add_dependencies(env env_${id})
-endmacro()
+endfunction()
 
 # add your programs here
 add_subdirectory(textcon)
