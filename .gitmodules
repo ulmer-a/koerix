@@ -1,6 +1,3 @@
-[submodule "libc"]
-	path = libc
-	url = https://github.com/ulmer-a/musl
 [submodule "platform/pc/limine"]
 	path = platform/pc/limine
 	url = https://github.com/ulmer-a/limine
