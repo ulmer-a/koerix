@@ -58,7 +58,7 @@ echo "mount and copy rootfs"
 mkdir -p ${BINDIR}/mnt
 sudo mount /dev/loop99 ${BINDIR}/mnt
 sudo cp -r ${SYSROOT}/** ${BINDIR}/mnt
-ls ${BINDIR}/mnt/**
+tree ${BINDIR}/mnt
 sync
 sleep 1
 sudo umount /dev/loop99
@@ -66,4 +66,4 @@ rm -r ${BINDIR}/mnt
 sudo losetup -d /dev/loop99
 
 echo "install limine bootloader"
-${LIMINE_BIN}/limine-install ${TARGET_DISK}
+${LIMINE_BIN}/limine-install ${TARGET_DISK} > /dev/null
