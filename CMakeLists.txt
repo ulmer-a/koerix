@@ -21,7 +21,7 @@ message(STATUS "Building for ${TARGET_ARCH}-${TARGET_PLATFORM}")
 ######################################################################
 # BUILD LIBC, USERSPACE                                              #
 ######################################################################
-add_subdirectory(libkoerix)
+add_subdirectory(libc)
 add_subdirectory(env)
 
 # todo userspace
@@ -77,7 +77,7 @@ add_custom_target(disk
         ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_BINARY_DIR}/disk.img
     BYPRODUCTS ${CMAKE_BINARY_DIR}/disk.img
-    DEPENDS vmkoerix
+    DEPENDS vmkoerix env
 )
 
 add_custom_target(qemu
