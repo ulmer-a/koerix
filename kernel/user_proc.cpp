@@ -10,7 +10,7 @@ UserProcess::UserProcess(ktl::shared_ptr<Loader>& loader)
 {
   ProcList::get().onAddProcess(this);
 
-  assert(m_loader->isValidBinary());
+  assert(m_loader->isValid());
 
   addTask();
 }

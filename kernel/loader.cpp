@@ -1,6 +1,7 @@
 #include <loader.h>
 #include <pagemap.h>
 #include <string.h>
+#include <debug.h>
 
 Loader::Loader(const void* elfBinary)
   : m_elfBinary(elfBinary)
@@ -9,6 +10,8 @@ Loader::Loader(const void* elfBinary)
   m_pht = (Elf64ProgHeaderTableEntry*)
       ((char*)elfBinary + m_header->pht_pos);
   m_phtEntryCount = m_header->pht_entries;
+
+  m_valid = isValidBinary();
 }
 
 bool Loader::isValidBinary() const
@@ -17,12 +20,35 @@ bool Loader::isValidBinary() const
     return false;
   if (m_header->magic != 0x464c457f)
     return false;
+
+  for (size_t i = 0; i < m_phtEntryCount; i++)
+  {
+    auto& phtEntry = m_pht[i];
+    if (phtEntry.type != 1 /* load */)
+      continue;
+
+    if ((phtEntry.p_vaddr & 0xfff) != 0)
+    {
+      debug() << "loader warning: trying to load ELF "
+                 "with unaligned LOAD program headers\n";
+      return false;
+    }
+
+    //debug() << "load: addr=" << (void*)phtEntry.p_vaddr
+    //        << ", size=" << DEBUG_HEX << phtEntry.p_memsz << "\n";
+  }
+
   return true;
 }
 
 size_t Loader::getEntryPoint() const
 {
   return (size_t)m_header->entry;
+}
+
+bool Loader::isValid() const
+{
+  return m_valid;
 }
 
 bool Loader::load(size_t addr, AddrSpace& vspace) const

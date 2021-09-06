@@ -10,12 +10,15 @@ class Loader
   public:
     Loader(const void* elfBinary);
 
-    bool isValidBinary() const;
     size_t getEntryPoint() const;
+    bool isValid() const;
 
     bool load(size_t addr, AddrSpace& vspace) const;
 
   private:
+    bool m_valid;
+    bool isValidBinary() const;
+
     const void* m_elfBinary;
     Elf64Header* m_header;
 

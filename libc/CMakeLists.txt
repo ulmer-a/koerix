@@ -8,7 +8,8 @@ set(LIBKOERIX_INCLUDE
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${TARGET_ARCH}.cmake)
 set(CMAKE_C_FLAGS "--target=${TARGET_ARCH}-none-eabi -O3 \
     -ffreestanding -nostdlib -nostdinc ${ARCH_USER_FLAGS}\
-    -Wno-shift-op-parentheses -fPIC -ffunction-sections ")
+    -Wno-shift-op-parentheses -ffunction-sections -fno-pic -fno-stack-protector")
+
 
 file(GLOB_RECURSE LIBKOERIX_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/generic/*.c
