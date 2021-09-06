@@ -10,3 +10,5 @@
 #define EXIT_ADDR       0xffff8000deadbeeful
 #define IDENT_OFFSET    0xffff800000000000ul
 #define USER_BREAK      0x0000800000000000ul
+
+#define FRAMEBUFFER_ADDR  0x0000400000000000ul

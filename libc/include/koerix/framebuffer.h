@@ -9,6 +9,7 @@ struct __fb_struct
   size_t width;
   size_t height;
   size_t pitch;
+  size_t bpp;
   void* fb;
 };
 
@@ -17,5 +18,7 @@ extern struct __fb_struct __fb_info;
 #define FB_WIDTH  (__fb_info.width)
 #define FB_HEIGHT (__fb_info.height)
 #define FB_PITCH  (__fb_info.pitch)
+#define FB_BPP    (__fb_info.bpp)
+#define FB_PTR    (__fb_info.fb)
 
 int fb_init();

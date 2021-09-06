@@ -119,3 +119,5 @@ struct stivale_struct {
     uint64_t smbios_entry_32;
     uint64_t smbios_entry_64;
 };
+
+extern stivale_struct* s_stivale;
