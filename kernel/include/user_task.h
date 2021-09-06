@@ -31,9 +31,13 @@ class UserTask : public Task
       return *m_fpuContext;
     }
 
+    void setThreadPtr(void* ptr);
+    void* getThreadPtr();
+
   private:
     UserProcess& m_process;
     UserStack m_stack;
 
+    void* m_threadPtr;
     ktl::unique_ptr<FpuContext> m_fpuContext;
 };

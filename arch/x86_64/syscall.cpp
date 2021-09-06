@@ -7,13 +7,18 @@ static void* syscalls[] = {
   (void*)sys_exit,          // 0
   (void*)sys_thread_exit,   // 1
   (void*)sys_read,          // 2
-  (void*)sys_write          // 3
+  (void*)sys_write,         // 3
+  nullptr,                  // 4
+  nullptr,                  // 5
+  (void*)set_thread_ptr,    // 6
+  (void*)get_thread_ptr,    // 7
+  nullptr                   // 8
 };
 
 void do_syscall(struct IrqContext* ctx)
 {
   /* check for an invalid system call number */
-  if (ctx->rax >= sizeof(syscalls))
+  if (ctx->rax >= sizeof(syscalls) / sizeof(void*))
   {
     ctx->rax = -ENOSYS;
     return;
@@ -21,7 +26,12 @@ void do_syscall(struct IrqContext* ctx)
 
   /* resolve the function address of the system call */
   void* syscall_addr = syscalls[ctx->rax];
-  assert(syscall_addr != nullptr);
+  if (syscall_addr == nullptr)
+  {
+    ctx->rax = -ENOSYS;
+    return;
+  }
+
   auto syscall = (size_t(*)(
         size_t arg1, size_t arg2, size_t arg3,
         size_t arg4, size_t arg5, size_t arg6

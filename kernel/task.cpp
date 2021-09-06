@@ -33,8 +33,8 @@ void Task::exit()
 
 void Task::sleep()
 {
-  assert(m_state == RUNNING);
   assert(sched::currentTask() == this);
+  assert(m_state == RUNNING);
   m_state = SLEEPING;
 
   if (sched::isEnabled())

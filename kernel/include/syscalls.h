@@ -8,9 +8,11 @@ extern "C" {
 
 void sys_exit(int status);
 void sys_thread_exit(void* ret);
-
 ssize_t sys_read(int fd, char* buffer, size_t len);
 ssize_t sys_write(int fd, char* buffer, size_t len);
+int close(int fd);
+void set_thread_ptr(void* ptr);
+void* get_thread_ptr();
 
 #ifdef __cplusplus
 }

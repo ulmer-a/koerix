@@ -56,3 +56,13 @@ void UserTask::asyncExit()
    * exception when it's next scheduled. */
   setInstructionPointer(context(), EXIT_ADDR);
 }
+
+void UserTask::setThreadPtr(void* ptr)
+{
+  m_threadPtr = ptr;
+}
+
+void* UserTask::getThreadPtr()
+{
+  return m_threadPtr;
+}

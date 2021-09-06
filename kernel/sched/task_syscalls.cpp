@@ -16,3 +16,13 @@ void sys_thread_exit(void* ret)
   debug() << "tid " << userTask->tid() << ": thread_exit(" << ret << ")\n";
   sched::currentUserTask()->exit();
 }
+
+void set_thread_ptr(void* ptr)
+{
+  sched::currentUserTask()->setThreadPtr(ptr);
+}
+
+void* get_thread_ptr()
+{
+  return sched::currentUserTask()->getThreadPtr();
+}
