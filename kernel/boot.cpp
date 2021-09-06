@@ -6,6 +6,18 @@
 #include <shared_ptr.h>
 #include <loader.h>
 #include <user_proc.h>
+#include <pagemap.h>
+
+static void printIssue()
+{
+  debug() << "Koerix OS kernel\n"
+             "Copyright (C) 2017-2021 Alexander Ulmer\n";
+
+  auto pagemap = PageMap::get();
+  debug() << "Memory: " << (pagemap.getUsedMemory() >> 20) << "/"
+          << (pagemap.getUsableMemory() >> 20) << " MB used"
+             " of total " << (pagemap.getTotalMemory() >> 20) << " MB\n\n";
+}
 
 void kernel_init(const char* cmdline)
 {
@@ -20,7 +32,7 @@ void kernel_init(const char* cmdline)
   auto mainTerm = ktl::shared_ptr<Terminal>(new Terminal(serialPort));
   Terminal::setMainTerm(mainTerm);
 
-  debug() << "welcome on uart!\n";
+  printIssue();
 
   void* init_bin = find_module("init.elf");
   assert(init_bin != nullptr);

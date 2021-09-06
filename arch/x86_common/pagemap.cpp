@@ -115,6 +115,7 @@ void create_page_bitmap()
         }
     }
 
+    size_t usable_pages = free_pages;
     for (int i = 0; i < pagemap_pages; i++)
     {
         free_pages -= 1;
@@ -122,7 +123,7 @@ void create_page_bitmap()
     }
 
     /* Initialize the PageManager class */
-    new (&s_pagemap) PageMap(total_pages, free_pages, pagemap);
+    new (&s_pagemap) PageMap(total_pages, free_pages, usable_pages, pagemap);
 
     debug() << "Usable RAM: " << (free_pages >> 8)
             << "/" << (total_pages >> 8) << " MB\n";
