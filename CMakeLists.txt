@@ -21,8 +21,8 @@ message(STATUS "Building for ${TARGET_ARCH}-${TARGET_PLATFORM}")
 ######################################################################
 # BUILD LIBC, USERSPACE                                              #
 ######################################################################
-# add_subdirectory(libc)
 add_subdirectory(libkoerix)
+add_subdirectory(env)
 
 # todo userspace
 
