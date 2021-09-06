@@ -22,4 +22,4 @@ macro(user_prog id sources)
 endmacro()
 
 # add your programs here
-add_subdirectory(hello_world)
+add_subdirectory(textcon)

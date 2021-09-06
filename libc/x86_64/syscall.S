@@ -34,3 +34,4 @@ syscall_w_errno   __lseek             5
 syscall           set_thread_ptr      6
 syscall           get_thread_ptr      7
 syscall_w_errno   _ioctl              8
+syscall_w_errno   fb_info             9
