@@ -15,7 +15,15 @@ static void irq_handler(SerialPort* this_ptr)
   this_ptr->handleIrq();
 }
 
-SerialPort::SerialPort(SerialPort::Port port)
+SerialPort::SerialPort()
+{
+  // should not be used! only there to make
+  // the compiler happy when we want to statically
+  // allocate it (global constructors are not called)
+  assert(false);
+}
+
+SerialPort::SerialPort(SerialPort::Port port, bool noIrq)
   : m_port(port)
   , m_minor(atomic_add(&s_minorCounter, 1))
 {
@@ -42,10 +50,13 @@ SerialPort::SerialPort(SerialPort::Port port)
    * enable irq's and set RTS and DTR */
   outb(m_port + 0x04, 0b00001111);
 
-  /* enable interrupts */
-  uint8_t irq = (port == COM1) ? 4 : 5;
-  registerIrq(irq, (void*)irq_handler, (void*)this);
-  setIrqMode(true, false);
+  if (!noIrq)
+  {
+    /* enable interrupts */
+    uint8_t irq = (port == COM1) ? 4 : 5;
+    registerIrq(irq, (void*)irq_handler, (void*)this);
+    setIrqMode(true, false);
+  }
 }
 
 int SerialPort::ioctrl(size_t cmd, size_t* arg)
@@ -73,6 +84,10 @@ ssize_t SerialPort::write(char* buffer, size_t len)
   size_t cnt = len;
   while (cnt--)
   {
+    if (*buffer == '\n') {
+      write((char*)"\r", 1);
+    }
+
     /* wait until new data can be written
      * TODO: make this more efficient, e.g. IRQs? */
     while ((inb(m_port + 0x05) & 0x20) == 0);

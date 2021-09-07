@@ -9,16 +9,6 @@ namespace dev {
 
   static ktl::List<dev::Device*> s_devices;
 
-  Device::Device()
-  {
-    registerDevice(this);
-  }
-
-  Device::~Device()
-  {
-    unregisterDevice(this);
-  }
-
   void setup()
   {
     new (&s_devices) ktl::List<dev::Device*>;

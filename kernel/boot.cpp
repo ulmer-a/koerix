@@ -27,8 +27,8 @@ void kernel_init(const char* cmdline)
 
   dev::setup();
 
-  auto uart0 = (fs::File*)dev::findDevice("uart0");
-  fs::FileDesc serialPort{ *uart0 };
+  auto uart1 = (fs::File*)dev::findDevice("uart1");
+  fs::FileDesc serialPort{ *uart1 };
   auto mainTerm = ktl::shared_ptr<Terminal>(new Terminal(serialPort));
   Terminal::setMainTerm(mainTerm);
 

@@ -48,9 +48,12 @@ bool s_avxEnabled = false;
 extern char _bss_start;
 extern char _bss_end;
 
+extern void debug_init();
+
 extern "C" void _NORETURN _start(struct stivale_struct *stivale)
 {
   memset((void*)&_bss_start, 0, (size_t)_bss_end - (size_t)_bss_start);
+  debug_init();
 
   s_stivale = stivale;
   debug() << "Hello, world!\n";

@@ -49,7 +49,8 @@ namespace pc {
       };
 
     public:
-      SerialPort(Port port);
+      SerialPort();
+      SerialPort(Port port, bool noIrq = false);
       ~SerialPort() = default;
 
       int ioctrl(size_t cmd, size_t *arg);

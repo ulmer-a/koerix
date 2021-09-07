@@ -7,8 +7,8 @@ namespace dev {
   class Device : public fs::File
   {
     public:
-      Device();
-      ~Device();
+      Device() = default;
+      ~Device() = default;
 
       virtual const char* getName() const = 0;
   };

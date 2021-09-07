@@ -4,11 +4,12 @@
 #include <term.h>
 #include <spin.h>
 #include <mm.h>
+#include <pc/serial.h>
 
 using namespace debugging;
 
 static Spinlock s_debugLock;
-static bool s_debugInitialized = false;
+static pc::SerialPort s_serial;
 
 void panic(const char* message)
 {
@@ -17,18 +18,21 @@ void panic(const char* message)
   for (;;) { hlt(); }
 }
 
+void debug_init()
+{
+  Terminal::init();
+  new (&s_debugLock) Spinlock();
+  new (&s_serial) pc::SerialPort(pc::SerialPort::COM1, true);
+}
+
 DebugStream::~DebugStream()
 {
-  if (!s_debugInitialized) {
-    Terminal::init();
-    new (&s_debugLock) Spinlock();
-    s_debugInitialized = true;
-  }
-
+  size_t len = strlen(m_buffer);
   s_debugLock.lock();
 #ifdef DEBUG
   /* only print to QEMU debug IO port in debug mode */
   qemu_print(m_buffer);
+  s_serial.write(m_buffer, len);
 #endif
 
   /* kernel output will always go to the main terminal,
@@ -36,7 +40,6 @@ DebugStream::~DebugStream()
   auto mainTerm = Terminal::getMainTerm();
   if (mainTerm != nullptr)
   {
-    size_t len = strlen(m_buffer);
     mainTerm->write(m_buffer, len);
   }
   s_debugLock.unlock();

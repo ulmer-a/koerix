@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <debug.h>
 #include <pc/serial.h>
+#include <dev/devices.h>
 
 void timer_reset(uint16_t freqHz);
 
@@ -11,7 +12,7 @@ void init_drivers()
   /* init timer to 50hz */
   timer_reset(50);
 
-  /* initialize serial port drivers */
-  new pc::SerialPort(pc::SerialPort::COM1);
-  new pc::SerialPort(pc::SerialPort::COM2);
+  dev::registerDevice(
+    new pc::SerialPort(pc::SerialPort::COM2)
+  );
 }
