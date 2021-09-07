@@ -21,7 +21,7 @@ cd "$cwd"
 # Assemble root filesystem
 SYSROOT=${BINDIR}/rootfs
 echo "Assembling root filesystem (${SYSROOT})"
-mkdir -p ${SYSROOT}/boot
+mkdir -p ${SYSROOT}/boot ${SYSROOT}/bin
 cp -r ${SRCDIR}/platform/pc/skel/** ${SYSROOT}
 mv ${BINDIR}/env/bin/* ${SYSROOT}/bin
 cp ${LIMINE_BIN}/limine.sys ${SYSROOT}/boot/limine.sys
