@@ -7,14 +7,14 @@ const psf_font_t* console_font;
 size_t term_width, term_height;
 size_t pos_x, pos_y;
 
-static void term_puts(const char* str)
+static void term_puts(const char* str, size_t len)
 {
-  char c;
-  while ((c = *str++)) {
+  for (size_t i = 0; i < len; i++) {
+    char c = str[i];
+
     if (c == '\n') {
       pos_x = 0;
       pos_y += 1;
-      continue;
     }
 
     fb_putc(pos_x * console_font->width,
@@ -34,7 +34,10 @@ const char* banner =
 "    | |/ /___   ___ _ __(_)_  __  / _ \\/ ___|\n"
 "    | ' // _ \\ / _ \\ '__| \\ \\/ / | | | \\___ \\\n"
 "    | . \\ (_) |  __/ |  | |>  <  | |_| |___) |\n"
-"    |_|\\_\\___/ \\___|_|  |_/_/\\_\\  \\___/|____/\n\n\n" ;
+"    |_|\\_\\___/ \\___|_|  |_/_/\\_\\  \\___/|____/\n\n\n";
+const char* banner2 =
+"Koerix OS Console\n"
+"Copyright (C) 2017-2021 Alexander Ulmer\n\n";
 
 int main() {
     printf("hello, world!\n");
@@ -55,19 +58,21 @@ int main() {
     pos_y = 1;
 
     fb_set_fg(color(0xf5, 0xdf, 0x3b));
-    term_puts(banner);
-
+    term_puts(banner, strlen(banner));
     fb_set_fg(color(0xff, 0xff, 0xff));
-    term_puts("Koerix OS Console\n"
-              "Copyright (C) 2017-2021 Alexander Ulmer\n\n");
+    term_puts(banner2, strlen(banner2));
 
-    term_puts("Welcome from the User-mode console driver program! I am "
-              "an ELF program\nwith access to a full C library loaded by "
-              "the kernel. My stack\nand data is NX-protected and SSE is "
-              "supported.");
+    char buffer[1024];
+    for (;;)
+    {
+      size_t len = fread(buffer, 1024, 1, stdin);
+      if (len == 0) {
+        fprintf(stderr, "I/O error\n");
+        return 1;
+      }
 
-    fb_set_fg(color(0xff, 0x00, 0xa0));
-    fb_draw_rect(600, 300, 100, 120);
+      term_puts(buffer, len);
+    }
 
     return 0;
 }
