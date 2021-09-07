@@ -5,7 +5,11 @@ Koerix is a Unix-like hobby OS written in C++. I am mainly targeting the
 `x86_64` (on PC) and `AArch64` (on raspi4) architectures, but I'm also
 interested in getting the OS to work on `i386` and `arm` 32bit architectures.
 
-## Kernel Features
+Version 1.0 will be shipped as soon as bash and busybox are up and running :)
+
+![Screenshot](screenshot.png)
+
+## Current Kernel Features
 * x86_64 kernel (64bit) written in C++, C as well as some GNU Assembler
 * preemptive multitasking (single core), Mutexes and Spinlocks
 * full paged Virtual Memory support
