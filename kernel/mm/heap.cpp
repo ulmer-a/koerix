@@ -8,6 +8,7 @@
 #include <mm.h>
 #include <debug.h>
 #include <platform.h>
+#include <string.h>
 
 struct HeapBlock
 {
@@ -175,7 +176,11 @@ void *kmalloc(size_t size)
 
       crop(entry, required_size);
       s_heapMutex.unlock();
-      return entry + 1;
+
+      /* clear the memory before returning */
+      void* ret_ptr = (void*)(entry + 1);
+      memset(ret_ptr, 0, size);
+      return ret_ptr;
     }
   }
 
@@ -205,7 +210,10 @@ void *kmalloc(size_t size)
 
   s_heapMutex.unlock();
 
-  return blk + 1;
+  /* clear the memory before returning */
+  void* ret_ptr = (void*)(blk + 1);
+  memset(ret_ptr, 0, size);
+  return ret_ptr;
 }
 
 static void mergeBlocks(HeapBlock *first, HeapBlock *second)
