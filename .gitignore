@@ -4,3 +4,4 @@ build/
 ulmeros.*
 env/a.out
 scratch.txt
+*.img
