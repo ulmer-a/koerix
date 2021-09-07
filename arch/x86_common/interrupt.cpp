@@ -46,17 +46,18 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
       else if (ctx->irq == EXC_PAGEFAULT)
       {
         sti();
-        void* addr = getPageFaultAddr();
-        if (handlePageFault((size_t)getPageFaultAddr(), (FaultFlags)ctx->error)) {
-          return ctx;
-        }
 
-        debug() << "unhandled page fault @ " << addr << "\n";
-        debug() << "present=" << (ctx->error & PF_PRESENT ? "y" : "n")
+        void* addr = getPageFaultAddr();
+        debug() << "fault: " << addr
+                << ", present=" << (ctx->error & PF_PRESENT ? "y" : "n")
                 << ", user=" << (ctx->error & PF_USER ? "y" : "n")
                 << ", write=" << (ctx->error & PF_WRITE ? "y" : "n")
                 << ", reserved=" << (ctx->error & PF_RESERVED ? "y" : "n")
                 << ", data=" << (ctx->error & PF_CODE ? "n" : "y") << "\n";
+
+        if (handlePageFault((size_t)getPageFaultAddr(), (FaultFlags)ctx->error)) {
+          return ctx;
+        }
       }
 
       debug() << "(!!) exception #" << ctx->irq
