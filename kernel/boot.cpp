@@ -19,22 +19,34 @@ static void printIssue()
              " of total " << (pagemap.getTotalMemory() >> 20) << " MB\n\n";
 }
 
+const char* s_cmdline;
+bool cmdline_get(const char* name, char* buffer);
+
 void kernel_init(const char* cmdline)
 {
   /* this is the entry point to the architecture-independent
    * kernel boot code. page map, virtual memory and kernel heap
    * as well as scheduling are already up and running at this point. */
 
+  char valueBuffer[128];
+  s_cmdline = cmdline;
   dev::setup();
 
-  auto uart1 = (fs::File*)dev::findDevice("uart1");
-  fs::FileDesc serialPort{ *uart1 };
-  auto mainTerm = ktl::shared_ptr<Terminal>(new Terminal(serialPort));
-  Terminal::setMainTerm(mainTerm);
+  ktl::shared_ptr<Terminal> mainTerm;
+  if (cmdline_get("console", valueBuffer)) {
+    auto termDevice = (fs::File*)dev::findDevice(valueBuffer);
+    fs::FileDesc termDeviceFd{ *termDevice };
+    mainTerm = ktl::shared_ptr<Terminal>(new Terminal(termDeviceFd));
+    Terminal::setMainTerm(mainTerm);
+  }
 
   printIssue();
 
-  void* init_bin = find_module("init.elf");
+  if (!cmdline_get("init", valueBuffer)) {
+    panic("no 'init' cmdline parameter: don't know what to execute");
+  }
+
+  void* init_bin = find_module(valueBuffer);
   assert(init_bin != nullptr);
   auto loader = ktl::shared_ptr<Loader>(
         new Loader(init_bin));
