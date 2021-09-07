@@ -9,6 +9,7 @@
 using namespace debugging;
 
 static Spinlock s_debugLock;
+static bool s_initialized = false;
 static pc::SerialPort s_serial;
 
 void panic(const char* message)
@@ -23,10 +24,14 @@ void debug_init()
   Terminal::init();
   new (&s_debugLock) Spinlock();
   new (&s_serial) pc::SerialPort(pc::SerialPort::COM1, true);
+  s_initialized = true;
 }
 
 DebugStream::~DebugStream()
 {
+  if (!s_initialized)
+    return;
+
   size_t len = strlen(m_buffer);
   s_debugLock.lock();
 #ifdef DEBUG
