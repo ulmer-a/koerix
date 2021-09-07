@@ -9,12 +9,12 @@ namespace fs {
 
   static ktl::shared_ptr<Dir> s_root;
 
-  File* lookup(const char* path, int& error)
+  ktl::shared_ptr<File> lookup(const char* path, int& error)
   {
     if (s_root == nullptr)
     {
       error = ENOENT;
-      return nullptr;
+      return ktl::shared_ptr<fs::File>();
     }
 
     return s_root->lookup(path, error);
@@ -47,7 +47,7 @@ namespace fs {
       return false;
     }
 
-    auto dir = (Dir*)file;
+    auto dir = (Dir*)file.get();
     return dir->mount(fs, error);
   }
 

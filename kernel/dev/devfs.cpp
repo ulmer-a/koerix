@@ -18,5 +18,5 @@ int DeviceFile::ioctrl(size_t cmd, size_t *arg)
 void DeviceFs::registerDevice(
     const char* name, ktl::shared_ptr<DeviceFile> device)
 {
-
+  addFile(name, *(ktl::shared_ptr<File>*)&device);
 }
