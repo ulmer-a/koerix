@@ -6,7 +6,8 @@
 
 UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
                          ktl::shared_ptr<Terminal> term)
-  : m_addrSpace(new AddrSpace())
+  : m_state(RUNNING)
+  , m_addrSpace(new AddrSpace())
   , m_loader(loader)
   , m_term(term)
 {
