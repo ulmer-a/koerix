@@ -1,7 +1,8 @@
 #include <debug.h>
 #include <term.h>
 #include <dev/devices.h>
-#include <fs/file.h>
+#include <fs/vfs.h>
+#include <fs/fd.h>
 #include <module.h>
 #include <shared_ptr.h>
 #include <loader.h>
@@ -32,17 +33,18 @@ void kernel_init(const char* cmdline)
   s_cmdline = cmdline;
   dev::setup();
 
+  /* check whether we got a command line option instructing the kernel
+   * to open a terminal with a specified device */
   ktl::shared_ptr<Terminal> mainTerm;
-  if (cmdline_get("console", valueBuffer)) {
-    auto termDevice = (fs::File*)dev::findDevice(valueBuffer);
-    if (termDevice == nullptr)
-    {
-      debug() << "warning: cannot find device '" << valueBuffer << "', ignoring\n";
-    }
-    else
-    {
-      fs::FileDesc termDeviceFd{ *termDevice };
-      mainTerm = ktl::shared_ptr<Terminal>(new Terminal(termDeviceFd));
+  if (cmdline_get("console", valueBuffer))
+  {
+    int error;
+    auto fd = fs::open(valueBuffer, error);
+    if (!fd.valid()) {
+      debug() << "warning: " << valueBuffer << ": "
+              << strerror(error) << "\n";
+    } else {
+      mainTerm = ktl::shared_ptr<Terminal>(new Terminal(fd));
       Terminal::setMainTerm(mainTerm);
     }
   }

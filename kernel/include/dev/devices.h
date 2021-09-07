@@ -4,19 +4,10 @@
 
 namespace dev {
 
-  class Device : public fs::File
-  {
-    public:
-      Device() = default;
-      ~Device() = default;
-
-      virtual const char* getName() const = 0;
-  };
+  class DeviceFile;
 
   void setup();
 
-  dev::Device* findDevice(const char* name);
-  void registerDevice(dev::Device* chardev);
-  void unregisterDevice(dev::Device* chardev);
+  void registerDevice(const char* name, dev::DeviceFile* dev);
 
 }

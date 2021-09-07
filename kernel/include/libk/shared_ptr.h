@@ -6,7 +6,7 @@
 
 namespace ktl {
   namespace _internal {
-    template<typename T>
+    template <typename T>
     class shared_ptr_data
     {
       public:
@@ -72,6 +72,16 @@ namespace ktl {
 
       T* operator->() {
         return get();
+      }
+
+      bool operator==(void* ptr) const {
+        if (m_data != nullptr)
+          return m_data->ptr() == ptr;
+        return ptr == nullptr;
+      }
+
+      bool isNull() const {
+        return *this == nullptr;
       }
 
       T* get() {

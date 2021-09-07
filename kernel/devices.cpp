@@ -4,35 +4,35 @@
 #include <mm.h>
 #include <string.h>
 #include <dev/chardev.h>
+#include <shared_ptr.h>
+#include <dev/devfs.h>
+#include <fs/vfs.h>
 
 namespace dev {
 
-  static ktl::List<dev::Device*> s_devices;
+  static ktl::shared_ptr<fs::Dir> s_devfs;
 
   void setup()
   {
-    new (&s_devices) ktl::List<dev::Device*>;
+    s_devfs = ktl::shared_ptr<fs::Dir>((fs::Dir*)new DeviceFs());
+
+    // mount the device filesystem as rootfs for now
+    int error;
+    if (!fs::mount("/", s_devfs, error))
+      assert(false);
+
     init_drivers();
   }
 
-  void registerDevice(Device* chardev)
+  DeviceFs& DeviceFs::get()
   {
-    s_devices.push_back(chardev);
+    return *(DeviceFs*)s_devfs.get();
   }
 
-  void unregisterDevice(Device* chardev)
+  void registerDevice(const char* name, DeviceFile* dev)
   {
-    s_devices.remove(s_devices.find(chardev));
-  }
-
-  Device* findDevice(const char* name)
-  {
-    for (auto it = s_devices.begin(); it != nullptr; it = it->next)
-    {
-      if (strcmp((*it)->getName(), name) == 0)
-        return it->item;
-    }
-    return nullptr;
+    DeviceFs* devfs = (DeviceFs*)s_devfs.get();
+    devfs->registerDevice(name, ktl::shared_ptr<DeviceFile>(dev));
   }
 
 }

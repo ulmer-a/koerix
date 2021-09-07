@@ -16,6 +16,7 @@ static void irq_handler(SerialPort* this_ptr)
 }
 
 SerialPort::SerialPort()
+  : dev::CharDev(0, 0)
 {
   // should not be used! only there to make
   // the compiler happy when we want to statically
@@ -24,17 +25,11 @@ SerialPort::SerialPort()
 }
 
 SerialPort::SerialPort(SerialPort::Port port, bool noIrq)
-  : m_port(port)
-  , m_minor(atomic_add(&s_minorCounter, 1))
+  : dev::CharDev(getMajor(), atomic_add(&s_minorCounter, 1))
+  , m_port(port)
 {
-  debug() << "init PC serial port #" << m_minor
+  debug() << "init PC serial port #" << minor()
           << " at port " << DEBUG_HEX << (size_t)port << "\n";
-
-  /* generate device name */
-  m_name[0] = 0;
-  char int_buffer[10];
-  strcpy(m_name, "uart");
-  strcat(m_name, utoa(m_minor, int_buffer, 10));
 
   /* temporarily disable all IRQs */
   setIrqMode(false, false);
@@ -98,11 +93,6 @@ ssize_t SerialPort::write(char* buffer, size_t len)
   return len;
 }
 
-const char* SerialPort::getName() const
-{
-  return m_name;
-}
-
 void SerialPort::setIrqMode(bool dataReadyIrq, bool txEmptyIrq)
 {
   /* Write to the Interrupt Enable Register (IER) */
@@ -134,8 +124,16 @@ void SerialPort::setBaudRate(SerialPort::BaudRate baud)
   outb(m_port + 1, baud >> 8);          // high byte
   outb(m_port + 3, line_ctrl & 0x7f);   // clear DLAB bit
 
-  debug() << "uart" << m_minor << ": baud_rate="
+  debug() << "uart" << minor() << ": baud_rate="
           << (115200 / baud) << "\n";
+}
+
+size_t SerialPort::getMajor()
+{
+  static size_t myMajor = (size_t)-1;
+  if (myMajor == (size_t)-1)
+    myMajor = dev::CharDev::getNewMajor();
+  return myMajor;
 }
 
 void SerialPort::handleIrq()
@@ -147,6 +145,6 @@ void SerialPort::handleIrq()
   size_t bytes_received = 0;
   while ((inb(m_port + 5) & 1) && bytes_received < 32)
     buffer[bytes_received++] = inb(m_port);
-  onRead(buffer, bytes_received);
+  onReceive(buffer, bytes_received);
 }
 

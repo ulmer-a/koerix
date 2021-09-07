@@ -23,7 +23,7 @@ void debug_init()
 {
   Terminal::init();
   new (&s_debugLock) Spinlock();
-  new (&s_serial) pc::SerialPort(pc::SerialPort::COM1, true);
+  new (&s_serial) pc::SerialPort(pc::SerialPort::COM2, true);
   s_initialized = true;
 }
 
