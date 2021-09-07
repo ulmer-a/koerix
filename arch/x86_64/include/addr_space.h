@@ -16,6 +16,9 @@ class AddrSpace
         MAP_NOEXEC  = BIT(2)
     };
 
+    struct Mapping;
+    struct GenericPagingTable;
+
     AddrSpace();
     ~AddrSpace() = default;
 
@@ -29,6 +32,9 @@ class AddrSpace
 
   private:
     void updateKernelMappings();
+    void invalidate(size_t virt);
+    void resolve(size_t virt, Mapping& mapping);
+    bool checkForPresentEntries(GenericPagingTable* table);
 
     size_t m_pml4;
 };

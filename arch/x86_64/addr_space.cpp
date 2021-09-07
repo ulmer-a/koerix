@@ -6,7 +6,7 @@
 #include <features.h>
 
 
-struct GenericPagingTable
+struct AddrSpace::GenericPagingTable
 {
   uint64_t present                   : 1;
   uint64_t write                     : 1;
@@ -23,6 +23,22 @@ struct GenericPagingTable
   uint64_t available2                : 10;
   uint64_t no_exec                   : 1;
 } _PACKED;
+
+struct AddrSpace::Mapping
+{
+  /* indices, pointers and PPN numbers
+   * of all four tables, where
+   *  0.. page table
+   *  1.. page directory
+   *  2.. pdpt
+   *  (3.. pml4)   */
+  size_t                ppn[4];
+  size_t                indices[4];
+  GenericPagingTable*   tables[4];
+
+  void*                 page;
+};
+
 
 AddrSpace s_kernelAddrSpace;
 bool s_initialized = false;
@@ -76,11 +92,18 @@ void AddrSpace::apply()
     __asm__ volatile ("mov %0, %%cr3;" : : "r"(phys_addr));
 }
 
-static inline void tlb_invalidate(size_t virt)
+void AddrSpace::invalidate(size_t virt)
 {
+  /* only do the TLB invalidation if we're mapping/unmapping
+   * the currently active address space. */
+  size_t cr3;
+  __asm__ volatile ("movq %%cr3, %0;" : "=r"(cr3));
+  if (cr3 == (m_pml4 << PAGE_SHIFT))
+  {
     /* Invalidate the respective entry in the TLB */
     virt <<= PAGE_SHIFT;
     __asm__ volatile ("invlpg (%0)" : : "b"(virt) : "memory");
+  }
 }
 
 void AddrSpace::map(size_t virt, size_t phys, int flags)
@@ -149,9 +172,36 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
 
 void AddrSpace::unmap(size_t virt)
 {
+  auto pageMap = PageMap::get();
 
-  assert(false);
-  tlb_invalidate(virt);
+  Mapping mapping;
+  resolve(virt, mapping);
+
+  /* if the payload page is actually mapped, free it */
+  if (mapping.page != nullptr)
+    pageMap.free(mapping.ppn[0]);
+
+  for (int level = 0; level < 4; level++)
+  {
+    /* check if the table on the current level is actually present */
+    if (mapping.tables[level] == nullptr)
+      continue;
+
+    auto& entry = mapping.tables[level][mapping.indices[level]];
+    *((uint64_t*)&entry) = 0;
+
+    if (level == 3)
+      break;
+
+    /* if there are other present entries, we cannot release
+     * any further tables -> we're done. */
+    if (checkForPresentEntries(mapping.tables[level]))
+      break;
+
+    pageMap.free(mapping.ppn[level + 1]);
+  }
+
+  invalidate(virt);
 }
 
 void AddrSpace::updateKernelMappings()
@@ -166,4 +216,33 @@ void AddrSpace::updateKernelMappings()
   auto kernel_upper_pml4 =
       (GenericPagingTable*)PPN_TO_VIRT(kernelVspace.m_pml4) + 256;
   memcpy((void*)my_upper_pml4, (void*)kernel_upper_pml4, PAGE_SIZE / 2);
+}
+
+void AddrSpace::resolve(size_t virt, AddrSpace::Mapping& mapping)
+{
+  size_t& pml4i = (mapping.indices[3] = (virt >> 27) & 0x1ff);     // PML4
+  size_t& pdpti = (mapping.indices[2] = (virt >> 18) & 0x1ff);     // PDPT
+  size_t& pdiri = (mapping.indices[1] = (virt >> 9) & 0x1ff);      // PDIR
+  size_t& ptbli = (mapping.indices[0] = (virt) & 0x1ff);           // PTAB
+
+  auto pml4 = (GenericPagingTable*)PPN_TO_VIRT(m_pml4);
+  auto pdpt = (GenericPagingTable*)PPN_TO_VIRT(mapping.ppn[3] = pml4[pml4i].ppn);
+  auto pdir = (GenericPagingTable*)PPN_TO_VIRT(mapping.ppn[2] = pdpt[pdpti].ppn);
+  auto ptbl = (GenericPagingTable*)PPN_TO_VIRT(mapping.ppn[1] = pdir[pdiri].ppn);
+  mapping.page = (void*)PPN_TO_VIRT(mapping.ppn[0] = ptbl[ptbli].ppn);
+
+  mapping.tables[3] = pml4;
+  mapping.tables[2] = pdpt;
+  mapping.tables[1] = pdir;
+  mapping.tables[0] = ptbl;
+}
+
+bool AddrSpace::checkForPresentEntries(GenericPagingTable* table)
+{
+  for (size_t i = 0; i < 512; i++)
+  {
+    if (table[i].present)
+      return true;
+  }
+  return false;
 }
