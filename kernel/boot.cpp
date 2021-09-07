@@ -35,9 +35,16 @@ void kernel_init(const char* cmdline)
   ktl::shared_ptr<Terminal> mainTerm;
   if (cmdline_get("console", valueBuffer)) {
     auto termDevice = (fs::File*)dev::findDevice(valueBuffer);
-    fs::FileDesc termDeviceFd{ *termDevice };
-    mainTerm = ktl::shared_ptr<Terminal>(new Terminal(termDeviceFd));
-    Terminal::setMainTerm(mainTerm);
+    if (termDevice == nullptr)
+    {
+      debug() << "warning: cannot find device '" << valueBuffer << "', ignoring\n";
+    }
+    else
+    {
+      fs::FileDesc termDeviceFd{ *termDevice };
+      mainTerm = ktl::shared_ptr<Terminal>(new Terminal(termDeviceFd));
+      Terminal::setMainTerm(mainTerm);
+    }
   }
 
   printIssue();
