@@ -12,7 +12,7 @@ void init_drivers()
   /* init timer to 50hz */
   timer_reset(50);
 
-  dev::registerDevice(
+  dev::registerDevice("uart0",
     new pc::SerialPort(pc::SerialPort::COM2)
   );
 }

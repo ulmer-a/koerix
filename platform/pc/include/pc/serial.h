@@ -2,6 +2,7 @@
 
 #include <types.h>
 #include <dev/chardev.h>
+#include <fifo.h>
 
 namespace pc {
 
@@ -12,6 +13,24 @@ namespace pc {
         COM1 = 0x3f8,
         COM2 = 0x2f8,
       };
+
+      static const size_t RECV_BUFFER_SIZE = 4096;
+
+    public:
+      // dummy constructor for static allocation
+      SerialPort();
+
+      // normal initialization
+      SerialPort(Port port, bool noIrq = false);
+      ~SerialPort() = default;
+
+      // called by the irq subsystem, dont' call!
+      void handleIrq();
+
+      // operations:
+      int ioctrl(size_t cmd, size_t *arg);
+      ssize_t write(char* buffer, size_t len) final;
+      ssize_t read(char* buffer, size_t len) final;
 
       enum BitMode {
         BITS_5        = 0x00,
@@ -48,27 +67,20 @@ namespace pc {
         CMD_SET_BAUD
       };
 
-    public:
-      SerialPort();
-      SerialPort(Port port, bool noIrq = false);
-      ~SerialPort() = default;
-
-      int ioctrl(size_t cmd, size_t *arg);
-      ssize_t write(char* buffer, size_t len) final;
-
-      const char* getName() const final;
-
-      void handleIrq();
-
     private:
+      // modesetting -> do it via ioctl()
       void setIrqMode(bool dataReadyIrq, bool txEmptyIrq);
-      void setMode(BitMode bit, ParityMode parity,
-                   StopBitMode stop);
+      void setMode(BitMode bit, ParityMode parity, StopBitMode stop);
       void setBaudRate(BaudRate baud);
 
+      char m_recvBuffer[RECV_BUFFER_SIZE];
+      Fifo m_fifo;
+
+      // io port base
       uint16_t m_port;
-      size_t m_minor;
-      char m_name[16];
+
+      // accounting related
+      static size_t getMajor();
       static size_t s_minorCounter;
   };
 
