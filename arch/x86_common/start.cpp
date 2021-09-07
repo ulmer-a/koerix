@@ -6,6 +6,7 @@
 #include <x86/stivale.h>
 #include <kernel_task.h>
 #include <features.h>
+#include <string.h>
 
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 1024*16;
@@ -44,8 +45,13 @@ extern void create_page_bitmap();
 bool s_sseEnabled = false;
 bool s_avxEnabled = false;
 
+extern char _bss_start;
+extern char _bss_end;
+
 extern "C" void _NORETURN _start(struct stivale_struct *stivale)
 {
+  memset((void*)&_bss_start, 0, (size_t)_bss_end - (size_t)_bss_start);
+
   s_stivale = stivale;
   debug() << "Hello, world!\n";
 

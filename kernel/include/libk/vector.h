@@ -10,7 +10,10 @@ namespace ktl {
   class vector
   {
     public:
-      vector() {
+      vector()
+        : m_size(0)
+        , m_array(nullptr)
+      {
         alloc(0);
       }
 
@@ -57,6 +60,7 @@ namespace ktl {
         T* old_array = m_array;
         alloc(capacity);
         memcpy(m_array, old_array, sizeof(T) * m_size);
+        delete old_array;
       }
 
     private:

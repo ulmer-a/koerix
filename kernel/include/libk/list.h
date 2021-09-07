@@ -28,9 +28,14 @@ namespace ktl {
     class List : public Canary
     {
       public:
-        List() = default;
+        List()
+          : m_first(nullptr)
+          , m_last(nullptr)
+          , m_size(0)
+        { }
 
-        ~List() {
+        ~List()
+        {
           verify();
           clear();
         }
@@ -106,14 +111,15 @@ namespace ktl {
 
         T front() {
           verify();
-          assert(m_first && m_size > 0);
+          assert(m_size > 0);
+          assert(m_first != nullptr);
           return m_first->item;
         }
 
         T pop_front() {
           verify();
-          if (!m_first || m_size == 0)
-            assert(false);
+          assert(m_size > 0);
+          assert(m_first != nullptr);
           T item = m_first->item;
           remove(m_first);
           return item;

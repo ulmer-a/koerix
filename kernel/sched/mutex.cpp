@@ -5,6 +5,7 @@
 
 Mutex::Mutex()
   : m_lock(0)
+  , m_heldBy(nullptr)
 { }
 
 Mutex::~Mutex()

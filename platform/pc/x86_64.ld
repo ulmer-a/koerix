@@ -46,10 +46,12 @@ SECTIONS
         *(.dynamic)
     } :data :dynamic
  
+    _bss_start = .;
     .bss : {
         *(COMMON)
         *(.bss*)
     } :data
+    _bss_end = .;
 
     . = ALIGN(4096);
     _kernel_end = .;
