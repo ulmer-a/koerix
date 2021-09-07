@@ -59,8 +59,18 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
                 << ", data=" << (ctx->error & PF_CODE ? "n" : "y") << "\n";
       }
 
-      debug() << "(!!) exception #" << ctx->irq << " (" << strexcept(ctx->irq) << ")\n";
-      debug() << DEBUG_HEX << "rip=" << ctx->rip << ", rsp=" << ctx->rsp << ", err=" << ctx->error << "\n";
+      debug() << "(!!) exception #" << ctx->irq
+              << " (" << strexcept(ctx->irq) << ")\n";
+      debug() << DEBUG_HEX << "rip=" << ctx->rip
+              << ", rsp=" << ctx->rsp
+              << ", err=" << ctx->error << "\n";
+      debug() << DEBUG_HEX << "rax=" << ctx->rax
+              << ", rbx=" << ctx->rbx
+              << ", rcx=" << ctx->rcx << "\n";
+      debug() << DEBUG_HEX << "rdx=" << ctx->rdx
+              << ", rdi=" << ctx->rdi
+              << ", rsi=" << ctx->rsi << "\n";
+
       panic("unhandled exception");
     }
   }
