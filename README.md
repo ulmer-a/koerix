@@ -9,6 +9,10 @@ Version 1.0 will be shipped as soon as bash and busybox are up and running :)
 
 ![Screenshot](screenshot.png)
 
+In the image, you can see the userspace program `textcon` in action. the terminal
+to the left shows the serial output. `textcon` will print everything on the screen
+it reads from it's stdin (in this case, the serial console).
+
 ## Current Kernel Features
 * x86_64 kernel (64bit) written in C++, C as well as some GNU Assembler
 * preemptive multitasking (single core), Mutexes and Spinlocks
