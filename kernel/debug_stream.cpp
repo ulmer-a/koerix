@@ -55,6 +55,7 @@ DebugStream& DebugStream::operator<<(const char* str)
 DebugStream& DebugStream::operator<<(char c)
 {
   *m_destPtr++ = c;
+  *m_destPtr = 0;
   return *this;
 }
 
