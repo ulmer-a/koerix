@@ -1,6 +1,7 @@
 #pragma once
 
 #include <types.h>
+#include <mutex.h>
 
 class Fifo
 {
@@ -9,13 +10,14 @@ class Fifo
     Fifo(char* buffer, size_t size);
     ~Fifo();
 
-    void put(char c, bool lock = true);
-    char get();
-
+    ssize_t write(char* buffer, size_t len);
     ssize_t read(char *buffer, size_t len);
-    ssize_t write(char *buffer, size_t len);
 
   private:
+    Mutex m_subscriberLock;
+    ktl::List<Task*> m_subscribers;
+    void wakeupSubscribers();
+
     char* m_data;
     size_t m_available;
     const size_t m_size;

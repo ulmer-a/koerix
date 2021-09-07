@@ -5,5 +5,5 @@ using namespace fs;
 
 FileDesc File::open(int& error)
 {
-  return FileDesc(this);
+  return FileDesc(this, true);
 }

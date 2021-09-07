@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 #include <koerix/framebuffer.h>
 
 const psf_font_t* console_font;
@@ -12,9 +13,13 @@ static void term_puts(const char* str, size_t len)
   for (size_t i = 0; i < len; i++) {
     char c = str[i];
 
-    if (c == '\n') {
+    if (c == '\n' || c == '\r') {
       pos_x = 0;
       pos_y += 1;
+      continue;
+    } else if (c == '\b') {
+      pos_x -= 1;
+      c = ' ';
     }
 
     fb_putc(pos_x * console_font->width,
@@ -62,16 +67,19 @@ int main() {
     fb_set_fg(color(0xff, 0xff, 0xff));
     term_puts(banner2, strlen(banner2));
 
+    fflush(stdout);
+
     char buffer[1024];
     for (;;)
     {
-      size_t len = fread(buffer, 1024, 1, stdin);
-      if (len == 0) {
+      ssize_t len = read(0, buffer, 1024);
+      if (len < 0) {
         fprintf(stderr, "I/O error\n");
         return 1;
       }
 
       term_puts(buffer, len);
+      write(1, buffer, len);
     }
 
     return 0;

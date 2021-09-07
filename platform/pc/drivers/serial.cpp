@@ -17,7 +17,6 @@ static void irq_handler(SerialPort* this_ptr)
 
 SerialPort::SerialPort()
   : dev::CharDev(0, 0)
-  , m_fifo(1)
 {
   // should not be used! only there to make
   // the compiler happy when we want to statically
@@ -28,7 +27,6 @@ SerialPort::SerialPort()
 SerialPort::SerialPort(SerialPort::Port port, bool noIrq)
   : dev::CharDev(getMajor(), atomic_add(&s_minorCounter, 1))
   , m_port(port)
-  , m_fifo(m_recvBuffer, RECV_BUFFER_SIZE)
 {
   debug() << "init PC serial port #" << minor()
           << " at port " << DEBUG_HEX << (size_t)port << "\n";
@@ -95,11 +93,6 @@ ssize_t SerialPort::write(char* buffer, size_t len)
   return len;
 }
 
-ssize_t SerialPort::read(char* buffer, size_t len)
-{
-  return m_fifo.read(buffer, len);
-}
-
 void SerialPort::setIrqMode(bool dataReadyIrq, bool txEmptyIrq)
 {
   /* Write to the Interrupt Enable Register (IER) */
@@ -148,8 +141,10 @@ void SerialPort::handleIrq()
   /* read 32 bytes from the serial's FIFO. if there's
    * more than that in the FIFO, we get another interrupt
    * right away and start over again. */
+  char buffer[32];
   size_t bytes_received = 0;
   while ((inb(m_port + 5) & 1) && bytes_received < 32)
-    m_fifo.put(inb(m_port), false);
+    buffer[bytes_received++] = inb(m_port);
+  onReceive(buffer, bytes_received);
 }
 

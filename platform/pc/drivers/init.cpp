@@ -13,6 +13,6 @@ void init_drivers()
   timer_reset(50);
 
   dev::registerDevice("uart0",
-    new pc::SerialPort(pc::SerialPort::COM2)
+    new pc::SerialPort(pc::SerialPort::COM1)
   );
 }

@@ -26,61 +26,64 @@ Fifo::~Fifo()
 
 }
 
-void Fifo::put(char c, bool lock)
+ssize_t Fifo::write(char* buffer, size_t len)
 {
-  if (lock) cli();
-
-  /* write a character, increment the write pointer
-   * or let it wrap around.  */
-  assert(m_writePtr < m_size);
-  m_data[m_writePtr++] = c;
-  if (m_writePtr == m_size)
-    m_writePtr = 0;
-
-  /* if the amount of available bytes is smaller than
-   * the buffer size, just increment the amount of
-   * available bytes. otherwise, increment the read
-   * pointer so that get() will always return the m_size
-   * newest characters.  */
-  if (m_available < m_size)
+  for (size_t i = 0; i < len; i++)
   {
-    m_available += 1;
-  }
-  else
-  {
-    m_readPtr += 1;
-    if (m_readPtr == m_size)
-      m_readPtr = 0;
+    /* write a character, increment the write pointer
+     * or let it wrap around.  */
+    assert(m_writePtr < m_size);
+    m_data[m_writePtr++] = buffer[i];
+    if (m_writePtr == m_size)
+      m_writePtr = 0;
+
+    /* if the amount of available bytes is smaller than
+     * the buffer size, just increment the amount of
+     * available bytes. otherwise, increment the read
+     * pointer so that get() will always return the m_size
+     * newest characters.  */
+    if (m_available < m_size)
+    {
+      m_available += 1;
+    }
+    else
+    {
+      m_readPtr += 1;
+      if (m_readPtr == m_size)
+        m_readPtr = 0;
+    }
   }
 
-  if (lock) sti();
+  wakeupSubscribers();
+  return len;
 }
 
-char Fifo::get()
+void Fifo::wakeupSubscribers()
 {
-  cli();
-  if (m_available == 0)
-  {
-    sched::currentTask()->sleep();
-  }
-
-  /* read one byte from the buffer */
-  assert(m_readPtr < m_size);
-  char c = m_data[m_readPtr++] = c;
-  if (m_readPtr == m_size)
-    m_readPtr = 0;
-  m_available -= 1;
-
-  sti();
-  return c;
+  while (m_subscribers.size() > 0)
+    m_subscribers.pop_front()->resume();
 }
 
 ssize_t Fifo::read(char* buffer, size_t len)
 {
-  return -ENOTSUP;
-}
+  cli();
+  if (m_available == 0)
+  {
+    m_subscribers.push_back(sched::currentTask());
+    sti();
+    sched::currentTask()->sleep();
+    cli();
+  }
 
-ssize_t Fifo::write(char* buffer, size_t len)
-{
-  return -ENOTSUP;
+  size_t bytes_read = 0;
+  while (m_available > 0) {
+    assert(m_readPtr < m_size);
+    *buffer++ = m_data[m_readPtr++];
+    if (m_readPtr == m_size)
+      m_readPtr = 0;
+    m_available -= 1;
+    bytes_read += 1;
+  }
+  sti();
+  return bytes_read;
 }
