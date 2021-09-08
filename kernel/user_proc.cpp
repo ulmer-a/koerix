@@ -3,6 +3,7 @@
 #include <scheduler.h>
 #include <user_task.h>
 #include <proc_list.h>
+#include <scheduler.h>
 
 UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
                          ktl::shared_ptr<Terminal> term)
@@ -11,11 +12,14 @@ UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
   , m_loader(loader)
   , m_term(term)
 {
+  /* add this process to the global list of processes */
   ProcList::get().onAddProcess(this);
 
   assert(m_loader->isValid());
 
-  addTask();
+  /* create a main thread for this process, the entry point
+   * is defined by the entry address found in the ELF binary. */
+  addTask(m_loader->entryAddr());
 }
 
 bool UserProcess::isOwnProcess() const
@@ -27,32 +31,47 @@ bool UserProcess::isOwnProcess() const
   return (&userTask->getProcess() == this);
 }
 
-bool UserProcess::isValidStackAddr(size_t addr) const
+void UserProcess::addTask(void* entryPoint)
 {
-  ScopedMutex smtx { m_stackListLock };
-  size_t i = (USER_BREAK - addr) / UserStack::getStackSize();
-  if (m_stackList.size() <= i)
-    return false;
-  return m_stackList[i];
+  ScopedMutex smtx { m_taskListLock };
+  assert(m_state == RUNNING);
+  auto task = new UserTask(*this, entryPoint);
+  m_taskList.push_back(task);
+
+  /* insert the task into the scheduler's run
+   * queue. this will effectively start the task.
+   * do this *after* it has been inserted
+   * into the task list of this process. */
+  sched::insertTask(task);
 }
 
 void UserProcess::exit(int status)
 {
-  /* acquire the task list lock, so no new tasks can be
+  /* acquire the task list lock, so that no new tasks can be
    * added. this will also prevent the process from being
    * killed multiple times. */
   m_taskListLock.lock();
-
   if (m_state != RUNNING)
   {
     m_taskListLock.unlock();
 
+    /* if the calling task is a task of a process that has
+     * already been killed, then kill ourselves. otherwise,
+     * we're done as the process has already been killed. */
     if (isOwnProcess())
       sched::currentTask()->exit();
     return;
   }
 
+  /* a process in the killed state will remain allocated as long
+   * as there are tasks around. the system will occasionally call
+   * checkForDeadTasks() which removes any ceased tasks. Then, and
+   * only then, the process can safely be deleted. */
   m_state = KILLED;
+
+  /* kill all remaining threads. this doesn't take immediate effect,
+   * because a task can only be killed by itself, so when we send a
+   * kill request to a task we must wait until they have done so. */
   killAllTasks();
 
   m_taskListLock.unlock();
@@ -68,11 +87,14 @@ void UserProcess::checkForDeadTasks()
     auto userTask = it->item;
     if (userTask->state() == Task::KILLED)
     {
+      /* don't delete ourselves while we're running */
       assert(userTask != sched::currentTask());
 
       delete userTask;
       debug() << "tid " << userTask->tid() << ": deleted\n";
 
+      /* some boilerplate code to remove the task from the list and
+       * not break the for loop at the same time:  */
       auto prev = it->prev;
       m_taskList.remove(it);
       it = prev;
@@ -84,15 +106,10 @@ void UserProcess::checkForDeadTasks()
     }
   }
 
+  /* after there's no more tasks in the list, the process
+   * can safely be marked ready for deletion. */
   if (m_taskList.size() == 0)
     m_state = TO_BE_DELETED;
-}
-
-void UserProcess::addTask()
-{
-  ScopedMutex smtx { m_taskListLock };
-  auto task = new UserTask(*this);
-  m_taskList.push_back(task);
 }
 
 void UserProcess::killAllTasks()
@@ -109,6 +126,15 @@ void UserProcess::killAllTasks()
 
     (*it)->asyncExit();
   }
+}
+
+bool UserProcess::isValidStackAddr(size_t addr) const
+{
+  ScopedMutex smtx { m_stackListLock };
+  size_t i = (USER_BREAK - addr) / UserStack::getStackSize();
+  if (m_stackList.size() <= i)
+    return false;
+  return m_stackList[i];
 }
 
 UserStack UserProcess::allocStack()
@@ -141,24 +167,4 @@ void UserProcess::releaseStack(UserStack stack)
     m_stackList.pop_back();
   else
     m_stackList[i] = false;
-}
-
-UserProcess::ProcState UserProcess::state() const
-{
-  return m_state;
-}
-
-AddrSpace& UserProcess::getAddrSpace()
-{
-  return *m_addrSpace;
-}
-
-Terminal& UserProcess::getTerm()
-{
-  return *m_term;
-}
-
-const Loader& UserProcess::getLoader()
-{
-  return *m_loader;
 }

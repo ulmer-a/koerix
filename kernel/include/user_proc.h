@@ -27,22 +27,22 @@ class UserProcess
                 ktl::shared_ptr<Terminal> term);
     ~UserProcess() = default;
 
-    ProcState state() const;
+    inline ProcState state() const { return m_state; }
     bool isOwnProcess() const;
-    AddrSpace& getAddrSpace();
-    Terminal& getTerm();
-    const Loader& getLoader();
+    AddrSpace& getAddrSpace() { return *m_addrSpace; }
+    Terminal& getTerm() { return *m_term; }
+    const Loader& getLoader() { return *m_loader; }
     bool isValidStackAddr(size_t addr) const;
-    void checkForDeadTasks();
 
     void exit(int status);
+    void checkForDeadTasks();
 
   protected: /* UserTask can access  */
     UserStack allocStack();
     void releaseStack(UserStack stack);
 
   private:
-    void addTask();
+    void addTask(void* entryPoint);
     void killAllTasks();
 
     ProcState m_state;

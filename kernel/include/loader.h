@@ -10,7 +10,7 @@ class Loader
   public:
     Loader(const void* elfBinary);
 
-    size_t getEntryPoint() const;
+    void* entryAddr() const;
     bool isValid() const;
 
     bool load(size_t addr, AddrSpace& vspace) const;

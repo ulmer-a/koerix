@@ -11,7 +11,7 @@ class FpuContext;
 class UserTask : public Task
 {
   public:
-    UserTask(UserProcess& process);
+    UserTask(UserProcess& process, void* entryPoint);
     ~UserTask();
 
     void initContext(size_t entryPoint);

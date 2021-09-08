@@ -7,14 +7,13 @@
 #include <scheduler.h>
 #include <fpu.h>
 
-UserTask::UserTask(UserProcess& process)
+UserTask::UserTask(UserProcess& process, void* entryPoint)
   : Task(process.getAddrSpace())
   , m_stack(process.allocStack())
   , m_process(process)
   , m_fpuContext(new FpuContext())
 {
-  initContext(m_process.getLoader().getEntryPoint());
-  sched::insertTask(this);
+  initContext((size_t)entryPoint);
 }
 
 UserTask::~UserTask()

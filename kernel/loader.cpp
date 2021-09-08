@@ -41,9 +41,9 @@ bool Loader::isValidBinary() const
   return true;
 }
 
-size_t Loader::getEntryPoint() const
+void* Loader::entryAddr() const
 {
-  return (size_t)m_header->entry;
+  return (void*)m_header->entry;
 }
 
 bool Loader::isValid() const
