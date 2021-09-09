@@ -31,7 +31,7 @@ bool UserProcess::isOwnProcess() const
   return (&userTask->getProcess() == this);
 }
 
-void UserProcess::addTask(void* entryPoint)
+size_t UserProcess::addTask(void* entryPoint)
 {
   ScopedMutex smtx { m_taskListLock };
   assert(m_state == RUNNING);
@@ -43,6 +43,7 @@ void UserProcess::addTask(void* entryPoint)
    * do this *after* it has been inserted
    * into the task list of this process. */
   sched::insertTask(task);
+  return task->tid();
 }
 
 void UserProcess::exit(int status)

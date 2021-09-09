@@ -14,7 +14,7 @@ function(user_prog id sources)
     add_custom_target(env_${id}
     COMMAND mkdir -p ${BIN_PATH}
     COMMAND "/usr/bin/ld.lld" -static --gc-sections
-        -T ${CMAKE_CURRENT_SOURCE_DIR}/../../platform/${TARGET_PLATFORM}/skel/usr/lib/${TARGET_ARCH}.ld
+        -T ${CMAKE_CURRENT_SOURCE_DIR}/../platform/${TARGET_PLATFORM}/skel/usr/lib/${TARGET_ARCH}.ld
         $<TARGET_FILE:env_${id}_lib> $<TARGET_FILE:koerix> -o ${BIN_PATH}/${id}
     DEPENDS koerix env_${id}_lib
     )
@@ -22,4 +22,5 @@ function(user_prog id sources)
 endfunction()
 
 # add your programs here
-add_subdirectory(textcon)
+user_prog(textcon ${CMAKE_CURRENT_SOURCE_DIR}/textcon.c)
+user_prog(thread_test ${CMAKE_CURRENT_SOURCE_DIR}/thread_test.c)

@@ -13,7 +13,9 @@ static void* syscalls[] = {
   (void*)set_thread_ptr,    // 6
   (void*)get_thread_ptr,    // 7
   nullptr,                  // 8
-  (void*)fb_info            // 9
+  (void*)fb_info,           // 9
+  (void*)sys_thread_create, // 10
+  (void*)sys_thread_count   // 11
 };
 
 void do_syscall(struct IrqContext* ctx)

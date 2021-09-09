@@ -28,12 +28,14 @@ class UserProcess
     ~UserProcess() = default;
 
     inline ProcState state() const { return m_state; }
+    size_t threadCount() const { return m_taskList.size(); } // TODO: don't count killed threads
     bool isOwnProcess() const;
     AddrSpace& getAddrSpace() { return *m_addrSpace; }
     Terminal& getTerm() { return *m_term; }
     const Loader& getLoader() { return *m_loader; }
     bool isValidStackAddr(size_t addr) const;
 
+    size_t addTask(void* entryPoint);
     void exit(int status);
     void checkForDeadTasks();
 
@@ -42,7 +44,6 @@ class UserProcess
     void releaseStack(UserStack stack);
 
   private:
-    void addTask(void* entryPoint);
     void killAllTasks();
 
     ProcState m_state;
