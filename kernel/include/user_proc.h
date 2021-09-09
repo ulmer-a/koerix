@@ -35,7 +35,7 @@ class UserProcess
     const Loader& getLoader() { return *m_loader; }
     bool isValidStackAddr(size_t addr) const;
 
-    size_t addTask(void* entryPoint);
+    size_t addTask(void* entryPoint, void* arg1 = nullptr, void* arg2 = nullptr);
     void exit(int status);
     void checkForDeadTasks();
 

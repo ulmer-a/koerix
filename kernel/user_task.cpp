@@ -7,13 +7,13 @@
 #include <scheduler.h>
 #include <fpu.h>
 
-UserTask::UserTask(UserProcess& process, void* entryPoint)
+UserTask::UserTask(UserProcess& process, void* entryPoint, void* arg1, void* arg2)
   : Task(process.getAddrSpace())
   , m_stack(process.allocStack())
   , m_process(process)
   , m_fpuContext(new FpuContext())
 {
-  initContext((size_t)entryPoint);
+  initContext((size_t)entryPoint, (size_t)arg1, (size_t)arg2);
 }
 
 UserTask::~UserTask()
@@ -21,7 +21,7 @@ UserTask::~UserTask()
   m_process.releaseStack(m_stack);
 }
 
-void UserTask::initContext(size_t entryPoint)
+void UserTask::initContext(size_t entryPoint, size_t arg1, size_t arg2)
 {
   /* User stack pointer: subtract a pointer size to
    * make it unambigously identifyable as a stack address */
@@ -31,8 +31,8 @@ void UserTask::initContext(size_t entryPoint)
   initArchContext(ctx, true,
     entryPoint,     // entry point
     userStackPtr,   // stack pointer
-    0,              // first argument
-    0               // second argument
+    arg1,           // first argument
+    arg2            // second argument
   );
 
   debug() << "created new user task with TID " << tid() << "\n";

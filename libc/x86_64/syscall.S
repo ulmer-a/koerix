@@ -26,7 +26,7 @@
 .endmacro
 
 syscall_wo_ret    _Exit               0
-syscall_wo_ret    _thread_exit        1
+syscall_wo_ret    thread_exit         1
 syscall_w_errno   read                2
 syscall_w_errno   write               3
 syscall_w_errno   close               4

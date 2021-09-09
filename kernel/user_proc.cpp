@@ -31,11 +31,11 @@ bool UserProcess::isOwnProcess() const
   return (&userTask->getProcess() == this);
 }
 
-size_t UserProcess::addTask(void* entryPoint)
+size_t UserProcess::addTask(void* entryPoint, void* arg1, void* arg2)
 {
   ScopedMutex smtx { m_taskListLock };
   assert(m_state == RUNNING);
-  auto task = new UserTask(*this, entryPoint);
+  auto task = new UserTask(*this, entryPoint, arg1, arg2);
   m_taskList.push_back(task);
 
   /* insert the task into the scheduler's run

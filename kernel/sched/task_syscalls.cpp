@@ -27,10 +27,10 @@ void* get_thread_ptr()
   return sched::currentUserTask()->getThreadPtr();
 }
 
-ssize_t sys_thread_create(void* func, void* arg, int flags)
+ssize_t sys_thread_create(void* rt0, void* func, void* arg, int flags)
 {
   auto& proc = sched::currentUserTask()->getProcess();
-  return proc.addTask(func);
+  return proc.addTask(rt0, func, arg);
 }
 
 size_t sys_thread_count()
