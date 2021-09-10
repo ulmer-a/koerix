@@ -29,8 +29,13 @@ static bool checkIfValid(size_t addr, FaultFlags flags)
 
 bool handlePageFault(size_t addr, FaultFlags flags)
 {
-  assert((flags & PF_RESERVED) == 0);   // Reserved bits are set -> not good
-  assert((flags & PF_USER) != 0);       // Kernel page fault -> not good
+  assert((flags & PF_RESERVED) == 0);
+
+  if ((flags & PF_USER) == 0)
+  {
+    debug() << "kernel got a page fault!!!\n";
+    return false;
+  }
 
   if (!checkIfValid(addr, flags))
   {
