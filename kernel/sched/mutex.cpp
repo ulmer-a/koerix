@@ -40,6 +40,10 @@ void Mutex::lock()
     currentTask->sleep();
     m_waitingTasksLock.unlock();
     sched::enable();
+
+    /* since we disbled the scheduler before, we might not
+     * actually be sleeping yet, so enforce it now. */
+    sched::yield();
   }
 
   m_heldBy = currentTask;

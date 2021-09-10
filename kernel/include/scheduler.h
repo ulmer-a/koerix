@@ -11,6 +11,9 @@ namespace sched {
     }
 
     bool isEnabled();
+
+    /* don't do this, ever, after booting (unless
+     * you are the mutex implementation etc.): */
     void enable();
     void disable();
 
