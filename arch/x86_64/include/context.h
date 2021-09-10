@@ -36,7 +36,7 @@ static inline void setInstructionPointer(IrqContext* ctx, size_t ip)
 }
 
 static inline void initArchContext(IrqContext* ctx, bool userMode,
-                size_t ip, size_t sp, size_t arg1, size_t arg2)
+                size_t ip, size_t sp, size_t arg1, size_t arg2, size_t arg3 = 0)
 {
   /* The instruction pointer is initialized with the entry
    * address, the stack pointer with the top of the kernel
@@ -64,6 +64,7 @@ static inline void initArchContext(IrqContext* ctx, bool userMode,
    * two must be located in %rdi, %rsi registers. */
   ctx->rdi = arg1;
   ctx->rsi = arg2;
+  ctx->rdx = arg3;
 
   /* enable interrupts */
   ctx->rflags = 0x0200;

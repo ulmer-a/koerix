@@ -32,7 +32,8 @@ void UserTask::initContext(size_t entryPoint, size_t arg1, size_t arg2)
     entryPoint,     // entry point
     userStackPtr,   // stack pointer
     arg1,           // first argument
-    arg2            // second argument
+    arg2,           // second argument
+    tid()           // third argument
   );
 
   debug() << "created new user task with TID " << tid() << "\n";
