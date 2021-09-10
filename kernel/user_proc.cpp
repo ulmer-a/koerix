@@ -91,6 +91,7 @@ void UserProcess::checkForDeadTasks()
       /* don't delete ourselves while we're running */
       assert(userTask != sched::currentTask());
 
+      sched::removeTask(userTask);
       delete userTask;
       debug() << "tid " << userTask->tid() << ": deleted\n";
 

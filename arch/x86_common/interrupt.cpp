@@ -23,7 +23,9 @@ static void* getPageFaultAddr()
 }
 
 namespace sched {
+namespace core {
   IrqContext* schedule(IrqContext* ctx);
+}
 }
 
 extern void handle_irq(size_t id);
@@ -34,7 +36,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
   {
     if (ctx->irq == 0x1f)
     {
-      ctx = sched::schedule(ctx);
+      ctx = sched::core::schedule(ctx);
     }
     else
     {
@@ -84,7 +86,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     size_t irq_id = ctx->irq - 32;
     if (irq_id == 0)
     {
-      ctx = sched::schedule(ctx);
+      ctx = sched::core::schedule(ctx);
     }
 
     handle_irq(irq_id);

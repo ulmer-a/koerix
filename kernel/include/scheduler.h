@@ -1,26 +1,19 @@
 #pragma once
 
+#include <types.h>
+
 class Task;
 class UserTask;
 
 namespace sched {
+  void _INIT setup(Task* initialTask);
 
-    namespace init {
-        void setup();
-        void insertTask(Task* task);
-    }
+  void yield();
 
-    bool isEnabled();
+  bool isEnabled();
+  Task* currentTask();
+  UserTask* currentUserTask();
 
-    /* don't do this, ever, after booting (unless
-     * you are the mutex implementation etc.): */
-    void enable();
-    void disable();
-
-    void yield();
-
-    Task* currentTask();
-    UserTask* currentUserTask();
-    void insertTask(Task* task);
-
+  void insertTask(Task* task);
+  void removeTask(Task* task);
 }
