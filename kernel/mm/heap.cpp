@@ -105,7 +105,7 @@ static void* kbrk(ssize_t increment)
     size_t first_map = (size_t)orig_brk >> PAGE_SHIFT;
     if ((size_t)orig_brk % PAGE_SIZE != 0)
       first_map += 1;
-    size_t last_map = (size_t)kheap_break_ >> PAGE_SHIFT;
+    size_t last_map = (size_t)(kheap_break_ - 1) >> PAGE_SHIFT;
 
     //debug() << "kheap: alloc " << (last_map - first_map + 1)
     //        << " pages @ "

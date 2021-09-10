@@ -11,10 +11,11 @@ class FpuContext;
 class UserTask : public Task
 {
   public:
-    UserTask(UserProcess& process, void* entryPoint);
+    UserTask(UserProcess& process, void* entryPoint,
+             void* arg1 = nullptr, void* arg2 = nullptr);
     ~UserTask();
 
-    void initContext(size_t entryPoint);
+    void initContext(size_t entryPoint, size_t arg1, size_t arg2);
 
     void exit() override;
     void asyncExit();

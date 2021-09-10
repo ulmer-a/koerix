@@ -2,27 +2,26 @@
 
 #include <types.h>
 #include <canary.h>
+#include <mm.h>
 
 namespace ktl {
 
-    namespace _internal {
-        template<typename T>
-        class ListItem
-        {
-          public:
-            T item;
-            ListItem<T>* next;
-            ListItem<T>* prev;
+    template<typename T>
+    class ListItem
+    {
+      public:
+        T item;
+        ListItem<T>* next;
+        ListItem<T>* prev;
 
-            T& operator->() {
-              return item;
-            }
+        T& operator->() {
+          return item;
+        }
 
-            T& operator*() {
-              return item;
-            }
-        };
-    }
+        T& operator*() {
+          return item;
+        }
+    };
 
     template<typename T>
     class List : public Canary
@@ -51,9 +50,14 @@ namespace ktl {
           return m_size;
         }
 
-        void push_back(const T& item) {
+        void push_back(const T& item, void* mem = nullptr) {
             verify();
-            auto it = new _internal::ListItem<T> {
+
+            if (mem == nullptr)
+              mem = kmalloc(sizeof(ListItem<T>));
+            auto it = (ListItem<T>*)mem;
+
+            new (it) ListItem<T> {
                 item, nullptr, m_last
             };
 
@@ -66,7 +70,7 @@ namespace ktl {
             m_size += 1;
         }
 
-        _internal::ListItem<T>* find(const T& item) {
+        ListItem<T>* find(const T& item) {
           verify();
           for (auto it = m_first; it != nullptr; it = it->next)
           {
@@ -76,7 +80,7 @@ namespace ktl {
           return nullptr;
         }
 
-        void remove(_internal::ListItem<T>* it) {
+        void remove_it(ListItem<T>* it) {
           assert(it != nullptr);
           verify();
 
@@ -91,6 +95,10 @@ namespace ktl {
             m_last = it->prev;
 
           m_size -= 1;
+        }
+
+        void remove(ListItem<T>* it) {
+          remove_it(it);
           delete it;
         }
 
@@ -131,18 +139,18 @@ namespace ktl {
           return m_last->item;
         }
 
-        _internal::ListItem<T>* begin() {
+        ListItem<T>* begin() {
           return m_first;
         }
 
-        _internal::ListItem<T>* end() {
+        ListItem<T>* end() {
           return m_last;
         }
 
       private:
         size_t m_size;
-        _internal::ListItem<T>* m_first;
-        _internal::ListItem<T>* m_last;
+        ListItem<T>* m_first;
+        ListItem<T>* m_last;
     };
 
 }

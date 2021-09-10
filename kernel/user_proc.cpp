@@ -31,11 +31,11 @@ bool UserProcess::isOwnProcess() const
   return (&userTask->getProcess() == this);
 }
 
-void UserProcess::addTask(void* entryPoint)
+size_t UserProcess::addTask(void* entryPoint, void* arg1, void* arg2)
 {
   ScopedMutex smtx { m_taskListLock };
   assert(m_state == RUNNING);
-  auto task = new UserTask(*this, entryPoint);
+  auto task = new UserTask(*this, entryPoint, arg1, arg2);
   m_taskList.push_back(task);
 
   /* insert the task into the scheduler's run
@@ -43,6 +43,7 @@ void UserProcess::addTask(void* entryPoint)
    * do this *after* it has been inserted
    * into the task list of this process. */
   sched::insertTask(task);
+  return task->tid();
 }
 
 void UserProcess::exit(int status)
@@ -90,6 +91,7 @@ void UserProcess::checkForDeadTasks()
       /* don't delete ourselves while we're running */
       assert(userTask != sched::currentTask());
 
+      sched::removeTask(userTask);
       delete userTask;
       debug() << "tid " << userTask->tid() << ": deleted\n";
 
@@ -147,6 +149,7 @@ UserStack UserProcess::allocStack()
     if (m_stackList[i] == true)
       continue;
 
+    m_stackList[i] = true;
     return UserStack(USER_BREAK - (UserStack::getStackSize() * i));
   }
 

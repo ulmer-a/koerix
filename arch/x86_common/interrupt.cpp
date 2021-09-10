@@ -23,7 +23,9 @@ static void* getPageFaultAddr()
 }
 
 namespace sched {
+namespace core {
   IrqContext* schedule(IrqContext* ctx);
+}
 }
 
 extern void handle_irq(size_t id);
@@ -34,7 +36,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
   {
     if (ctx->irq == 0x1f)
     {
-      ctx = sched::schedule(ctx);
+      ctx = sched::core::schedule(ctx);
     }
     else
     {
@@ -45,9 +47,13 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
       }
       else if (ctx->irq == EXC_PAGEFAULT)
       {
+        /* make sure to grab the page fault address while we're
+         * still executing in an interrupt context, so we don't
+         * take the address from some other page fault that might
+         * have occurred in the meantime.  */
+        void* addr = getPageFaultAddr();
         sti();
 
-        void* addr = getPageFaultAddr();
         debug() << "fault: " << addr
                 << ", present=" << (ctx->error & PF_PRESENT ? "y" : "n")
                 << ", user=" << (ctx->error & PF_USER ? "y" : "n")
@@ -55,7 +61,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
                 << ", reserved=" << (ctx->error & PF_RESERVED ? "y" : "n")
                 << ", data=" << (ctx->error & PF_CODE ? "n" : "y") << "\n";
 
-        if (handlePageFault((size_t)getPageFaultAddr(), (FaultFlags)ctx->error)) {
+        if (handlePageFault((size_t)addr, (FaultFlags)ctx->error)) {
           return ctx;
         }
       }
@@ -80,7 +86,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     size_t irq_id = ctx->irq - 32;
     if (irq_id == 0)
     {
-      ctx = sched::schedule(ctx);
+      ctx = sched::core::schedule(ctx);
     }
 
     handle_irq(irq_id);

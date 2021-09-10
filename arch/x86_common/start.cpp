@@ -85,10 +85,8 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
           << (s_avxEnabled ? "ok\n" : "not available\n");
 
   /* Create kernel setup task and enable scheduling */
-  sched::init::setup();
-  sched::init::insertTask(new KernelTask(
+  sched::setup(new KernelTask(
       setup_task, (void*)stivale->cmdline));
-  sched::enable();
   sched::yield();
 
   /* This will never be reached */
