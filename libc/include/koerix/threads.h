@@ -3,7 +3,7 @@
 #include <sys/types.h>
 
 ssize_t thread_create(void* func, void* arg, int flags);
-void thread_exit(void* ret);
+void _Noreturn thread_exit(void* ret);
 
 size_t thread_count();
 size_t thread_id();

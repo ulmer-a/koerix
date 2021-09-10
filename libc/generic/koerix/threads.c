@@ -4,7 +4,7 @@
 
 extern ssize_t _thread_create(void* rt_ptr, void* func, void* arg, int flags);
 
-static void thread_rt0(void*(*func)(void*), void* arg, size_t tid)
+static void _Noreturn thread_rt0(void*(*func)(void*), void* arg, size_t tid)
 {
   /* allocate thread info structure on the thread's stack */
   thread_info_t thread_info;
