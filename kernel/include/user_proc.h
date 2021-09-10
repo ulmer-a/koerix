@@ -28,6 +28,7 @@ class UserProcess
     ~UserProcess() = default;
 
     inline ProcState state() const { return m_state; }
+    inline size_t pid() const { return m_pid; }
     size_t threadCount() const { return m_taskList.size(); } // TODO: don't count killed threads
     bool isOwnProcess() const;
     AddrSpace& getAddrSpace() { return *m_addrSpace; }
@@ -44,9 +45,11 @@ class UserProcess
     void releaseStack(UserStack stack);
 
   private:
+    static size_t getNewPid();
     void killAllTasks();
 
     ProcState m_state;
+    size_t m_pid;
 
     ktl::unique_ptr<AddrSpace> m_addrSpace;
     ktl::shared_ptr<Loader> m_loader;

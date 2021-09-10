@@ -15,7 +15,9 @@ static void* syscalls[] = {
   nullptr,                  // 8
   (void*)fb_info,           // 9
   (void*)sys_thread_create, // 10
-  (void*)sys_thread_count   // 11
+  (void*)sys_thread_count,  // 11
+  (void*)sys_fork,          // 12
+  (void*)sys_getpid         // 13
 };
 
 void do_syscall(struct IrqContext* ctx)

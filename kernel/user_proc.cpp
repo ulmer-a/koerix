@@ -8,6 +8,7 @@
 UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
                          ktl::shared_ptr<Terminal> term)
   : m_state(RUNNING)
+  , m_pid(getNewPid())
   , m_addrSpace(new AddrSpace())
   , m_loader(loader)
   , m_term(term)
@@ -170,4 +171,10 @@ void UserProcess::releaseStack(UserStack stack)
     m_stackList.pop_back();
   else
     m_stackList[i] = false;
+}
+
+size_t UserProcess::getNewPid()
+{
+  static size_t pidCounter = 1;
+  return atomic_add(&pidCounter, 1);
 }
