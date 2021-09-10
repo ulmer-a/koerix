@@ -18,3 +18,13 @@ size_t atomic_add(size_t* mem, ssize_t increment)
     : "memory");
   return increment;
 }
+
+uint8_t atomic_add8(uint8_t* mem, int8_t increment)
+{
+  __asm__ volatile(
+    "lock xaddb %0, (%1);"
+    : "=a"(increment)
+    : "r"(mem), "a"(increment)
+    : "memory");
+  return increment;
+}

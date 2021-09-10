@@ -46,8 +46,14 @@ bool handlePageFault(size_t addr, FaultFlags flags)
   assert(currentTask->isUserTask());
   auto& process = ((UserTask*)currentTask)->getProcess();
 
-  // 1. check if COW fault?
-  // 2. check if stack fault?
+  /* check for a copy-on-write fault */
+  if ((flags & PF_PRESENT) && (flags & PF_WRITE))
+  {
+    size_t virt = addr >> PAGE_SHIFT;
+    sched::currentUserTask()->getProcess()
+        .getAddrSpace().triggerCow(virt);
+    return true;
+  }
 
   if (process.isValidStackAddr(addr))
   {

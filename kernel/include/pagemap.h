@@ -8,12 +8,19 @@ class PageMap
 {
   public:
     PageMap();
+    PageMap(const PageMap& self) = delete;
+    PageMap& operator=(PageMap& self) = delete;
 
     static PageMap& get();
     PageMap(size_t pagemapSize, size_t freePages,
             size_t usablePages, uint8_t* initializedMap);
 
-    size_t alloc();
+    void lock();
+    void unlock();
+
+    size_t getRefs(size_t ppn);
+
+    size_t alloc(bool noLock = false);
     void addRef(size_t ppn);
     void free(size_t ppn);
 

@@ -67,7 +67,7 @@ AddrSpace* AddrSpace::clone()
   auto pml4_old = (GenericPagingTable*)PPN_TO_VIRT(this->m_pml4);
   auto pml4_new = (GenericPagingTable*)PPN_TO_VIRT(forked->m_pml4);
 
-  auto pageMap = PageMap::get();
+  auto& pageMap = PageMap::get();
   for (size_t i = 0; i < 256; i++)
   {
     if (!pml4_old[i].present)
@@ -123,7 +123,8 @@ AddrSpace &AddrSpace::kernel()
 
 void AddrSpace::apply()
 {
-    /* Switch to the virtual address space represented by this class */
+    /* Switch to the virtual address space represented
+     * by this class */
     void* phys_addr = (void*)(m_pml4 << PAGE_SHIFT);
     __asm__ volatile ("mov %0, %%cr3;" : : "r"(phys_addr));
 }
@@ -145,7 +146,7 @@ void AddrSpace::invalidate(size_t virt)
 void AddrSpace::map(size_t virt, size_t phys, int flags)
 {
   ScopedMutex smtx { m_lock };
-  auto pageMap = PageMap::get();
+  auto& pageMap = PageMap::get();
 
   /* first, pre-compute all the indices into the different
    * page tables. for example tableIndices[3] will be the
@@ -161,8 +162,8 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
   for (int level = 3; level >= 0; level--)
   {
     /* Compute a reference to the entry in the current table */
-    auto& currentLevelTableEntry =
-        ((GenericPagingTable*)PPN_TO_VIRT(currentTablePPN))[tableIndices[level]];
+    auto& currentLevelTableEntry = ((GenericPagingTable*)
+        PPN_TO_VIRT(currentTablePPN))[tableIndices[level]];
 
     if (level == 0)
     {
@@ -210,7 +211,7 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
 void AddrSpace::unmap(size_t virt)
 {
   ScopedMutex smtx { m_lock };
-  auto pageMap = PageMap::get();
+  auto& pageMap = PageMap::get();
 
   Mapping mapping;
   resolve(virt, mapping);
@@ -240,6 +241,112 @@ void AddrSpace::unmap(size_t virt)
   }
 
   invalidate(virt);
+}
+
+bool AddrSpace::triggerCow(size_t virt)
+{
+  ScopedMutex smtx { m_lock };
+  auto& pageMap = PageMap::get();
+
+  size_t indices[4];
+  indices[3] = (virt >> 27) & 0x1ff;
+  indices[2] = (virt >> 18) & 0x1ff;
+  indices[1] = (virt >> 9) & 0x1ff;
+  indices[0] = (virt) & 0x1ff;
+
+  debug() << "COW triggered for addr "
+          << (void*)(virt << PAGE_SHIFT) << "\n";
+
+  size_t currentTablePpn = m_pml4;
+  for (int level = 3; level >= 0; level--)
+  {
+    auto& currentLevelTableEntry = ((GenericPagingTable*)
+        PPN_TO_VIRT(currentTablePpn))[indices[level]];
+
+    if (!currentLevelTableEntry.present)
+    {
+      /* we're done, it's not a cow fault */
+      return false;
+    }
+
+    if (level == 0 && currentLevelTableEntry.write == 0 &&
+        currentLevelTableEntry.cow_was_writable == 0)
+    {
+      /* the page is not writable, so the page fault is legit */
+      return false;
+    }
+
+    pageMap.lock();
+    if (pageMap.getRefs(currentLevelTableEntry.ppn) > 1)
+    {
+      // create new table one level below
+      // e.g. if PML4 is currentLevelTable -> create new PDPT
+      const size_t new_table = pageMap.alloc(true);
+      auto new_table_ptr = (GenericPagingTable*)
+          PPN_TO_VIRT(new_table);
+
+      // copy from the parent's table, then set both
+      // tables non_writable and the new table to not_copied
+      auto old_table_ptr = (GenericPagingTable*)
+          PPN_TO_VIRT(currentLevelTableEntry.ppn);
+
+      if (level == 0)
+      {
+        /* if we're in level 0, that means currentLevelTable
+         * is a PageTable and thus the level below is an
+         * actual table. That means we must not set any bits
+         * but just copy the page */
+        memcpy(new_table_ptr, old_table_ptr, PAGE_SIZE);
+      }
+      else
+      {
+        for (size_t i = 0; i < 512; i++)
+        {
+          auto& oldEntry = old_table_ptr[i];
+          auto& newEntry = new_table_ptr[i];
+
+          if (!oldEntry.present)
+          {
+            newEntry.present = 0;
+            continue;
+          }
+
+          if (oldEntry.cow_was_writable == 0)
+          {
+            /* if the old entry was already copied, writable
+             * might be zero, hereby causing cow_writable to go
+             * zero, even though the page is actually writable.
+             * this was REALLY nasty to debug! */
+            oldEntry.cow_was_writable = oldEntry.write;
+          }
+          oldEntry.write = 0;
+          newEntry = oldEntry;
+          pageMap.addRef(oldEntry.ppn);
+        }
+      }
+
+      /* decrease the reference count of the page that we just copied */
+      pageMap.free(currentLevelTableEntry.ppn);
+      pageMap.unlock();
+
+      currentLevelTableEntry.ppn = new_table;
+      currentLevelTableEntry.write = 1;
+    }
+    else
+    {
+      pageMap.unlock();
+
+      if (currentLevelTableEntry.write == 0 &&
+          currentLevelTableEntry.cow_was_writable)
+      {
+        currentLevelTableEntry.write = 1;
+      }
+    }
+
+    currentTablePpn = currentLevelTableEntry.ppn;
+  }
+
+  return true;
 }
 
 void AddrSpace::updateKernelMappings()

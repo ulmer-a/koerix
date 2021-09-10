@@ -34,6 +34,8 @@ class AddrSpace
     void map(size_t virt, size_t phys, int flags);
     void unmap(size_t virt);
 
+    bool triggerCow(size_t virt);
+
   private:
     void updateKernelMappings();
     void invalidate(size_t virt);

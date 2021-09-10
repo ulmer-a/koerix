@@ -19,9 +19,27 @@ PageMap::PageMap(size_t pagemapSize, size_t freePages,
 {
 }
 
-size_t PageMap::alloc()
+void PageMap::lock()
 {
   m_lock.lock();
+}
+
+void PageMap::unlock()
+{
+  m_lock.unlock();
+}
+
+size_t PageMap::getRefs(size_t ppn)
+{
+  assert(ppn < m_totalPages);
+  return m_pagemap[ppn];
+}
+
+size_t PageMap::alloc(bool noLock)
+{
+  if (!noLock)
+    m_lock.lock();
+
   for (size_t i = 0; i < m_totalPages; i++)
   {
     if (m_pagemap[i] == 0)
@@ -29,12 +47,16 @@ size_t PageMap::alloc()
       m_pagemap[i]++;
       m_freePageCount--;
       m_usedPages++;
-      m_lock.unlock();
+
+      if (!noLock)
+        m_lock.unlock();
       return i;
     }
   }
 
-  m_lock.unlock();
+  if (!noLock)
+    m_lock.unlock();
+
   assert(false);
   return (size_t)-1;
 }
@@ -43,24 +65,28 @@ void PageMap::addRef(size_t ppn)
 {
   assert(ppn < m_totalPages);
 
-  m_lock.lock();
-  if (m_pagemap[ppn] == 0)
+  if (atomic_add8(&m_pagemap[ppn], 1) == 0)
   {
     m_freePageCount -= 1;
     m_usedPages += 1;
   }
-  m_pagemap[ppn] += 1;
-  m_lock.unlock();
 }
 
 void PageMap::free(size_t ppn)
 {
-  m_lock.lock();
-  m_pagemap[ppn] -= 1;
-  if (m_pagemap[ppn] == 0)
+  /* decrement and get the before-reference count */
+  size_t before = atomic_add8(&m_pagemap[ppn], -1);
+
+  if (before == 0)
+  {
+    /* if refcount before was zero, then we did some sort
+     * of double free -> not good */
+    assert(false);
+    m_pagemap[ppn] = 0;
+  }
+  else
   {
     m_usedPages -= 1;
     m_freePageCount += 1;
   }
-  m_lock.unlock();
 }
