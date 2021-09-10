@@ -148,6 +148,7 @@ UserStack UserProcess::allocStack()
     if (m_stackList[i] == true)
       continue;
 
+    m_stackList[i] = true;
     return UserStack(USER_BREAK - (UserStack::getStackSize() * i));
   }
 
