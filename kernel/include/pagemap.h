@@ -1,7 +1,7 @@
 #pragma once
 
 #include <types.h>
-#include <addr_space.h>
+#include <offsets.h>
 #include <spin.h>
 
 class PageMap
@@ -14,6 +14,7 @@ class PageMap
             size_t usablePages, uint8_t* initializedMap);
 
     size_t alloc();
+    void addRef(size_t ppn);
     void free(size_t ppn);
 
     size_t getTotalPageCount() { return m_totalPages; }

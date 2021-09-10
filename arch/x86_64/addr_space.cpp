@@ -46,11 +46,47 @@ bool s_nxEnabled = false;
 
 AddrSpace::AddrSpace()
 {
-    /* Create a new address space by allocating
-     * a fresh Page Map Level 4 */
-    m_pml4 = PageMap::get().alloc();
+  /* Create a new address space by allocating
+   * a fresh Page Map Level 4 */
+  m_pml4 = PageMap::get().alloc();
 
-    updateKernelMappings();
+  updateKernelMappings();
+}
+
+AddrSpace* AddrSpace::clone()
+{
+  /* nobody should modify the structure of the address
+   * space while we're cloning it. */
+  ScopedMutex smtx { m_lock };
+
+  /* create a new AddrSpace with kernel mappings by using
+   * the default constructor. */
+  auto forked = new AddrSpace();
+
+  /* get pointers to both the old and new PML4 */
+  auto pml4_old = (GenericPagingTable*)PPN_TO_VIRT(this->m_pml4);
+  auto pml4_new = (GenericPagingTable*)PPN_TO_VIRT(forked->m_pml4);
+
+  auto pageMap = PageMap::get();
+  for (size_t i = 0; i < 256; i++)
+  {
+    if (!pml4_old[i].present)
+      continue;
+
+    /* clear write permissions for the entire address spaces of both
+     * the old and new processes. processes that like to write on a
+     * page must create their own copies and make them writable until
+     * everyone has their own copy. */
+    if (pml4_old[i].cow_was_writable == 0)
+      pml4_old[i].cow_was_writable = pml4_old[i].write;
+    pml4_old[i].write = 0;
+    pml4_new[i] = pml4_old[i];
+
+    /* increase the reference count for the respective PDPT table */
+    pageMap.addRef(pml4_old[i].ppn);
+  }
+
+  return forked;
 }
 
 void AddrSpace::setup()
@@ -108,6 +144,7 @@ void AddrSpace::invalidate(size_t virt)
 
 void AddrSpace::map(size_t virt, size_t phys, int flags)
 {
+  ScopedMutex smtx { m_lock };
   auto pageMap = PageMap::get();
 
   /* first, pre-compute all the indices into the different
@@ -172,6 +209,7 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
 
 void AddrSpace::unmap(size_t virt)
 {
+  ScopedMutex smtx { m_lock };
   auto pageMap = PageMap::get();
 
   Mapping mapping;
@@ -211,7 +249,7 @@ void AddrSpace::updateKernelMappings()
 
   /* copy upper half of PML4 entries from the kernel's address space
    * over to this address space. */
-  auto kernelVspace = kernel();
+  auto& kernelVspace = kernel();
   auto my_upper_pml4 = (GenericPagingTable*)PPN_TO_VIRT(m_pml4) + 256;
   auto kernel_upper_pml4 =
       (GenericPagingTable*)PPN_TO_VIRT(kernelVspace.m_pml4) + 256;

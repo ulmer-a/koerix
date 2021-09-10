@@ -66,7 +66,7 @@ class Task
         return m_state;
     }
 
-    inline IrqContext* context() {
+    inline IrqContext* context() const {
         return m_context;
     }
 

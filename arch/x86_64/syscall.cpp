@@ -20,7 +20,7 @@ static void* syscalls[] = {
   (void*)sys_getpid         // 13
 };
 
-void do_syscall(struct IrqContext* ctx)
+void do_syscall(IrqContext* ctx)
 {
   /* check for an invalid system call number */
   if (ctx->rax >= sizeof(syscalls) / sizeof(void*))

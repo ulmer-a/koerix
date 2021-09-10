@@ -41,7 +41,7 @@ size_t sys_thread_count()
 
 ssize_t sys_fork()
 {
-  return -ENOSYS;
+  return sched::currentUserTask()->getProcess().fork();
 }
 
 size_t sys_getpid()

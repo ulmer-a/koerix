@@ -1,5 +1,6 @@
 #include <pagemap.h>
 #include <debug.h>
+#include <arch/asm.h>
 
 PageMap::PageMap()
     : m_pagemap(nullptr)
@@ -38,11 +39,28 @@ size_t PageMap::alloc()
   return (size_t)-1;
 }
 
+void PageMap::addRef(size_t ppn)
+{
+  assert(ppn < m_totalPages);
+
+  m_lock.lock();
+  if (m_pagemap[ppn] == 0)
+  {
+    m_freePageCount -= 1;
+    m_usedPages += 1;
+  }
+  m_pagemap[ppn] += 1;
+  m_lock.unlock();
+}
+
 void PageMap::free(size_t ppn)
 {
   m_lock.lock();
   m_pagemap[ppn] -= 1;
-  m_usedPages -= 1;
-  m_freePageCount += 1;
+  if (m_pagemap[ppn] == 0)
+  {
+    m_usedPages -= 1;
+    m_freePageCount += 1;
+  }
   m_lock.unlock();
 }

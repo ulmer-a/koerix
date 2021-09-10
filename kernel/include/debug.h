@@ -45,12 +45,14 @@ namespace debugging {
         DebugStream& operator<<(Modifier modif);
 
       private:
+        const static size_t BUFFER_SIZE = 256;
+
         int getBase();
         void basePrefix();
 
         char *m_destPtr;
         Modifier m_currentMode;
-        char m_buffer[256];
+        char m_buffer[BUFFER_SIZE];
     };
 
 }

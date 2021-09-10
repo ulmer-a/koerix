@@ -2,73 +2,75 @@
 
 #include <types.h>
 
-struct IrqContext
+class _PACKED IrqContext
 {
-  size_t r15;
-  size_t r14;
-  size_t r13;
-  size_t r12;
-  size_t r11;
-  size_t r10;
-  size_t r9;
-  size_t r8;
-  size_t rdi;
-  size_t rsi;
-  size_t rdx;
-  size_t rcx;
-  size_t rbx;
-  size_t rax;
-  size_t rbp;
-  size_t gs;
-  size_t fs;
-  size_t irq;
-  size_t error;
-  size_t rip;
-  size_t cs;
-  size_t rflags;
-  size_t rsp;
-  size_t ss;
-} _PACKED;
+    friend void do_syscall(IrqContext* ctx);
 
-static inline void setInstructionPointer(IrqContext* ctx, size_t ip)
-{
-  ctx->rip = ip;
-}
+  public:
+    explicit IrqContext();
+    explicit IrqContext(const IrqContext& self);
 
-static inline void initArchContext(IrqContext* ctx, bool userMode,
-                size_t ip, size_t sp, size_t arg1, size_t arg2, size_t arg3 = 0)
-{
-  /* The instruction pointer is initialized with the entry
-   * address, the stack pointer with the top of the kernel
-   * stack. */
-  ctx->rip = ip;
-  ctx->rsp = sp;
+    void newUserCtx();
+    void newCompatUserCtx();
+    void newKernelCtx();
 
-  /* Code and data segment selectors. The GDT is setup
-   * in a way so that 0x08 will always point to a descriptor
-   * for kernel code and 0x10 will always point to one
-   * for kernel data. see gdt.c */
-  if (userMode) {
-    ctx->cs = 0x1b;
-    ctx->ss = 0x23;
-    ctx->fs = 0x23;
-    ctx->gs = 0x23;
-  } else {
-    ctx->cs = 0x08;
-    ctx->ss = 0x10;
-    ctx->fs = 0x10;
-    ctx->gs = 0x10;
-  }
+    void print();
 
-  /* Arguments: Calling convention implies that argument 1 and
-   * two must be located in %rdi, %rsi registers. */
-  ctx->rdi = arg1;
-  ctx->rsi = arg2;
-  ctx->rdx = arg3;
+    inline size_t& returnValue() {
+      return rax;
+    }
 
-  /* enable interrupts */
-  ctx->rflags = 0x0200;
+    inline size_t& instructionPtr() {
+      return rip;
+    }
 
-  /* All other registers have been initialized with zeroes
-   * before by the Task class constructor */
-}
+    inline size_t& stackPtr() {
+      return rsp;
+    }
+
+    inline size_t irq() {
+      return irq_id;
+    }
+
+    inline size_t error() {
+      return error_id;
+    }
+
+    inline size_t& arg1() {
+      return rdi;
+    }
+
+    inline size_t& arg2() {
+      return rsi;
+    }
+
+    inline size_t& arg3() {
+      return rdx;
+    }
+
+  private:
+    size_t r15;
+    size_t r14;
+    size_t r13;
+    size_t r12;
+    size_t r11;
+    size_t r10;
+    size_t r9;
+    size_t r8;
+    size_t rdi;
+    size_t rsi;
+    size_t rdx;
+    size_t rcx;
+    size_t rbx;
+    size_t rax;
+    size_t rbp;
+    size_t gs;
+    size_t fs;
+    size_t irq_id;
+    size_t error_id;
+    size_t rip;
+    size_t cs;
+    size_t rflags;
+    size_t rsp;
+    size_t ss;
+};

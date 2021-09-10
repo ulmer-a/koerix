@@ -2,6 +2,7 @@
 #include <pagemap.h>
 #include <string.h>
 #include <debug.h>
+#include <addr_space.h>
 
 Loader::Loader(const void* elfBinary)
   : m_elfBinary(elfBinary)

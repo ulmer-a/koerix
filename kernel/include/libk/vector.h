@@ -21,7 +21,13 @@ namespace ktl {
         delete[] m_array;
       }
 
-      vector(const vector& self) = delete;
+      vector(const vector& self)
+        : m_size(self.m_size)
+      {
+        alloc(self.m_size);
+        memcpy((void*)m_array, (void*)self.m_array, m_size * sizeof(T));
+      }
+
       vector& operator=(const vector& self) = delete;
 
       T& operator[](size_t index) {

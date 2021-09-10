@@ -1,6 +1,7 @@
 #pragma once
 
 #include <types.h>
+#include <mutex.h>
 #include <offsets.h>
 
 #define PPN_TO_PTR(x)   ((void*)((x) << PAGE_SHIFT))
@@ -19,7 +20,10 @@ class AddrSpace
     struct Mapping;
     struct GenericPagingTable;
 
-    AddrSpace();
+    explicit AddrSpace();
+    AddrSpace(const AddrSpace& self) = delete;
+
+    AddrSpace* clone();
     ~AddrSpace() = default;
 
     static void setup();
@@ -37,4 +41,5 @@ class AddrSpace
     bool checkForPresentEntries(GenericPagingTable* table);
 
     size_t m_pml4;
+    Mutex m_lock;
 };

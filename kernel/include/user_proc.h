@@ -25,6 +25,7 @@ class UserProcess
 
     UserProcess(ktl::shared_ptr<Loader> loader,
                 ktl::shared_ptr<Terminal> term);
+    explicit UserProcess(const UserProcess& forkee);
     ~UserProcess() = default;
 
     inline ProcState state() const { return m_state; }
@@ -37,6 +38,7 @@ class UserProcess
     bool isValidStackAddr(size_t addr) const;
 
     size_t addTask(void* entryPoint, void* arg1 = nullptr, void* arg2 = nullptr);
+    ssize_t fork();
     void exit(int status);
     void checkForDeadTasks();
 

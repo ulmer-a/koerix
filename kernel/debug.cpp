@@ -29,6 +29,8 @@ void debug_init()
 
 DebugStream::~DebugStream()
 {
+  assert((size_t)m_destPtr - (size_t)m_buffer < BUFFER_SIZE);
+
   if (!s_initialized)
     return;
 

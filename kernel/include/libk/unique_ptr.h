@@ -9,7 +9,7 @@ namespace ktl {
         m_ptr = nullptr;
       }
 
-      explicit unique_ptr(T* ptr) {
+      unique_ptr(T* ptr) {
         m_ptr = ptr;
       }
 
@@ -36,7 +36,7 @@ namespace ktl {
         return *m_ptr;
       }
 
-      T* operator->() {
+      T* operator->() const {
         return m_ptr;
       }
 

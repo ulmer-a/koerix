@@ -4,6 +4,7 @@
 #include <user_task.h>
 #include <proc_list.h>
 #include <scheduler.h>
+#include <addr_space.h>
 
 UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
                          ktl::shared_ptr<Terminal> term)
@@ -21,6 +22,24 @@ UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
   /* create a main thread for this process, the entry point
    * is defined by the entry address found in the ELF binary. */
   addTask(m_loader->entryAddr());
+}
+
+UserProcess::UserProcess(const UserProcess& forkee)
+  : m_state(RUNNING)
+  , m_pid(getNewPid())
+  , m_addrSpace(forkee.m_addrSpace->clone())
+  , m_loader(forkee.m_loader)
+  , m_term(forkee.m_term)
+  , m_stackList(forkee.m_stackList)
+{
+  /* add this process to the global list of processes */
+  ProcList::get().onAddProcess(this);
+
+  /* create a new main thread by cloning the context of
+   * the current task. */
+  auto task = new UserTask(*this, *sched::currentUserTask());
+  m_taskList.push_back(task);
+  sched::insertTask(task);
 }
 
 bool UserProcess::isOwnProcess() const
@@ -45,6 +64,14 @@ size_t UserProcess::addTask(void* entryPoint, void* arg1, void* arg2)
    * into the task list of this process. */
   sched::insertTask(task);
   return task->tid();
+}
+
+ssize_t UserProcess::fork()
+{
+  assert(isOwnProcess());
+
+  auto forked = new UserProcess(*this);
+  return forked->pid();
 }
 
 void UserProcess::exit(int status)

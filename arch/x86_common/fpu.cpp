@@ -3,6 +3,7 @@
 #include <user_task.h>
 #include <scheduler.h>
 #include <x86/asm.h>
+#include <string.h>
 
 static UserTask* s_fpuTask = nullptr;
 
@@ -26,6 +27,13 @@ FpuContext::FpuContext()
 FpuContext::~FpuContext()
 {
   kfree(m_data);
+}
+
+FpuContext* FpuContext::clone()
+{
+  auto ctx = new FpuContext();
+  memcpy((void*)ctx->m_context, (void*)m_context, sizeof(FpuContextStruct));
+  return ctx;
 }
 
 void fpuFault()
