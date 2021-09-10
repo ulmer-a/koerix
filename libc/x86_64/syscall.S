@@ -37,4 +37,6 @@ syscall_w_errno   _ioctl              8
 syscall_w_errno   fb_info             9
 syscall_w_errno   _thread_create      10
 syscall_w_errno   thread_count        11
+syscall_w_errno   fork                12
+syscall           getpid              13
 
