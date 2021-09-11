@@ -1,0 +1,18 @@
+#! /bin/bash
+
+kl=`cat $(find kernel/ arch/ platform/pc/drivers -name *.c) \
+    $(find kernel/ arch/ platform/pc/drivers -name *.cpp) \
+    $(find kernel/ arch/ platform/pc/drivers -name *.S) \
+    $(find kernel/ arch/ platform/pc/include -name *.h) \
+    | wc -l`
+
+ll=`cat $(find libc/ -name *.c) \
+    $(find libc/ -name *.h) \
+    $(find libc/ -name *.S) \
+    | wc -l`
+
+echo " -- Lines of Code report -- "
+echo "Kernel:   ${kl}"
+echo "libc:     ${ll}"
+echo "--------------"
+echo "Total:   $(expr ${kl} + ${ll})"
