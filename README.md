@@ -21,6 +21,7 @@ it reads from it's stdin (in this case, the serial console).
 * x86_64 kernel (64bit) written in C++, C as well as some GNU Assembler
 * preemptive multitasking (single core), Mutexes and Spinlocks
 * full paged Virtual Memory support
+* POSIX `fork()` with multi-level copy-on-write
 * `read()`, `write()`, `open()`, `close()` via Virtual file system (WIP)
 * system calls via software interrupt 0x80
 * `limine` bootloader
