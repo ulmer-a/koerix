@@ -394,3 +394,54 @@ bool AddrSpace::checkForPresentEntries(GenericPagingTable* table)
   }
   return false;
 }
+
+AddrSpace::~AddrSpace()
+{
+  ScopedMutex smtx { m_lock };
+  auto& pageMap = PageMap::get();
+
+  auto pml4 = (GenericPagingTable*)PPN_TO_VIRT(m_pml4);
+  for (size_t pml4i = 0; pml4i < 256; pml4i++)
+  {
+    auto& pml4e = pml4[pml4i];
+    if (!pml4e.present)
+      continue;
+
+    auto pdpt = (GenericPagingTable*)PPN_TO_VIRT(pml4e.ppn);
+    for (size_t pdpti = 0; pdpti < 512; pdpti++)
+    {
+      auto& pdpte = pdpt[pdpti];
+      if (!pdpte.present)
+        continue;
+
+      auto pdir = (GenericPagingTable*)PPN_TO_VIRT(pdpte.ppn);
+      for (size_t pdiri = 0; pdiri < 512; pdiri++)
+      {
+        auto& pdire = pdir[pdiri];
+        if (!pdire.present)
+          continue;
+
+        auto ptbl = (GenericPagingTable*)PPN_TO_VIRT(pdire.ppn);
+        for (size_t ptbli = 0; ptbli < 512; ptbli++)
+        {
+          auto& ptble = ptbl[ptbli];
+          if (!ptble.present)
+            continue;
+
+          pageMap.free(ptble.ppn);
+        }
+
+        pageMap.free(pdire.ppn);
+      }
+
+      pageMap.free(pdpte.ppn);
+    }
+
+    pageMap.free(pml4e.ppn);
+  }
+
+  pageMap.free(m_pml4);
+  m_pml4 = (size_t)-1;
+
+  debug() << "address space deleted\n";
+}
