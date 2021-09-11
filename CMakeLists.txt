@@ -6,7 +6,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 project(UlmerOS VERSION 0.1)
 enable_language(ASM)
 
-set(TARGET_ARCH "i386")
+set(TARGET_ARCH "x86_64")
 set(TARGET_PLATFORM "pc")
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/arch.cmake)
