@@ -16,25 +16,39 @@ typedef enum
 
 // id, running/sleeping/killed
 typedef struct {
+    size_t tid;
     int state;
     int cpu_usage;
 } sched_task_info_t;
 
+namespace sched {
+    extern ktl::List<Task*> s_taskList;
+}
+
 ssize_t get_sched_task_info(size_t tid, void* info_ptr)
 {
     auto info = (sched_task_info_t*)info_ptr;
-    if (tid == 0)
+    ktl::ListItem<Task*>* found = nullptr;
+    for (auto it = sched::s_taskList.begin();
+         it != nullptr;
+         it = it->next)
     {
-        info->state = SCHED_TASK_RUNNING;
-        info->cpu_usage = 50;
-        return 1;
+        auto task = it->item;
+        if (task->tid() == tid) {
+            found = it;
+            break;
+        }
     }
-    else
-    {
-        info->state = SCHED_TASK_KILLED;
-        info->cpu_usage = 0;
-        return -1;
-    }
+
+    if (found == nullptr)
+        found = sched::s_taskList.begin();
+
+    info->state = found->item->state();
+    info->tid = found->item->tid();
+
+    if (found->next)
+        return found->next->item->tid();
+    return -1;
 }
 
 

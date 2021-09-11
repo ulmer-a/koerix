@@ -12,7 +12,7 @@ enum fb_info_types
 
 struct __fb_struct __fb_info;
 const psf_font_t* __fb_current_font;
-uint32_t __fb_fg_color;
+uint32_t __fb_fg_color = color(0xff, 0xff, 0xff);
 extern psf_font_t __koerix_console_font;
 
 extern ssize_t fb_info(int type);
@@ -49,6 +49,8 @@ void fb_putc(size_t x, size_t y, char c)
       uint32_t glyph_word = *glyph;
       if (glyph_word & (1 << (font->width - j - 1))) {
         framebuffer(x + j, y + i) = __fb_fg_color;
+      } else {
+        framebuffer(x + j, y + i) = color(0, 0, 0);
       }
     }
     glyph += bytes_per_line;

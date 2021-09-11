@@ -12,6 +12,7 @@ typedef enum
 
 // id, running/sleeping/killed
 typedef struct {
+    size_t tid;
     int state;
     int cpu_usage;
 } sched_task_info_t;
