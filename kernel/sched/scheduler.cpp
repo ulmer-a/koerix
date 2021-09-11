@@ -6,9 +6,9 @@
 #include <mm.h>
 #include <kernel_task.h>
 #include <addr_space.h>
-#include <features.h>
 #include <user_task.h>
 #include <proc_list.h>
+#include <fpu.h>
 
 /* sets the stack pointer that will be used
  * when the thread returns to kernel code */

@@ -8,7 +8,10 @@ enable_language(ASM)
 
 set(TARGET_ARCH "x86_64")
 set(TARGET_PLATFORM "pc")
-set(ARCH_FLAGS "-mno-red-zone -mcmodel=kernel -mno-mmx -mno-sse -mno-avx")
+
+add_compile_options("--target=${TARGET_ARCH}-none-eabi")
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/arch.cmake)
 
 set(CMAKE_BUILD_TYPE Debug)
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -30,12 +33,12 @@ add_subdirectory(env)
 # BUILD KERNEL                                                       #
 ######################################################################
 
-set(CMAKE_C_FLAGS "--target=${TARGET_ARCH}-none-eabi \
+set(CMAKE_C_FLAGS "\
     -ffreestanding -fno-rtti -fno-exceptions -fPIC \
     -nostdlib -nostdinc -fno-stack-protector \
     ${ARCH_FLAGS}"
 )
-set(CMAKE_CXX_FLAGS "--target=${TARGET_ARCH}-none-eabi \
+set(CMAKE_CXX_FLAGS "\
     -ffreestanding -fno-rtti -fno-exceptions -fPIC \
     -nostdlib -nostdinc -fno-stack-protector \
     ${ARCH_FLAGS}"

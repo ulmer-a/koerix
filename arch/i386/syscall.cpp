@@ -8,17 +8,17 @@
 void do_syscall(IrqContext* ctx)
 {
   /* check for an invalid system call number */
-  if (ctx->rax >= sizeof(syscalls) / sizeof(void*))
+  if (ctx->eax >= sizeof(syscalls) / sizeof(void*))
   {
-    ctx->rax = -ENOSYS;
+    ctx->eax = -ENOSYS;
     return;
   }
 
   /* resolve the function address of the system call */
-  void* syscall_addr = syscalls[ctx->rax];
+  void* syscall_addr = syscalls[ctx->eax];
   if (syscall_addr == nullptr)
   {
-    ctx->rax = -ENOSYS;
+    ctx->eax = -ENOSYS;
     return;
   }
 
@@ -29,8 +29,8 @@ void do_syscall(IrqContext* ctx)
 
   /* actually perform the call with the arguments from
    * the interrupt context structure */
-  ctx->rax = syscall(
-    ctx->rdi, ctx->rsi, ctx->rdx,
-    ctx->rcx, ctx->r8,  ctx->r9
+  ctx->eax = syscall(
+    ctx->ebx, ctx->ecx, ctx->edx,
+    ctx->edi, ctx->esi,  ctx->ebp
   );
 }

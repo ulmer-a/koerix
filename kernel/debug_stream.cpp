@@ -59,6 +59,7 @@ DebugStream& DebugStream::operator<<(char c)
   return *this;
 }
 
+#ifndef i386
 DebugStream& DebugStream::operator<<(size_t i)
 {
   basePrefix();
@@ -66,6 +67,7 @@ DebugStream& DebugStream::operator<<(size_t i)
   m_destPtr = m_buffer + strlen(m_buffer);
   return *this;
 }
+#endif
 
 DebugStream& DebugStream::operator<<(void* p)
 {
