@@ -24,7 +24,7 @@ class AddrSpace
     AddrSpace(const AddrSpace& self) = delete;
 
     AddrSpace* clone();
-    ~AddrSpace() = default;
+    ~AddrSpace();
 
     static void setup();
     static AddrSpace& kernel();
