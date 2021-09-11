@@ -12,8 +12,13 @@ typedef short int16_t;
 typedef unsigned char uint8_t;
 typedef char int8_t;
 
+#ifdef i386
+typedef int ssize_t;
+typedef unsigned int size_t;
+#else
 typedef signed long ssize_t;
 typedef unsigned long size_t;
+#endif
 
 /* Attributes */
 #define _INIT
@@ -24,3 +29,5 @@ typedef unsigned long size_t;
 
 
 #define BIT(x) (1ul << (x))
+#define min(x, y) ((x) < (y) ? (x) : (y))
+#define max(x, y) ((x) > (y) ? (x) : (y))

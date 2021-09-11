@@ -42,11 +42,6 @@ class AddrSpace
     void resolve(size_t virt, Mapping& mapping);
     bool checkForPresentEntries(GenericPagingTable* table);
 
-#ifdef i386
-    size_t m_pdir;
-#else
-    size_t m_pml4;
-#endif
-
+    size_t m_topLevelPageTable;
     Mutex m_lock;
 };
