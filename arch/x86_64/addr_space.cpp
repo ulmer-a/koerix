@@ -86,6 +86,9 @@ AddrSpace* AddrSpace::clone()
     pageMap.addRef(pml4_old[i].ppn);
   }
 
+  /* it's important that the TLB will be flushed after setting all
+   * the tables readonly by calling apply(). */
+  this->apply();
   return forked;
 }
 

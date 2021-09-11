@@ -15,12 +15,12 @@
 static bool checkIfValid(size_t addr, FaultFlags flags)
 {
   if (addr < MIN_LOAD_ADDR) {
-    debug() << "PF: probably a nullpointer dereference\n";
+    debug() << "PF: nullptr dereferenced!\n";
     return false;
   }
 
   if (addr >= USER_BREAK) {
-    debug() << "PF: user referencing kernel memory\n";
+    debug() << "PF: referencing (unmapped) kernel memory!\n";
     return false;
   }
 
@@ -30,12 +30,6 @@ static bool checkIfValid(size_t addr, FaultFlags flags)
 bool handlePageFault(size_t addr, FaultFlags flags)
 {
   assert((flags & PF_RESERVED) == 0);
-
-  if ((flags & PF_USER) == 0)
-  {
-    debug() << "kernel got a page fault!!!\n";
-    return false;
-  }
 
   if (!checkIfValid(addr, flags))
   {

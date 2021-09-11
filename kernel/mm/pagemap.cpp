@@ -84,7 +84,7 @@ void PageMap::free(size_t ppn)
     assert(false);
     m_pagemap[ppn] = 0;
   }
-  else
+  else if (before == 1)
   {
     m_usedPages -= 1;
     m_freePageCount += 1;
