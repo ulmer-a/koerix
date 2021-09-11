@@ -3,7 +3,7 @@
 #include <string.h>
 #include <mm.h>
 #include <arch/asm.h>
-#include <features.h>
+#include <x86/features.h>
 
 
 struct AddrSpace::GenericPagingTable

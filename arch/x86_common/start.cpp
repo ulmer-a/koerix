@@ -4,8 +4,8 @@
 #include <addr_space.h>
 #include <scheduler.h>
 #include <x86/stivale.h>
+#include <x86/features.h>
 #include <kernel_task.h>
-#include <features.h>
 #include <string.h>
 
 // setup stack allocation
