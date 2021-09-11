@@ -30,7 +30,7 @@ void do_syscall(IrqContext* ctx)
   /* actually perform the call with the arguments from
    * the interrupt context structure */
   ctx->eax = syscall(
-    ctx->ebx, ctx->ecx, ctx->rdx,
+    ctx->ebx, ctx->ecx, ctx->edx,
     ctx->edi, ctx->esi,  ctx->ebp
   );
 }

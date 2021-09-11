@@ -47,9 +47,3 @@ enableFpuCalls:
     btrq $3, %rax
     mov %rax, %cr0
     ret
-
-.global avx_enable
-avx_enable:
-    // TODO: implement
-    xor %rax, %rax
-    ret

@@ -43,7 +43,6 @@ extern void initHeap();
 extern void create_page_bitmap();
 
 bool s_sseEnabled = false;
-bool s_avxEnabled = false;
 
 extern char _bss_start;
 extern char _bss_end;
@@ -77,12 +76,9 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
 
   /* enable SSE and AVX if available */
   s_sseEnabled = sse_enable();
-  s_avxEnabled = avx_enable();
   debug() << "trying to enable SSE: "
           << (s_sseEnabled ? "ok\n" : "not available\n");
   s_sseEnabled = sse_enable();
-  debug() << "trying to enable AVX: "
-          << (s_avxEnabled ? "ok\n" : "not available\n");
 
   /* Create kernel setup task and enable scheduling */
   sched::setup(new KernelTask(
