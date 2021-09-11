@@ -25,6 +25,11 @@
     ret
 .endmacro
 
+.global yield
+yield:
+    int $0x1f
+    ret
+
 syscall_wo_ret    _Exit               0
 syscall_wo_ret    thread_exit         1
 syscall_w_errno   read                2
@@ -39,4 +44,5 @@ syscall_w_errno   _thread_create      10
 syscall_w_errno   thread_count        11
 syscall_w_errno   fork                12
 syscall           getpid              13
+syscall           get_sched_task_info 14
 

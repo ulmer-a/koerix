@@ -18,6 +18,7 @@ ssize_t sys_thread_create(void* rt, void* func, void* arg, int flags);
 size_t sys_thread_count();
 ssize_t sys_fork();
 size_t sys_getpid();
+ssize_t get_sched_task_info(size_t tid, void* sched_task_info);
 
 #ifdef __cplusplus
 }

@@ -114,7 +114,7 @@ static void setup_idt()
   install_descriptor(28, &irq28, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
   install_descriptor(29, &irq29, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
   install_descriptor(30, &irq30, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
-  install_descriptor(31, &irq31, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
+  install_descriptor(31, &irq31, IDT_PRESENT | IDT_USER | IDT_GATE, 0); // YIELD
   install_descriptor(32, &irq32, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
   install_descriptor(33, &irq33, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
   install_descriptor(34, &irq34, IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);

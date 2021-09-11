@@ -15,5 +15,6 @@ static void* syscalls[] = {
   (void*)sys_thread_create, // 10
   (void*)sys_thread_count,  // 11
   (void*)sys_fork,          // 12
-  (void*)sys_getpid         // 13
+  (void*)sys_getpid,        // 13
+  (void*)get_sched_task_info// 14
 };
