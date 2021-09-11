@@ -1,5 +1,6 @@
 #include <koerix/framebuffer.h>
 #include <stdint.h>
+#include <math.h>
 
 enum fb_info_types
 {
@@ -62,13 +63,51 @@ void fb_set_fg(uint32_t color)
   __fb_fg_color = color;
 }
 
-void fb_draw_rect(size_t x, size_t y, size_t width, size_t height)
+void fb_draw_line(size_t stroke, uint32_t color,
+  ssize_t x1, ssize_t y1, ssize_t x2, ssize_t y2)
 {
-  for (size_t i = 0; i < width; i++)
+  // vector of the line
+  double dx = ((double)x2 - (double)x1);
+  double dy = ((double)y2 - (double)y1);
+
+  double len = sqrt(dx*dx + dy*dy);
+  dx = dx / len;
+  dy = dy / len;
+
+  for (float i = 0; i < len; i += 0.5)
   {
-    for (size_t j = 0; j < height; j++)
+    double x = x1 + i * dx;
+    double y = y1 + i * dy;
+    framebuffer((size_t)x, (size_t)y) = color;
+  }
+}
+
+void fb_draw_rect(size_t stroke, uint32_t color,
+  size_t x, size_t y, size_t width, size_t height, int fill)
+{
+  if (fill)
+  {
+    for (size_t i = x; i < x + width; i++)
     {
-      framebuffer(x + i, y + j) = __fb_fg_color;
+      for (size_t j = y; j < y + height; j++)
+      {
+        framebuffer(i, j) = color;
+      }
     }
   }
+  else
+  {
+    fb_draw_line(stroke, color, x, y, x + width, y);
+    fb_draw_line(stroke, color, x + width, y, x + width, y + height);
+    fb_draw_line(stroke, color, x, y + height, x + width, y + height);
+    fb_draw_line(stroke, color, x, y, x, y + height);
+  }
+}
+
+void fb_draw_progressbar(float percent, uint32_t color,
+    size_t x, size_t y, size_t width, size_t height)
+{
+  size_t prog_width = width * percent;
+  fb_draw_rect(2, color, x, y, width, height, 0);
+  fb_draw_rect(2, color, x, y, prog_width, height, 1);
 }

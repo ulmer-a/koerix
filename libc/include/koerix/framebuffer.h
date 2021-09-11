@@ -48,4 +48,10 @@ int fb_init();
 void fb_set_bg(uint32_t color);
 void fb_set_fg(uint32_t color);
 void fb_putc(size_t x, size_t y, char c);
-void fb_draw_rect(size_t x, size_t y, size_t width, size_t height);
+
+void fb_draw_line(size_t stroke, uint32_t color,
+  ssize_t x1, ssize_t y1, ssize_t x2, ssize_t y2);
+void fb_draw_rect(size_t stroke, uint32_t color,
+  size_t x, size_t y, size_t width, size_t height, int fill);
+void fb_draw_progressbar(float percent, uint32_t color,
+    size_t x, size_t y, size_t width, size_t height);

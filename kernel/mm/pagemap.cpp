@@ -31,7 +31,8 @@ void PageMap::unlock()
 
 size_t PageMap::getRefs(size_t ppn)
 {
-  assert(ppn < m_totalPages);
+  if (ppn >= m_totalPages)
+    return 1;
   return m_pagemap[ppn];
 }
 
@@ -63,7 +64,8 @@ size_t PageMap::alloc(bool noLock)
 
 void PageMap::addRef(size_t ppn)
 {
-  assert(ppn < m_totalPages);
+  if (ppn >= m_totalPages)
+    return;
 
   if (atomic_add8(&m_pagemap[ppn], 1) == 0)
   {
@@ -74,6 +76,9 @@ void PageMap::addRef(size_t ppn)
 
 void PageMap::free(size_t ppn)
 {
+  if (ppn >= m_totalPages)
+    return;
+
   /* decrement and get the before-reference count */
   size_t before = atomic_add8(&m_pagemap[ppn], -1);
 

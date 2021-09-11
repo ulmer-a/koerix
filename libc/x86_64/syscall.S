@@ -45,4 +45,5 @@ syscall_w_errno   thread_count        11
 syscall_w_errno   fork                12
 syscall           getpid              13
 syscall           get_sched_task_info 14
+syscall           sysinfo             15
 
