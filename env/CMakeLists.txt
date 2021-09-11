@@ -24,3 +24,4 @@ endfunction()
 # add your programs here
 user_prog(textcon ${CMAKE_CURRENT_SOURCE_DIR}/textcon.c)
 user_prog(thread_test ${CMAKE_CURRENT_SOURCE_DIR}/thread_test.c)
+user_prog(fork_test ${CMAKE_CURRENT_SOURCE_DIR}/fork_test.c)

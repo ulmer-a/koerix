@@ -4,7 +4,8 @@
 
 int *__errno_location(void)
 {
-	return &__pthread_self()->errno_val;
+  thread_info_t* t_info = __pthread_self();
+  return &t_info->errno_val;
 }
 
 ssize_t _sys_errno(ssize_t ret)

@@ -10,6 +10,8 @@ class FpuContext
     FpuContext();
     ~FpuContext();
 
+    FpuContext* clone();
+
     void save();
     void restore() const;
 

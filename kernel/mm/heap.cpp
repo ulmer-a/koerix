@@ -9,6 +9,7 @@
 #include <debug.h>
 #include <platform.h>
 #include <string.h>
+#include <addr_space.h>
 
 struct HeapBlock
 {

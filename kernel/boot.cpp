@@ -14,7 +14,7 @@ static void printIssue()
   debug() << "Koerix OS kernel\n"
              "Copyright (C) 2017-2021 Alexander Ulmer\n";
 
-  auto pagemap = PageMap::get();
+  auto& pagemap = PageMap::get();
   debug() << "Memory: " << (pagemap.getUsedMemory() >> 20) << "/"
           << (pagemap.getUsableMemory() >> 20) << " MB used"
              " of total " << (pagemap.getTotalMemory() >> 20) << " MB\n\n";

@@ -14,13 +14,11 @@ KernelTask::KernelTask(void(*entry)(void* arg), void* arg)
   : Task(AddrSpace::kernel())
   , m_argument(arg)
 {
-  auto ctx = context();
-  initArchContext(ctx, false,
-    (size_t)ktask_runtime,  // entry point
-    kernelStackPtr(),       // stack pointer
-    (size_t)this,           // first argument
-    (size_t)entry           // second argument
-  );
+  context()->newKernelCtx();
+  context()->instructionPtr() = (size_t)ktask_runtime;
+  context()->stackPtr() = kernelStackPtr();
+  context()->arg1() = (size_t)this;
+  context()->arg2() = (size_t)entry;
 
   debug() << "created new kernel task with TID " << tid() << "\n";
 }

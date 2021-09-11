@@ -16,6 +16,8 @@ void* get_thread_ptr();
 ssize_t fb_info(int type);
 ssize_t sys_thread_create(void* rt, void* func, void* arg, int flags);
 size_t sys_thread_count();
+ssize_t sys_fork();
+size_t sys_getpid();
 
 #ifdef __cplusplus
 }

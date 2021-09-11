@@ -20,7 +20,7 @@ Task::Task(AddrSpace& vspace)
   m_kernelStack = kmalloc(KERNEL_STACK_SIZE);
   m_kernelStackTop = (size_t)m_kernelStack.get() + KERNEL_STACK_SIZE;
   m_context = (IrqContext*)m_kernelStackTop - 1;
-  memset((void*)m_context, 0, sizeof(IrqContext));
+  new (m_context) IrqContext();
 }
 
 void Task::exit()

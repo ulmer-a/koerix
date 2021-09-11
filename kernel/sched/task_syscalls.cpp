@@ -2,6 +2,7 @@
 #include <scheduler.h>
 #include <user_task.h>
 #include <user_proc.h>
+#include <errno.h>
 
 void sys_exit(int status)
 {
@@ -36,4 +37,14 @@ ssize_t sys_thread_create(void* rt0, void* func, void* arg, int flags)
 size_t sys_thread_count()
 {
   return sched::currentUserTask()->getProcess().threadCount();
+}
+
+ssize_t sys_fork()
+{
+  return sched::currentUserTask()->getProcess().fork();
+}
+
+size_t sys_getpid()
+{
+  return sched::currentUserTask()->getProcess().pid();
 }
