@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #include "stdio_impl.h"
 #include <limits.h>
 #include <string.h>

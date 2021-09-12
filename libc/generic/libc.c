@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #include "libc.h"
 
 struct __libc __libc;
