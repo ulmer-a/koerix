@@ -148,8 +148,14 @@ static void textcon(int readFd, int writeFd)
     sleep(10);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+  /* get the name of the shell to be executed from the
+   * command line arguments. if none, then take the default. */
+  const char* shell = "/bin/sh"; // default
+  if (argc > 1)
+    shell = argv[1];
+
   /* create a IPC pipe to be able to communicate with
    * the shell. */
   int toShell[2];
