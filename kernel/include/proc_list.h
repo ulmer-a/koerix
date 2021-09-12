@@ -12,6 +12,7 @@ class ProcList
   public:
     static ProcList& get();
 
+    size_t procCount();
     void checkForDeadProcesses();
 
   protected:

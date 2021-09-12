@@ -1,13 +1,10 @@
 #include <syscalls.h>
 #include <pagemap.h>
 #include <errno.h>
-
-enum _sysinfo_type
-{
-  SYSINFO_MEM_SIZE,
-  SYSINFO_MEM_USABLE,
-  SYSINFO_MEM_USED,
-};
+#include <proc_list.h>
+#include <scheduler.h>
+#include <x86/features.h>
+#include <bits.h>
 
 
 int sys_sysinfo(int type, size_t* value)
@@ -23,6 +20,12 @@ int sys_sysinfo(int type, size_t* value)
     break;
   case SYSINFO_MEM_USED:
     *value = pageMap.getUsedMemory();
+    break;
+  case SYSINFO_PROC_CNT:
+    *value = ProcList::get().procCount();
+    break;
+  case SYSINFO_THREAD_CNT:
+    *value = sched::taskCount();
     break;
   default:
     return -ENOTSUP;

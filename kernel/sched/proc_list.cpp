@@ -10,6 +10,11 @@ ProcList& ProcList::get()
   return *s_instance;
 }
 
+size_t ProcList::procCount()
+{
+  return m_procList.size();
+}
+
 void ProcList::checkForDeadProcesses()
 {
   ScopedMutex smtx { m_procListLock };

@@ -143,4 +143,9 @@ namespace sched {
       return ctx;
     }
   }
+
+  size_t taskCount()
+  {
+    return s_taskList.size();
+  }
 }

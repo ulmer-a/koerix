@@ -1,0 +1,10 @@
+#pragma once
+
+enum _sysinfo_type
+{
+  SYSINFO_MEM_SIZE,
+  SYSINFO_MEM_USABLE,
+  SYSINFO_MEM_USED,
+  SYSINFO_THREAD_CNT,
+  SYSINFO_PROC_CNT,
+};
