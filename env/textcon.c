@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <koerix/sysinfo.h>
 #include <koerix/scheduler.h>
 #include <koerix/framebuffer.h>
@@ -129,54 +130,59 @@ static void infoBarThread()
   }
 }
 
-int main()
+static void textcon(int readFd, int writeFd)
 {
   /* initialize the framebuffer */
   if (fb_init() < 0) {
     fprintf(stderr, "textcon: error: framebuffer not supported\n");
-    return EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   }
+  printf("initialized framebuffer: %ldx%ld\n", FB_WIDTH, FB_HEIGHT);
 
   /* create a thread that maintains the info bar on top
    * of the screen displaying memory usage, etc. */
   thread_create(infoBarThread, NULL, 0);
 
-
   // temporary: don't exit
   while (1)
     sleep(10);
+}
 
+int main()
+{
+  /* create a IPC pipe to be able to communicate with
+   * the shell. */
+  int toShell[2];
+  pipe(toShell);
+  int toTextcon[2];
+  pipe(toTextcon);
 
-  /*printf("framebuffer: %ld x %ld, pitch=%ld\n",
-         FB_WIDTH, FB_HEIGHT, FB_PITCH);
-
-  console_font = __fb_current_font;
-  term_width = FB_WIDTH / console_font->width;
-  term_height = FB_HEIGHT / console_font->height;
-  pos_x = 0;
-  pos_y = 1;
-
-  fb_set_fg(color(0xf5, 0xdf, 0x3b));
-  term_puts(banner, strlen(banner));
-  fb_set_fg(color(0xff, 0xff, 0xff));
-  term_puts(banner2, strlen(banner2));
-
-  fflush(stdout);
-
-  char buffer[1024];
-  for (;;)
+  /* fork off a new process that will execute the shell */
+  pid_t pid = fork();
+  if (pid == 0)
   {
-    ssize_t len = read(0, buffer, 1024);
-    if (len < 0) {
-      fprintf(stderr, "I/O error\n");
-      return 1;
-    }
+    /* reroute standard input/output streams to the pipe
+     * we just created. that way, when the shell thinks it
+     * reads and writes from/to stdio, it really actually
+     * writes into the pipe file descriptors. */
+    dup2(toShell[0], 0);
+    dup2(toTextcon[1], 1);
+    dup2(toTextcon[1], 2);
 
-    term_puts(buffer, len);
-    write(1, buffer, len);
-  }*/
+    /* execute the shell */
+    static char* const shell_args[] = {
+      "/bin/sh",
+      NULL
+    };
+    execv("/bin/sh", shell_args);
 
+    /* execv() returns only on error, so handle it */
+    fprintf(stderr, "error: execv(): %s\n", strerror(errno));
+    exit(EXIT_FAILURE);
+  }
 
+  /* ... while this process will handle the text console */
+  textcon(toTextcon[0], toShell[1]);
   return 0;
 }
 
