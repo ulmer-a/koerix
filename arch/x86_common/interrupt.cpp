@@ -15,6 +15,8 @@
 extern void fpuFault();
 extern void do_syscall(IrqContext* ctx);
 
+uint64_t s_timerTicks = 0;
+
 static void* getPageFaultAddr()
 {
     void* addr;
@@ -78,6 +80,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     size_t irq_id = ctx->irq() - 32;
     if (irq_id == 0)
     {
+      s_timerTicks += 1;
       ctx = sched::core::schedule(ctx);
     }
 

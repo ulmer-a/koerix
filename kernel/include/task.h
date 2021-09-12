@@ -27,6 +27,7 @@ class Task
     /* go to sleep. this can only be called from within
      * the task itself for now. */
     void sleep();
+    void sleepTicks(size_t timerTicks);
 
     /* wake the task up from sleep. this can only be called
      * from outside the task. */
@@ -45,6 +46,7 @@ class Task
     size_t m_tid;
     TaskState m_state;
     AddrSpace& m_addrSpace;
+    uint64_t m_wakeUpAt;
 
     /* kernel stack, allocated on the heap */
     ktl::unique_ptr<uint8_t> m_kernelStack;

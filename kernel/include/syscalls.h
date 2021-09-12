@@ -1,6 +1,7 @@
 #pragma once
 
 #include <types.h>
+#include <bits.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,6 +21,7 @@ ssize_t sys_fork();
 size_t sys_getpid();
 ssize_t get_sched_task_info(size_t tid, void* sched_task_info);
 int sys_sysinfo(int type, size_t* value);
+int sys_nanosleep(const struct timespec *req, struct timespec *rem);
 
 #ifdef __cplusplus
 }

@@ -8,10 +8,13 @@
 
 #define KERNEL_STACK_SIZE 8192
 
+extern uint64_t s_timerTicks;
+
 Task::Task(AddrSpace& vspace)
   : m_tid(getNewTid())
   , m_state(RUNNING)
   , m_addrSpace(vspace)
+  , m_wakeUpAt(0)
 {
   /* allocate a kernel stack and make the context struct
    * point to a location on the top. the derived class is
@@ -41,6 +44,12 @@ void Task::sleep()
     sched::yield();
 }
 
+void Task::sleepTicks(size_t timerTicks)
+{
+  m_wakeUpAt = s_timerTicks + timerTicks;
+  sleep();
+}
+
 void Task::resume()
 {
   assert(m_state == SLEEPING);
@@ -54,6 +63,12 @@ bool Task::schedulable()
    * and therefore is running in an interrupt
    * context with further interrupts disabled.
    * don't use any locks and don't block */
+
+  if (m_state == SLEEPING && s_timerTicks > m_wakeUpAt)
+  {
+    m_state = RUNNING;
+    m_wakeUpAt = 0;
+  }
 
   return (m_state == RUNNING);
 }
