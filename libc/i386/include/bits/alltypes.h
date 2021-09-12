@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #define _REDIR_TIME64 1
 #define _Addr int
 #define _Int64 long long

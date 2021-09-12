@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 /* The first entry is a catch-all for codes not enumerated here.
  * This file is included multiple times to declare and define a structure
  * with these messages, and then to define a lookup table translating

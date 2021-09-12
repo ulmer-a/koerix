@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #define a_cas a_cas
 static inline int a_cas(volatile int *p, int t, int s)
 {

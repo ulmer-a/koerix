@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #ifndef _INTTYPES_H
 #define _INTTYPES_H
 
@@ -226,4 +229,3 @@ uintmax_t wcstoumax(const wchar_t *__restrict, wchar_t **__restrict, int);
 #endif
 
 #endif
-

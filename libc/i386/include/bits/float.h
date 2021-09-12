@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #ifdef __FLT_EVAL_METHOD__
 #define FLT_EVAL_METHOD __FLT_EVAL_METHOD__
 #else

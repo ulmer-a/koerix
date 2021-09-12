@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2017-2021 Alexander Ulmer <alexulmer1999@gmail.com>
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
 #include <task.h>
 #include <mm.h>
 #include <string.h>
@@ -50,7 +53,3 @@ ssize_t get_sched_task_info(size_t tid, void* info_ptr)
         return found->next->item->tid();
     return -1;
 }
-
-
-
-

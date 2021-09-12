@@ -17,6 +17,14 @@ In the image, you can see the userspace program `textcon` in action. the termina
 to the left shows the serial output. `textcon` will print everything on the screen
 it reads from it's stdin (in this case, the serial console).
 
+## Licensing
+While the kernel (directories `arch/`, `platform/`, `kernel/`) and userspace environment
+programs (`env/`) is licensed under the terms of the GNU Lesser General Public License,
+the directory `libc/` contains large parts of the *Musl* libc, which is provided under
+the terms of the MIT license. Additionally, all files should have a SPDX comment at the top
+stating the exact license and copyright holder. If they don't: please tell me or open
+a pull request.
+
 ## Current Kernel Features
 * x86_64 kernel (64bit) written in C++, C as well as some GNU Assembler
 * preemptive multitasking (single core), Mutexes and Spinlocks

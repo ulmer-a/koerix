@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2017-2021 Alexander Ulmer <alexulmer1999@gmail.com>
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <sys/types.h>
@@ -13,4 +16,3 @@ size_t thread_id();
  * to refer to per-thread data.  */
 void* get_thread_ptr();
 void set_thread_ptr(void* ptr);
-
