@@ -46,4 +46,4 @@ syscall_w_errno   fork                12
 syscall           getpid              13
 syscall           get_sched_task_info 14
 syscall           sysinfo             15
-
+syscall_w_errno   nanosleep           16

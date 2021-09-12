@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
@@ -119,33 +120,32 @@ static void drawInfoBar()
   drawText(FB_WIDTH/4 + 10, 7, textBuffer);
 }
 
-static void doSth()
+static void infoBarThread()
 {
-  printf("thread %ld here\n", thread_id());
-
-  int i = 10000000;
-  while (i--);
-
-  if (thread_id() > 500)
-    return;
-
-  thread_create(doSth, NULL, 0);
-  thread_create(doSth, NULL, 0);
+  for (;;)
+  {
+    drawInfoBar();
+    sleep(1);
+  }
 }
 
 int main()
 {
+  /* initialize the framebuffer */
   if (fb_init() < 0) {
-    fprintf(stderr, "error: framebuffer not supported\n");
-    return 1;
+    fprintf(stderr, "textcon: error: framebuffer not supported\n");
+    return EXIT_FAILURE;
   }
 
-  thread_create(doSth, NULL, 0);
+  /* create a thread that maintains the info bar on top
+   * of the screen displaying memory usage, etc. */
+  thread_create(infoBarThread, NULL, 0);
+
+
+  // temporary: don't exit
   while (1)
-  {
-    drawInfoBar();
-    yield();
-  }
+    sleep(10);
+
 
   /*printf("framebuffer: %ld x %ld, pitch=%ld\n",
          FB_WIDTH, FB_HEIGHT, FB_PITCH);
