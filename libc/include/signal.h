@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #ifndef _SIGNAL_H
 #define _SIGNAL_H
 

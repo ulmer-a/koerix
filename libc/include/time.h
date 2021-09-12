@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
+// SPDX-License-Identifier: MIT
+
 #ifndef	_TIME_H
 #define _TIME_H
 
