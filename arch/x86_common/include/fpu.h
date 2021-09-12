@@ -8,7 +8,6 @@ class FpuContext
 {
   public:
     FpuContext();
-    ~FpuContext();
 
     FpuContext* clone();
 
@@ -16,7 +15,7 @@ class FpuContext
     void restore() const;
 
   private:
-    void* m_data;
+    char m_data[512 + 16];
     FpuContextStruct* m_context;
 };
 

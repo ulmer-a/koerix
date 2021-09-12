@@ -20,13 +20,7 @@ FpuContext::FpuContext()
   /* allocate 16 extra bytes to be able to find
    * a 16byte-aligned location within m_data. */
   assert(sizeof(FpuContextStruct) == 512);
-  m_data = kmalloc(sizeof(FpuContextStruct) + 16);
   m_context = (FpuContextStruct*)(((size_t)m_data & ~0xf) + 16);
-}
-
-FpuContext::~FpuContext()
-{
-  kfree(m_data);
 }
 
 FpuContext* FpuContext::clone()
