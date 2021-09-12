@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2017-2021 Alexander Ulmer <alexulmer1999@gmail.com>
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
 #include <pc/serial.h>
 #include <x86/ports.h>
 #include <errno.h>
@@ -147,4 +150,3 @@ void SerialPort::handleIrq()
     buffer[bytes_received++] = inb(m_port);
   onReceive(buffer, bytes_received);
 }
-
