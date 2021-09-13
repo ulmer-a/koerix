@@ -230,6 +230,7 @@ int UserProcess::insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum)
   {
     fdNum = 0;
     while (m_files.find(fdNum++));
+    fdNum--;
   }
 
   m_files[fdNum] = fd;

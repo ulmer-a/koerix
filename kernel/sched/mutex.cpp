@@ -40,10 +40,6 @@ void Mutex::lock()
      * unlock the waitingTasks spinlock without a
      * reschedule in between. */
     currentTask->sleepAndUnlock(&m_waitingTasksLock);
-
-    /* since we disbled the scheduler before, we might not
-     * actually be sleeping yet, so enforce it now. */
-    sched::yield();
   }
 
   m_heldBy = currentTask;

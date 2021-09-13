@@ -58,6 +58,10 @@ void Task::sleepAndUnlock(Lock* lock)
   sleep();
   lock->unlock();
   sched::s_schedEnable = true;
+
+  /* since we disbled the scheduler before, we might not
+   * actually be sleeping yet, so enforce it now. */
+  sched::yield();
 }
 
 void Task::sleepTicks(size_t timerTicks)
