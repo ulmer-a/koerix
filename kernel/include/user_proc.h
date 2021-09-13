@@ -48,7 +48,7 @@ class UserProcess
     void checkForDeadTasks();
 
     bool closeFile(size_t fd);
-    void insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum = -1);
+    int insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum = -1);
     fs::FileDesc getOpenFile(size_t fd);
 
   protected: /* UserTask can access  */

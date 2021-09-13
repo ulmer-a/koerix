@@ -20,12 +20,23 @@ FileDesc::FileDesc(File* file, bool write)
   , m_file(file)
   , m_write(write)
 {
+  assert(m_file != nullptr);
+  m_file->addRef();
+}
 
+FileDesc::FileDesc(const FileDesc& fd)
+  : m_valid(fd.m_valid)
+  , m_file(fd.m_file)
+  , m_write(fd.m_write)
+{
+  if (m_file)
+    m_file->addRef();
 }
 
 FileDesc::~FileDesc()
 {
-
+  if (m_file)
+    m_file->release();
 }
 
 ssize_t FileDesc::read(char* buf, size_t len)

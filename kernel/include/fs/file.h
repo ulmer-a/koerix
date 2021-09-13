@@ -14,7 +14,7 @@ namespace fs {
       friend class FileDesc;
 
     public:
-      File() = default;
+      File();
       virtual ~File() = default;
 
       virtual bool isDir() const { return false; }
@@ -24,6 +24,14 @@ namespace fs {
     protected:
       virtual ssize_t read(char* buf, size_t len) = 0;
       virtual ssize_t write(char* buf, size_t len) = 0;
+
+      virtual void closed() { }
+
+      void addRef();
+      void release();
+
+    private:
+      size_t m_refs;
   };
 
 }

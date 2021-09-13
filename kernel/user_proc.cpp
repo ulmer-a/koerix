@@ -223,7 +223,7 @@ bool UserProcess::closeFile(size_t fd)
   return m_files.erase(fd);
 }
 
-void UserProcess::insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum)
+int UserProcess::insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum)
 {
   ScopedMutex smtx { m_filesLock };
   if (fdNum < 0)
@@ -233,6 +233,7 @@ void UserProcess::insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum)
   }
 
   m_files[fdNum] = fd;
+  return fdNum;
 }
 
 fs::FileDesc UserProcess::getOpenFile(size_t fd)
