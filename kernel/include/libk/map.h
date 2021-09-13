@@ -73,9 +73,12 @@ namespace ktl {
       MapEntry(const MapEntry& self)
         : m_key(self.m_key)
         , m_value(self.m_value)
-        , m_left(self.m_left->copy())
-        , m_right(self.m_right->copy())
-      { }
+      {
+        if (self.m_left)
+          m_left = self.m_left->copy();
+        if (self.m_right)
+          m_right = self.m_right->copy();
+      }
 
     private:
       K m_key;

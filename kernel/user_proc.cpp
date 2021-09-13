@@ -41,6 +41,7 @@ UserProcess::UserProcess(const UserProcess& forkee)
   , m_loader(forkee.m_loader)
   , m_term(forkee.m_term)
   , m_stackList(forkee.m_stackList)
+  , m_files(forkee.m_files)
 {
   /* add this process to the global list of processes */
   ProcList::get().onAddProcess(this);

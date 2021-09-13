@@ -51,9 +51,3 @@ size_t sys_getpid()
 {
   return sched::currentUserTask()->getProcess().pid();
 }
-
-int sys_execve(const char* pathname,
-               char *const argv[], char *const envp[])
-{
-  return -ENOSYS;
-}

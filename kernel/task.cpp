@@ -17,7 +17,7 @@ Task::Task(AddrSpace& vspace)
   : m_tid(getNewTid())
   , m_state(RUNNING)
   , m_addrSpace(vspace)
-  , m_wakeUpAt(0)
+  , m_wakeUpAt((size_t)-1)
 {
   /* allocate a kernel stack and make the context struct
    * point to a location on the top. the derived class is
@@ -70,7 +70,7 @@ bool Task::schedulable()
   if (m_state == SLEEPING && s_timerTicks > m_wakeUpAt)
   {
     m_state = RUNNING;
-    m_wakeUpAt = 0;
+    m_wakeUpAt = (size_t)-1;
   }
 
   return (m_state == RUNNING);
