@@ -175,20 +175,34 @@ int main(int argc, char* argv[])
      * we just created. that way, when the shell thinks it
      * reads and writes from/to stdio, it really actually
      * writes into the pipe file descriptors. */
-    dup2(toShell[0], 0);
-    dup2(toTextcon[1], 1);
-    dup2(toTextcon[1], 2);
+    //dup2(toShell[0], 0);
+    //dup2(toTextcon[1], 1);
+    //dup2(toTextcon[1], 2);
+
+    char lineBuffer[128];
+    while (1)
+    {
+      fprintf(stderr, "test shell >> ");
+      char c;
+      char* linePtr = lineBuffer;
+      while ((c = getchar()) != '\n' && c != EOF && c != '\r')
+        *linePtr++ = c;
+      *linePtr = 0;
+
+      fprintf(stderr, "Your command was '%s'\n", lineBuffer);
+    }
+
 
     /* execute the shell */
-    static char* const shell_args[] = {
-      "/bin/sh",
-      NULL
-    };
-    execv("/bin/sh", shell_args);
+    //static char* const shell_args[] = {
+    //  "/bin/sh",
+    //  NULL
+    //};
+    //execv("/bin/sh", shell_args);
 
     /* execv() returns only on error, so handle it */
-    fprintf(stderr, "error: execv(): %s\n", strerror(errno));
-    exit(EXIT_FAILURE);
+    //fprintf(stderr, "error: execv(): %s\n", strerror(errno));
+    //exit(EXIT_FAILURE);
   }
 
   /* ... while this process will handle the text console */
