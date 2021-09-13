@@ -16,7 +16,7 @@ class Pipe : public fs::File
     Pipe() = default;
 
     fs::FileDesc getFd() {
-      return fs::FileDesc(this);
+      return fs::FileDesc(this, true);
     }
 
   protected:

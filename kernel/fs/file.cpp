@@ -25,6 +25,7 @@ void File::addRef()
 
 void File::release()
 {
+  assert(m_refs > 0);
   size_t refs_before = atomic_add(&m_refs, -1);
   if (refs_before == 1)
     closed();

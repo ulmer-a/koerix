@@ -24,10 +24,10 @@ Queue::~Queue()
 
 ssize_t Queue::read(char* buffer, size_t len)
 {
+  atomic_add(&m_subscriberCount, 1);
   if (m_available == 0)
   {
     m_subscriberLock.lock();
-    m_subscriberCount += 1;
     m_readSubscribers.push_back(sched::currentTask());
     sched::currentTask()->sleepAndUnlock(&m_subscriberLock);
   }

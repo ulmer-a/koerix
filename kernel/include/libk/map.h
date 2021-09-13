@@ -65,8 +65,17 @@ namespace ktl {
 
       void del()
       {
-        delete m_left;
-        delete m_right;
+        if (m_left)
+        {
+          m_left->del();
+          delete m_left;
+        }
+
+        if (m_right)
+        {
+          m_right->del();
+          delete m_right;
+        }
       }
 
     private:
