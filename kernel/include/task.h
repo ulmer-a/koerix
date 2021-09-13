@@ -8,6 +8,7 @@
 #include <unique_ptr.h>
 
 class AddrSpace;
+class Lock;
 struct IrqContext;
 
 class Task
@@ -30,6 +31,7 @@ class Task
     /* go to sleep. this can only be called from within
      * the task itself for now. */
     void sleep();
+    void sleepAndUnlock(Lock* lock);
     void sleepTicks(size_t timerTicks);
 
     /* wake the task up from sleep. this can only be called

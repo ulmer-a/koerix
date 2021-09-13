@@ -16,6 +16,7 @@ namespace fs {
       FileDesc();
       FileDesc(File* file, bool write = false);
       FileDesc(const FileDesc& fd);
+      FileDesc& operator=(const FileDesc& fd);
       ~FileDesc();
 
       inline bool valid() const { return m_valid; }

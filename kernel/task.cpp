@@ -8,10 +8,15 @@
 #include <arch/asm.h>
 #include <debug.h>
 #include <scheduler.h>
+#include <lock.h>
 
 #define KERNEL_STACK_SIZE 8192
 
 extern uint64_t s_timerTicks;
+
+namespace sched {
+  extern bool s_schedEnable;
+}
 
 Task::Task(AddrSpace& vspace)
   : m_tid(getNewTid())
@@ -45,6 +50,14 @@ void Task::sleep()
 
   if (sched::isEnabled())
     sched::yield();
+}
+
+void Task::sleepAndUnlock(Lock* lock)
+{
+  sched::s_schedEnable = false;
+  sleep();
+  lock->unlock();
+  sched::s_schedEnable = true;
 }
 
 void Task::sleepTicks(size_t timerTicks)

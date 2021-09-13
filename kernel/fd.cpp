@@ -33,6 +33,21 @@ FileDesc::FileDesc(const FileDesc& fd)
     m_file->addRef();
 }
 
+FileDesc& FileDesc::operator=(const FileDesc& fd)
+{
+  if (m_file)
+    m_file->release();
+
+  m_file = fd.m_file;
+  m_valid = fd.m_valid;
+  m_write = fd.m_write;
+
+  if (m_file)
+    m_file->addRef();
+
+  return *this;
+}
+
 FileDesc::~FileDesc()
 {
   if (m_file)

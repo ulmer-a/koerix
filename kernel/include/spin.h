@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <canary.h>
+#include <lock.h>
 
-class Spinlock : public ktl::Canary
+class Spinlock : public Lock
 {
   public:
     Spinlock();

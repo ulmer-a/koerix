@@ -6,10 +6,6 @@
 #include <task.h>
 #include <scheduler.h>
 
-namespace sched {
-  extern bool s_schedEnable;
-}
-
 Mutex::Mutex()
   : m_lock(0)
   , m_heldBy(nullptr)
@@ -43,10 +39,7 @@ void Mutex::lock()
      * now, we have to put ourselves to sleep as well as
      * unlock the waitingTasks spinlock without a
      * reschedule in between. */
-    sched::s_schedEnable = false;
-    currentTask->sleep();
-    m_waitingTasksLock.unlock();
-    sched::s_schedEnable = true;
+    currentTask->sleepAndUnlock(&m_waitingTasksLock);
 
     /* since we disbled the scheduler before, we might not
      * actually be sleeping yet, so enforce it now. */

@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <canary.h>
 #include <list.h>
 #include <spin.h>
+#include <lock.h>
 
 class Task;
 
-class Mutex : public ktl::Canary
+class Mutex : public Lock
 {
   public:
     Mutex();

@@ -8,6 +8,7 @@
 #include <user_task.h>
 #include <user_proc.h>
 #include <scheduler.h>
+#include <queue.h>
 
 class Pipe : public fs::File
 {
@@ -20,16 +21,19 @@ class Pipe : public fs::File
 
   protected:
     ssize_t read(char* buf, size_t len) final {
-      return -ENOTSUP;
+      return m_buffer.read(buf, len);
     }
 
     ssize_t write(char* buf, size_t len) final {
-      return len;
+      return m_buffer.write(buf, len);
     }
 
     void closed() final {
       delete this;
     }
+
+  private:
+    Queue m_buffer;
 };
 
 int sys_pipe(int* fds)
