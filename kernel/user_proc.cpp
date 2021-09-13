@@ -8,6 +8,7 @@
 #include <proc_list.h>
 #include <scheduler.h>
 #include <addr_space.h>
+#include <stdio.h>
 
 UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
                          ktl::shared_ptr<Terminal> term)
@@ -21,6 +22,12 @@ UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
   ProcList::get().onAddProcess(this);
 
   assert(m_loader->isValid());
+
+  /* open file descriptors for standard IO */
+  auto stdio = StdIO::get().getFd();
+  insertOpenFile(stdio, 0); // stdin
+  insertOpenFile(stdio, 1); // stdout
+  insertOpenFile(stdio, 2); // stderr
 
   /* create a main thread for this process, the entry point
    * is defined by the entry address found in the ELF binary. */
@@ -207,4 +214,31 @@ size_t UserProcess::getNewPid()
 {
   static size_t pidCounter = 1;
   return atomic_add(&pidCounter, 1);
+}
+
+bool UserProcess::closeFile(size_t fd)
+{
+  ScopedMutex smtx { m_filesLock };
+  return m_files.erase(fd);
+}
+
+void UserProcess::insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum)
+{
+  ScopedMutex smtx { m_filesLock };
+  if (fdNum < 0)
+  {
+    fdNum = 0;
+    while (m_files.find(fdNum++));
+  }
+
+  m_files[fdNum] = fd;
+}
+
+fs::FileDesc UserProcess::getOpenFile(size_t fd)
+{
+  ScopedMutex smtx { m_filesLock };
+  auto it = m_files.find(fd);
+  if (it)
+    return it->value();
+  return fs::FileDesc();
 }

@@ -9,7 +9,7 @@ static void* syscalls[] = {
   (void*)sys_thread_exit,           // 1
   (void*)sys_read,                  // 2
   (void*)sys_write,                 // 3
-  nullptr,                          // 4
+  (void*)sys_close,                 // 4
   nullptr,                          // 5
   (void*)set_thread_ptr,            // 6
   (void*)get_thread_ptr,            // 7
@@ -21,5 +21,8 @@ static void* syscalls[] = {
   (void*)sys_getpid,                // 13
   (void*)get_sched_task_info,       // 14
   (void*)sys_sysinfo,               // 15
-  (void*)sys_nanosleep              // 16
+  (void*)sys_nanosleep,             // 16
+  (void*)sys_pipe,                  // 17
+  (void*)sys_dup2,                  // 18
+  (void*)sys_execve                 // 19
 };

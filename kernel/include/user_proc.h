@@ -8,6 +8,8 @@
 #include <vector.h>
 #include <mutex.h>
 #include <addr_space.h>
+#include <map.h>
+#include <fs/fd.h>
 
 class Loader;
 class UserTask;
@@ -45,6 +47,10 @@ class UserProcess
     void exit(int status);
     void checkForDeadTasks();
 
+    bool closeFile(size_t fd);
+    void insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum = -1);
+    fs::FileDesc getOpenFile(size_t fd);
+
   protected: /* UserTask can access  */
     UserStack allocStack();
     void releaseStack(UserStack stack);
@@ -65,4 +71,7 @@ class UserProcess
 
     mutable Mutex m_stackListLock;
     ktl::vector<bool> m_stackList;
+
+    Mutex m_filesLock;
+    ktl::Map<size_t, fs::FileDesc> m_files;
 };

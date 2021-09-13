@@ -11,16 +11,45 @@
 
 ssize_t sys_read(int fd, char* buffer, size_t len)
 {
-  if (fd > 2)
+  auto& proc = sched::currentUserTask()->getProcess();
+  auto fdObj = proc.getOpenFile(fd);
+
+  if (!fdObj.valid())
     return -EBADF;
-  return sched::currentUserTask()->getProcess()
-      .getTerm().read(buffer, len);
+
+  return fdObj.read(buffer, len);
 }
 
 ssize_t sys_write(int fd, char* buffer, size_t len)
 {
-  if (fd > 2)
+  auto& proc = sched::currentUserTask()->getProcess();
+  auto fdObj = proc.getOpenFile(fd);
+
+  if (!fdObj.valid())
     return -EBADF;
-  return sched::currentUserTask()->getProcess()
-      .getTerm().write(buffer, len);
+
+  return fdObj.write(buffer, len);
+}
+
+int sys_close(int fd)
+{
+  auto& proc = sched::currentUserTask()->getProcess();
+  if (!proc.closeFile(fd))
+    return -EBADF;
+  return 0;
+}
+
+int sys_dup2(int oldfd, int newfd)
+{
+  if (oldfd < 0 || newfd < 0)
+    return -EINVAL;
+
+  auto& proc = sched::currentUserTask()->getProcess();
+  auto fd = proc.getOpenFile(oldfd);
+
+  if (!fd.valid())
+    return -EBADF;
+
+  proc.insertOpenFile(fd, newfd);
+  return 0;
 }
