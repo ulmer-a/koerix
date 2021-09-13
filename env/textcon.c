@@ -9,7 +9,6 @@
 #include <koerix/framebuffer.h>
 #include <koerix/threads.h>
 
-const psf_font_t* console_font;
 size_t term_width, term_height;
 size_t pos_x, pos_y;
 
@@ -27,8 +26,8 @@ static void term_puts(const char* str, size_t len)
       c = ' ';
     }
 
-    fb_putc(pos_x * console_font->width,
-      pos_y * console_font->height, c);
+    fb_putc(pos_x * __fb_current_font->width,
+      pos_y * __fb_current_font->height, c);
     pos_x += 1;
 
     if (pos_x == term_width)
@@ -134,7 +133,30 @@ static void infoBarThread()
   }
 }
 
-static void textcon(int readFd, int writeFd)
+static void stdoutThread(void* arg)
+{
+  int shell_stdout_fd = (int)arg;
+
+  term_width = FB_WIDTH / __fb_current_font->width;
+  term_height = FB_HEIGHT / __fb_current_font->height;
+  pos_x = 0, pos_y = 10;
+
+  ssize_t len;
+  char buffer[1024];
+  for (;;)
+  {
+    len = read(shell_stdout_fd, buffer, 1024);
+    if (len < 0) {
+      fprintf(stderr, "textcon error: stdoutThread(): %s\n",
+              strerror(errno));
+      return;
+    }
+
+    term_puts(buffer, len);
+  }
+}
+
+static void textcon(size_t readFd, size_t writeFd)
 {
   /* initialize the framebuffer */
   if (fb_init() < 0) {
@@ -146,6 +168,10 @@ static void textcon(int readFd, int writeFd)
   /* create a thread that maintains the info bar on top
    * of the screen displaying memory usage, etc. */
   thread_create(infoBarThread, NULL, 0);
+
+  /* create a thread that reads the pipe for data coming from
+   * the shell, and prints it to the framebuffer console */
+  thread_create(stdoutThread, (void*)readFd, 0);
 
   // temporary: don't exit
   while (1)
@@ -175,9 +201,9 @@ int main(int argc, char* argv[])
      * we just created. that way, when the shell thinks it
      * reads and writes from/to stdio, it really actually
      * writes into the pipe file descriptors. */
-    //dup2(toShell[0], 0);
-    //dup2(toTextcon[1], 1);
-    //dup2(toTextcon[1], 2);
+    dup2(toShell[0], 0);
+    dup2(toTextcon[1], 1);
+    dup2(toTextcon[1], 2);
 
     char lineBuffer[128];
     while (1)
