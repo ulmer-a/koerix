@@ -88,6 +88,8 @@ static void memText(char* buffer, size_t bytes)
   sprintf(buffer, "%lu %s", num, postfix);
 }
 
+static const uint32_t barBackgroundColor = color(0x43, 0x43, 0x43);
+
 static void drawInfoBar()
 {
   /* query system information to be printed */
@@ -100,7 +102,7 @@ static void drawInfoBar()
   sysinfo(SYSINFO_THREAD_CNT, &thread_count);
 
   /* clear the top bar */
-  memset(FB_PTR, 0, 30 * FB_PITCH * FB_BPP);
+  fb_draw_rect(2, barBackgroundColor, 0, 0, FB_WIDTH, 30, 1);
 
   /* draw used-memory progress bar */
   float prog = (float)used_mem / (float)usable_mem;
@@ -118,11 +120,13 @@ static void drawInfoBar()
   char textBuffer[64];
   sprintf(textBuffer, "%s / %s  | %lu processes | %lu threads",
           memTextBuffer1, memTextBuffer2, proc_count, thread_count);
-  drawText(FB_WIDTH/4 + 10, 7, textBuffer);
+  drawText(FB_WIDTH/4 + 20, 7, textBuffer);
 }
 
 static void infoBarThread()
 {
+  fb_set_bg(barBackgroundColor);
+
   for (;;)
   {
     drawInfoBar();
