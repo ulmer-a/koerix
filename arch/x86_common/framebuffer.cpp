@@ -12,8 +12,7 @@
 
 size_t fb_page_count()
 {
-  const size_t byte_per_px = s_stivale->framebuffer_bpp >> 3;
-  const size_t line = s_stivale->framebuffer_pitch * byte_per_px;
+  const size_t line = s_stivale->framebuffer_pitch;
   const size_t byte_size = line * s_stivale->framebuffer_height;
 
   size_t pages = byte_size >> PAGE_SHIFT;
@@ -30,7 +29,7 @@ void* fb_map()
   auto& addrSpace = sched::currentUserTask()->getProcess().getAddrSpace();
   for (size_t i = 0; i < count; i++)
   {
-    addrSpace.map(virt_start_page + i, start_page + i,
+    addrSpace.map(virt_start_page + i, start_page + i, AddrSpace::MAP_SHARED |
       AddrSpace::MAP_USER | AddrSpace::MAP_WRITE | AddrSpace::MAP_NOEXEC);
   }
   return (void*)FRAMEBUFFER_ADDR;

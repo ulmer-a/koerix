@@ -23,7 +23,8 @@ struct AddrSpace::GenericPagingTable
   uint64_t ppn                       : 28;
   uint64_t zero2                     : 12;
   uint64_t cow_was_writable          : 1;
-  uint64_t available2                : 10;
+  uint64_t shared                    : 1;
+  uint64_t available2                : 9;
   uint64_t no_exec                   : 1;
 } _PACKED;
 
@@ -204,6 +205,7 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
         if (flags & MAP_WRITE)  currentLevelTableEntry.write = 1;
         if (flags & MAP_USER)   currentLevelTableEntry.user = 1;
         if (flags & MAP_NOEXEC) currentLevelTableEntry.no_exec = 1;
+        if (flags & MAP_SHARED) currentLevelTableEntry.shared = 1;
       }
       else
       {
@@ -321,17 +323,20 @@ bool AddrSpace::triggerCow(size_t virt)
             continue;
           }
 
-          if (oldEntry.cow_was_writable == 0)
+          if (!oldEntry.shared)
           {
-            /* if the old entry was already copied, writable
-             * might be zero, hereby causing cow_writable to go
-             * zero, even though the page is actually writable.
-             * this was REALLY nasty to debug! */
-            oldEntry.cow_was_writable = oldEntry.write;
+            if (oldEntry.cow_was_writable == 0)
+            {
+              /* if the old entry was already copied, writable
+               * might be zero, hereby causing cow_writable to go
+               * zero, even though the page is actually writable.
+               * this was REALLY nasty to debug! */
+              oldEntry.cow_was_writable = oldEntry.write;
+            }
+            oldEntry.write = 0;
+            pageMap.addRef(oldEntry.ppn);
           }
-          oldEntry.write = 0;
           newEntry = oldEntry;
-          pageMap.addRef(oldEntry.ppn);
         }
       }
 

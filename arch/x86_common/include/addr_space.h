@@ -15,9 +15,10 @@ class AddrSpace
   public:
     enum MapFlags
     {
-        MAP_USER    = BIT(0),
-        MAP_WRITE   = BIT(1),
-        MAP_NOEXEC  = BIT(2)
+      MAP_USER    = BIT(0),
+      MAP_WRITE   = BIT(1),
+      MAP_NOEXEC  = BIT(2),
+      MAP_SHARED = BIT(3)
     };
 
     struct Mapping;
