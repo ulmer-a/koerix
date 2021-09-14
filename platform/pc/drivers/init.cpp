@@ -8,6 +8,8 @@
 
 void timer_reset(uint16_t freqHz);
 
+extern void ps2kbd_init();
+
 void init_drivers()
 {
   debug() << "init platform drivers\n";
@@ -18,4 +20,6 @@ void init_drivers()
   dev::registerDevice("uart0",
     new pc::SerialPort(pc::SerialPort::COM1)
   );
+
+  ps2kbd_init();
 }
