@@ -8,10 +8,17 @@
 #include <user_task.h>
 #include <user_proc.h>
 #include <term.h>
+#include <fs/vfs.h>
 
 int sys_open(const char* pathname, int flags)
 {
-  return -ENOSYS;
+  int error;
+  auto fd = fs::open(pathname, error);
+  if (!fd.valid())
+    return -error;
+
+  return sched::currentUserTask()->getProcess()
+      .insertOpenFile(fd);
 }
 
 ssize_t sys_read(int fd, char* buffer, size_t len)

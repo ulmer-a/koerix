@@ -8,6 +8,8 @@
 #include <koerix/scheduler.h>
 #include <koerix/framebuffer.h>
 #include <koerix/threads.h>
+#include <koerix/keyboard.h>
+#include <fcntl.h>
 
 size_t term_width, term_height;
 size_t pos_x, pos_y;
@@ -149,10 +151,26 @@ static void stdoutThread(void* arg)
     if (len < 0) {
       fprintf(stderr, "textcon error: stdoutThread(): %s\n",
               strerror(errno));
-      return;
+      exit(EXIT_FAILURE);
     }
 
     term_puts(buffer, len);
+  }
+}
+
+static void stdinThread(int shell_stdin_fd)
+{
+  if (kbd_init() < 0) {
+    fprintf(stderr, "cannot open keyboard device: %s\n", strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+  ssize_t len;
+  char buffer[1024];
+  for (;;)
+  {
+    char c = kbd_getchar();
+    write(shell_stdin_fd, &c, 1);
   }
 }
 
@@ -173,9 +191,7 @@ static void textcon(size_t readFd, size_t writeFd)
    * the shell, and prints it to the framebuffer console */
   thread_create(stdoutThread, (void*)readFd, 0);
 
-  // temporary: don't exit
-  while (1)
-    sleep(10);
+  stdinThread(writeFd);
 }
 
 int main(int argc, char* argv[])

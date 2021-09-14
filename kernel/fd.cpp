@@ -11,6 +11,7 @@ using namespace fs;
 FileDesc::FileDesc()
   : m_valid(false)
   , m_write(false)
+  , m_file(nullptr)
 {
 
 }
