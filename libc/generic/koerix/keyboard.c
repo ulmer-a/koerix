@@ -2,6 +2,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <stdio.h>
+
 static int __kbd_fd = -1;
 
 enum SpecialKeys
@@ -22,7 +24,7 @@ enum SpecialKeys
   SCROLL_LOCK = 0x97
 };
 
-static unsigned char scancodes[] = {
+static unsigned char layout_base[] = {
   NONE, F9, NONE, F5, F3, F1, F2, F12, NONE, F10, F8, F6, F4,
   TAB, '`', NONE, NONE, ALT_LEFT, SHIFT_LEFT, NONE, CTRL_LEFT,
   'q', '1', NONE, NONE, NONE, 'y', 's', 'a', 'w', '2', NONE,
@@ -32,7 +34,7 @@ static unsigned char scancodes[] = {
   'o', '0', '9', NONE, NONE, '.', '-', 'l', ';', 'p', 's', NONE,
   NONE, NONE, '\'', NONE, 'u', '=', NONE, NONE, CAPS_LOCK, SHIFT_RIGHT,
   '\n', '+', NONE, '\\', NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-  BACKSPACE, NONE, NONE, '1', NONE, '4', '7', NONE, NONE, NONE,
+  '\b', NONE, NONE, '1', NONE, '4', '7', NONE, NONE, NONE,
   '0', '.', '2', '5', '6', '8', ESCAPE, NUM_LOCK, F11, '+', '3', '-',
   '*', '9', SCROLL_LOCK, NONE, NONE, NONE, NONE, F7
 };
@@ -46,19 +48,35 @@ int kbd_init()
   return 0;
 }
 
-static char from_scancode(unsigned char scancode)
+static unsigned char do_getchar()
 {
-  unsigned char key = scancodes[scancode];
-  if (key < 0x80)
-    return key;
-  return 0;
+  unsigned char c;
+  read(__kbd_fd, &c, 1);
+  return c;
 }
 
 char kbd_getchar()
 {
-  unsigned char c;
-  if (read(__kbd_fd, &c, 1) < 0)
-    return -1;
-
-  return from_scancode(c);
+  unsigned char c = do_getchar();
+  if (c < sizeof(layout_base))
+  {
+    c = layout_base[c];
+    if (c < 0x80)
+      return c;
+    else
+      return kbd_getchar();
+  }
+  else if (c == 0xf0)
+  {
+    // ignore the release
+    do_getchar();
+    return kbd_getchar();
+  }
+  else if (c == 0xe0)
+  {
+    // ignore the special key
+    do_getchar();
+    return kbd_getchar();
+  }
+  return 0;
 }
