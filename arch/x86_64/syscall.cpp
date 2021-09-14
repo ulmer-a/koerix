@@ -21,8 +21,8 @@ void do_syscall(IrqContext* ctx)
   /* check for an invalid system call number */
   if (ctx->rax >= sizeof(syscalls) / sizeof(void*))
   {
-    ctx->rax = -ENOSYS;
     invalidSyscall(ctx);
+    ctx->rax = -ENOSYS;
     return;
   }
 
@@ -30,8 +30,8 @@ void do_syscall(IrqContext* ctx)
   void* syscall_addr = syscalls[ctx->rax];
   if (syscall_addr == nullptr)
   {
-    ctx->rax = -ENOSYS;
     invalidSyscall(ctx);
+    ctx->rax = -ENOSYS;
     return;
   }
 
