@@ -42,6 +42,13 @@ bool handlePageFault(size_t addr, FaultFlags flags)
 {
   assert((flags & PF_RESERVED) == 0);
 
+  if (addr == EXIT_ADDR && (flags & PF_CODE))
+  {
+    /* the thread has been sent a kill request (because the
+     * process exited or whatever). So cleanly exit the thread. */
+    sched::currentTask()->exit();
+  }
+
   if (!checkIfValid(addr, flags))
   {
     killProgram();
