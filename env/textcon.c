@@ -139,7 +139,7 @@ static void stdoutThread(int shell_stdout_fd)
 {
   term_width = FB_WIDTH / __fb_current_font->width;
   term_height = FB_HEIGHT / __fb_current_font->height;
-  pos_x = 0, pos_y = 10;
+  pos_x = 0, pos_y = 3;
 
   ssize_t len;
   char buffer[1024];
@@ -227,6 +227,7 @@ int main(int argc, char* argv[])
         putc(c, stderr);
         *linePtr++ = c;
       }
+      putc('\n', stderr);
       *linePtr = 0;
 
       fprintf(stderr, "Your command was '%s'\n", lineBuffer);
