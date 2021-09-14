@@ -24,5 +24,6 @@ static void* syscalls[] = {
   (void*)sys_nanosleep,             // 16
   (void*)sys_pipe,                  // 17
   (void*)sys_dup2,                  // 18
-  (void*)sys_execve                 // 19
+  (void*)sys_execve,                // 19
+  (void*)sys_open                   // 20
 };

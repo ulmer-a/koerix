@@ -29,6 +29,7 @@ int sys_pipe(int* fds);
 int sys_dup2(int oldfd, int newfd);
 int sys_execve(const char* pathname,
                char *const argv[], char *const envp[]);
+int sys_open(const char* pathname, int flags);
 
 
 #ifdef __cplusplus

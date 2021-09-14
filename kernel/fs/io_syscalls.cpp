@@ -9,6 +9,11 @@
 #include <user_proc.h>
 #include <term.h>
 
+int sys_open(const char* pathname, int flags)
+{
+  return -ENOSYS;
+}
+
 ssize_t sys_read(int fd, char* buffer, size_t len)
 {
   auto& proc = sched::currentUserTask()->getProcess();
