@@ -30,12 +30,21 @@ static bool checkIfValid(size_t addr, FaultFlags flags)
   return true;
 }
 
+void killProgram()
+{
+  auto& proc = sched::currentUserTask()->getProcess();
+  debug() << "PID " << proc.pid()
+          << ": KILLED due to invalid memory reference\n";
+  proc.exit(-1);
+}
+
 bool handlePageFault(size_t addr, FaultFlags flags)
 {
   assert((flags & PF_RESERVED) == 0);
 
   if (!checkIfValid(addr, flags))
   {
+    killProgram();
     return false;
   }
 
@@ -61,5 +70,11 @@ bool handlePageFault(size_t addr, FaultFlags flags)
     return true;
   }
 
-  return process.getLoader().load(addr, process.getAddrSpace());
+  if (!process.getLoader().load(addr, process.getAddrSpace()))
+  {
+    killProgram();
+    return false;
+  }
+
+  return true;
 }
