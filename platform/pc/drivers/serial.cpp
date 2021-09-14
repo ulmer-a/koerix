@@ -11,15 +11,12 @@
 
 using namespace pc;
 
-size_t SerialPort::s_minorCounter = 0;
-
 static void irq_handler(SerialPort* this_ptr)
 {
   this_ptr->handleIrq();
 }
 
 SerialPort::SerialPort()
-  : dev::CharDev(0, 0)
 {
   // should not be used! only there to make
   // the compiler happy when we want to statically
@@ -28,8 +25,7 @@ SerialPort::SerialPort()
 }
 
 SerialPort::SerialPort(SerialPort::Port port, bool noIrq)
-  : dev::CharDev(getMajor(), atomic_add(&s_minorCounter, 1))
-  , m_port(port)
+  : m_port(port)
 {
   debug() << "init PC serial port #" << minor()
           << " at port " << DEBUG_HEX << (size_t)port << "\n";
@@ -131,14 +127,6 @@ void SerialPort::setBaudRate(SerialPort::BaudRate baud)
           << (115200 / baud) << "\n";
 }
 
-size_t SerialPort::getMajor()
-{
-  static size_t myMajor = (size_t)-1;
-  if (myMajor == (size_t)-1)
-    myMajor = dev::CharDev::getNewMajor();
-  return myMajor;
-}
-
 void SerialPort::handleIrq()
 {
   /* read 32 bytes from the serial's FIFO. if there's
@@ -148,5 +136,5 @@ void SerialPort::handleIrq()
   size_t bytes_received = 0;
   while ((inb(m_port + 5) & 1) && bytes_received < 32)
     buffer[bytes_received++] = inb(m_port);
-  onReceive(buffer, bytes_received);
+  receive(buffer, bytes_received);
 }

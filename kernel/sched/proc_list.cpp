@@ -20,7 +20,7 @@ size_t ProcList::procCount()
 
 void ProcList::checkForDeadProcesses()
 {
-  ScopedMutex smtx { m_procListLock };
+  ScopedLock smtx { m_procListLock };
   for (auto it = m_procList.begin(); it != nullptr; it = it->next)
   {
     auto proc = it->item;
@@ -45,6 +45,6 @@ void ProcList::checkForDeadProcesses()
 
 void ProcList::onAddProcess(UserProcess* proc)
 {
-  ScopedMutex smtx { m_procListLock };
+  ScopedLock smtx { m_procListLock };
   m_procList.push_back(proc);
 }

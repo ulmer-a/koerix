@@ -60,7 +60,7 @@ AddrSpace* AddrSpace::clone()
 {
   /* nobody should modify the structure of the address
    * space while we're cloning it. */
-  ScopedMutex smtx { m_lock };
+  ScopedLock smtx { m_lock };
 
   /* create a new AddrSpace with kernel mappings by using
    * the default constructor. */
@@ -151,7 +151,7 @@ void AddrSpace::invalidate(size_t virt)
 
 void AddrSpace::map(size_t virt, size_t phys, int flags)
 {
-  ScopedMutex smtx { m_lock };
+  ScopedLock smtx { m_lock };
   auto& pageMap = PageMap::get();
 
   /* first, pre-compute all the indices into the different
@@ -216,7 +216,7 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
 
 void AddrSpace::unmap(size_t virt)
 {
-  ScopedMutex smtx { m_lock };
+  ScopedLock smtx { m_lock };
   auto& pageMap = PageMap::get();
 
   Mapping mapping;
@@ -251,7 +251,7 @@ void AddrSpace::unmap(size_t virt)
 
 bool AddrSpace::triggerCow(size_t virt)
 {
-  ScopedMutex smtx { m_lock };
+  ScopedLock smtx { m_lock };
   auto& pageMap = PageMap::get();
 
   size_t indices[4];
@@ -400,7 +400,7 @@ bool AddrSpace::checkForPresentEntries(GenericPagingTable* table)
 
 AddrSpace::~AddrSpace()
 {
-  ScopedMutex smtx { m_lock };
+  ScopedLock smtx { m_lock };
   auto& pageMap = PageMap::get();
 
   auto pml4 = (GenericPagingTable*)PPN_TO_VIRT(m_pml4);

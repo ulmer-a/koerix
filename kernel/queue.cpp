@@ -6,15 +6,25 @@
 #include <scheduler.h>
 #include <arch/asm.h>
 
-Queue::Queue()
-  : m_available(0)
+IQueue::IQueue(Lock& bufferLock)
+  : m_bufferLock(bufferLock)
+  , m_available(0)
   , m_readPtr(0)
   , m_writePtr(0)
   , m_subscriberCount(0)
 { }
 
-Queue::~Queue()
+Queue::Queue()
+  : IQueue(m_bufferLock)
+{ }
+
+IrqContextQueue::IrqContextQueue()
+  : IQueue(m_bufferLock)
+{ }
+
+IQueue::~IQueue()
 {
+  // TODO: make this safe
   wakeupSubscribers();
 
   // TODO: replace this with a semaphore!!
@@ -22,17 +32,18 @@ Queue::~Queue()
     sched::yield();
 }
 
-ssize_t Queue::read(char* buffer, size_t len)
+ssize_t IQueue::read(char* buffer, size_t len)
 {
   atomic_add(&m_subscriberCount, 1);
   if (m_available == 0)
   {
-    m_subscriberLock.lock();
-    m_readSubscribers.push_back(sched::currentTask());
-    sched::currentTask()->sleepAndUnlock(&m_subscriberLock);
+    void* mem = kmalloc(sizeof(ktl::ListItem<Task*>));
+    m_bufferLock.lock();
+    m_readSubscribers.push_back(sched::currentTask(), mem);
+    sched::currentTask()->sleepAndUnlock(&m_bufferLock);
   }
 
-  ScopedMutex smtx { m_bufferLock };
+  ScopedLock smtx { m_bufferLock };
   size_t bytes_read = 0;
   while (m_available > 0) {
     assert(m_readPtr < QUEUE_BUFFER_SIZE);
@@ -47,9 +58,9 @@ ssize_t Queue::read(char* buffer, size_t len)
   return bytes_read;
 }
 
-ssize_t Queue::write(char* buffer, size_t len)
+ssize_t IQueue::write(char* buffer, size_t len)
 {
-  ScopedMutex smtx { m_bufferLock };
+  ScopedLock smtx { m_bufferLock };
   for (size_t i = 0; i < len; i++)
   {
     /* write a character, increment the write pointer
@@ -80,7 +91,7 @@ ssize_t Queue::write(char* buffer, size_t len)
   return len;
 }
 
-void Queue::wakeupSubscribers()
+void IQueue::wakeupSubscribers()
 {
   while (m_readSubscribers.size() > 0)
     m_readSubscribers.pop_front()->resume();

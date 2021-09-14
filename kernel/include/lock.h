@@ -14,3 +14,20 @@ class Lock : public ktl::Canary
     virtual void lock() = 0;
     virtual void unlock() = 0;
 };
+
+class ScopedLock
+{
+  public:
+    ScopedLock(Lock& lock)
+      : m_lock(lock)
+    {
+      m_lock.lock();
+    }
+
+    ~ScopedLock() {
+      m_lock.unlock();
+    }
+
+  private:
+    Lock& m_lock;
+};

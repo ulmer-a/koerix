@@ -4,11 +4,11 @@
 #pragma once
 
 #include <types.h>
-#include <dev/chardev.h>
+#include <dev/uart.h>
 
 namespace pc {
 
-  class SerialPort : public dev::CharDev
+  class SerialPort : public devices::UartDevice
   {
     public:
       enum Port {
@@ -74,10 +74,6 @@ namespace pc {
 
       // io port base
       uint16_t m_port;
-
-      // accounting related
-      static size_t getMajor();
-      static size_t s_minorCounter;
   };
 
 }

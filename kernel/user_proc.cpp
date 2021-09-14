@@ -64,7 +64,7 @@ bool UserProcess::isOwnProcess() const
 
 size_t UserProcess::addTask(void* entryPoint, void* arg1, void* arg2)
 {
-  ScopedMutex smtx { m_taskListLock };
+  ScopedLock smtx { m_taskListLock };
   assert(m_state == RUNNING);
   auto task = new UserTask(*this, entryPoint, arg1, arg2);
   m_taskList.push_back(task);
@@ -121,7 +121,7 @@ void UserProcess::exit(int status)
 
 void UserProcess::checkForDeadTasks()
 {
-  ScopedMutex smtx { m_taskListLock };
+  ScopedLock smtx { m_taskListLock };
   for (auto it = m_taskList.begin(); it != nullptr; it = it->next)
   {
     auto userTask = it->item;
@@ -171,7 +171,7 @@ void UserProcess::killAllTasks()
 
 bool UserProcess::isValidStackAddr(size_t addr) const
 {
-  ScopedMutex smtx { m_stackListLock };
+  ScopedLock smtx { m_stackListLock };
   size_t i = (USER_BREAK - addr) / UserStack::getStackSize();
   if (m_stackList.size() <= i)
     return false;
@@ -181,7 +181,7 @@ bool UserProcess::isValidStackAddr(size_t addr) const
 UserStack UserProcess::allocStack()
 {
   size_t i;
-  ScopedMutex smtx { m_stackListLock };
+  ScopedLock smtx { m_stackListLock };
   for (i = 0; i < m_stackList.size(); i++)
   {
     // check if the stack is already allocated
@@ -200,7 +200,7 @@ UserStack UserProcess::allocStack()
 
 void UserProcess::releaseStack(UserStack stack)
 {
-  ScopedMutex smtx { m_stackListLock };
+  ScopedLock smtx { m_stackListLock };
   size_t i = (USER_BREAK - stack.getStackPtr()) / UserStack::getStackSize();
   assert(m_stackList.size() > i);
   assert(m_stackList[i] == true);
@@ -219,13 +219,13 @@ size_t UserProcess::getNewPid()
 
 bool UserProcess::closeFile(size_t fd)
 {
-  ScopedMutex smtx { m_filesLock };
+  ScopedLock smtx { m_filesLock };
   return m_files.erase(fd);
 }
 
 int UserProcess::insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum)
 {
-  ScopedMutex smtx { m_filesLock };
+  ScopedLock smtx { m_filesLock };
   if (fdNum < 0)
   {
     fdNum = 0;
@@ -239,7 +239,7 @@ int UserProcess::insertOpenFile(const fs::FileDesc& fd, ssize_t fdNum)
 
 fs::FileDesc UserProcess::getOpenFile(size_t fd)
 {
-  ScopedMutex smtx { m_filesLock };
+  ScopedLock smtx { m_filesLock };
   auto it = m_files.find(fd);
   if (it)
     return it->value();

@@ -13,7 +13,7 @@ bool fs::Dir::isMountPoint() const
 
 bool fs::Dir::mount(ktl::shared_ptr<fs::Dir> fs, int& error)
 {
-  ScopedMutex smtx { m_mountLock };
+  ScopedLock smtx { m_mountLock };
   if (this->isMountPoint())
   {
     error = ENOTSUP;
@@ -26,7 +26,7 @@ bool fs::Dir::mount(ktl::shared_ptr<fs::Dir> fs, int& error)
 
 ktl::shared_ptr<fs::File> fs::Dir::lookup(const char* path, int& error)
 {
-  ScopedMutex smtx { m_mountLock };
+  ScopedLock smtx { m_mountLock };
   if (m_mountOverlay.isNull())
     return doLookup(path, error);
   return m_mountOverlay->lookup(path, error);
@@ -34,7 +34,7 @@ ktl::shared_ptr<fs::File> fs::Dir::lookup(const char* path, int& error)
 
 ktl::shared_ptr<fs::File> fs::Dir::doLookup(const char* path, int& error)
 {
-  ScopedMutex smtx { m_fileLock };
+  ScopedLock smtx { m_fileLock };
   for (size_t i = 0; i < m_files.size(); i++)
   {
     if (matchesFileName(m_files[i]->name, path))
@@ -66,7 +66,7 @@ ssize_t fs::Dir::write(char* buf, size_t len)
 
 void fs::Dir::addFile(const char* name, ktl::shared_ptr<fs::File> file)
 {
-  ScopedMutex smtx { m_fileLock };
+  ScopedLock smtx { m_fileLock };
   auto entry = new Direntry;
   strcpy(entry->name, name);
   entry->file = file;
