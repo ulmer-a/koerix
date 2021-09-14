@@ -48,9 +48,11 @@ int fb_init();
     | ((r & 0xff) << 16)  \
 )
 
-void fb_set_bg(uint32_t color);
-void fb_set_fg(uint32_t color);
-void fb_putc(size_t x, size_t y, char c);
+#define COLOR_WHITE color(0xff, 0xff, 0xff)
+#define COLOR_BLACK color(0x00, 0x00, 0x00)
+
+void fb_putc(size_t x, size_t y, char c,
+             uint32_t fg_color, uint32_t bg_color);
 
 void fb_draw_line(size_t stroke, uint32_t color,
   ssize_t x1, ssize_t y1, ssize_t x2, ssize_t y2);

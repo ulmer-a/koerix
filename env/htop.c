@@ -31,7 +31,7 @@ static void term_puts(const char* str, size_t len)
     }
 
     fb_putc(pos_x * console_font->width,
-      pos_y * console_font->height, c);
+      pos_y * console_font->height, c, COLOR_WHITE, COLOR_BLACK);
     pos_x += 1;
 
     if (pos_x == term_width)

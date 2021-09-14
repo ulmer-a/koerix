@@ -10,6 +10,7 @@
 #include <koerix/threads.h>
 #include <koerix/keyboard.h>
 #include <fcntl.h>
+#include <assert.h>
 
 size_t term_width, term_height;
 size_t pos_x, pos_y;
@@ -29,7 +30,7 @@ static void term_puts(const char* str, size_t len)
     }
 
     fb_putc(pos_x * __fb_current_font->width,
-      pos_y * __fb_current_font->height, c);
+      pos_y * __fb_current_font->height, c, COLOR_WHITE, COLOR_BLACK);
     pos_x += 1;
 
     if (pos_x == term_width)
@@ -40,13 +41,14 @@ static void term_puts(const char* str, size_t len)
   }
 }
 
-static void drawText(size_t x, size_t y, const char* str)
+static void drawText(size_t x, size_t y, const char* str,
+                     uint32_t fg_color, uint32_t bg_color)
 {
   size_t x_offset = 0;
   while (*str)
   {
     char c = *str++;
-    fb_putc(x + x_offset, y, c);
+    fb_putc(x + x_offset, y, c, fg_color, bg_color);
     x_offset += __fb_current_font->width;
   }
 }
@@ -121,13 +123,11 @@ static void drawInfoBar()
   char textBuffer[64];
   sprintf(textBuffer, "%s / %s  | %lu processes | %lu threads",
           memTextBuffer1, memTextBuffer2, proc_count, thread_count);
-  drawText(FB_WIDTH/4 + 20, 7, textBuffer);
+  drawText(FB_WIDTH/4 + 20, 7, textBuffer, COLOR_WHITE, barBackgroundColor);
 }
 
 static void infoBarThread()
 {
-  fb_set_bg(barBackgroundColor);
-
   for (;;)
   {
     drawInfoBar();
@@ -135,10 +135,8 @@ static void infoBarThread()
   }
 }
 
-static void stdoutThread(void* arg)
+static void stdoutThread(int shell_stdout_fd)
 {
-  int shell_stdout_fd = (int)arg;
-
   term_width = FB_WIDTH / __fb_current_font->width;
   term_height = FB_HEIGHT / __fb_current_font->height;
   pos_x = 0, pos_y = 10;
@@ -165,8 +163,6 @@ static void stdinThread(int shell_stdin_fd)
     exit(EXIT_FAILURE);
   }
 
-  ssize_t len;
-  char buffer[1024];
   for (;;)
   {
     char c = kbd_getchar();
@@ -227,8 +223,10 @@ int main(int argc, char* argv[])
       fprintf(stderr, "test shell >> ");
       char c;
       char* linePtr = lineBuffer;
-      while ((c = getchar()) != '\n' && c != EOF && c != '\r')
+      while ((c = getchar()) != '\n' && c != EOF && c != '\r') {
+        putc(c, stderr);
         *linePtr++ = c;
+      }
       *linePtr = 0;
 
       fprintf(stderr, "Your command was '%s'\n", lineBuffer);

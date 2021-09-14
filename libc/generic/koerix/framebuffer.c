@@ -16,8 +16,6 @@ enum fb_info_types
 
 struct __fb_struct __fb_info;
 const psf_font_t* __fb_current_font;
-uint32_t __fb_fg_color = color(0xff, 0xff, 0xff);
-uint32_t __fb_bg_color = color(0x00, 0x00, 0x00);
 extern psf_font_t __koerix_console_font;
 
 extern ssize_t fb_info(int type);
@@ -39,7 +37,8 @@ int fb_init()
 }
 
 
-void fb_putc(size_t x, size_t y, char c)
+void fb_putc(size_t x, size_t y, char c,
+             uint32_t fg_color, uint32_t bg_color)
 {
   const psf_font_t* font = __fb_current_font;
   const size_t bytes_per_line = (font->width + 7)/8;
@@ -53,23 +52,13 @@ void fb_putc(size_t x, size_t y, char c)
     {
       uint32_t glyph_word = *glyph;
       if (glyph_word & (1 << (font->width - j - 1))) {
-        framebuffer(x + j, y + i) = __fb_fg_color;
+        framebuffer(x + j, y + i) = fg_color;
       } else {
-        framebuffer(x + j, y + i) = __fb_bg_color;
+        framebuffer(x + j, y + i) = bg_color;
       }
     }
     glyph += bytes_per_line;
   }
-}
-
-void fb_set_fg(uint32_t color)
-{
-  __fb_fg_color = color;
-}
-
-void fb_set_bg(uint32_t color)
-{
-  __fb_bg_color = color;
 }
 
 void fb_draw_line(size_t stroke, uint32_t color,
