@@ -45,7 +45,7 @@ ssize_t IQueue::read(char* buffer, size_t len)
 
   ScopedLock smtx { m_bufferLock };
   size_t bytes_read = 0;
-  while (m_available > 0) {
+  while (m_available > 0 && bytes_read < len) {
     assert(m_readPtr < QUEUE_BUFFER_SIZE);
     *buffer++ = m_buffer[m_readPtr++];
     if (m_readPtr == QUEUE_BUFFER_SIZE)
@@ -55,6 +55,7 @@ ssize_t IQueue::read(char* buffer, size_t len)
   }
 
   atomic_add(&m_subscriberCount, -1);
+  assert(bytes_read <= len);
   return bytes_read;
 }
 
