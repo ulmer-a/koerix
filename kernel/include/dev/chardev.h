@@ -5,7 +5,6 @@
 
 #include <types.h>
 #include <dev/devfs.h>
-#include <fifo.h>
 
 namespace devices {
 
