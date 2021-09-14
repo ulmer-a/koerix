@@ -15,6 +15,7 @@ namespace sync {
 
     private:
       bool m_locked;
+      bool m_irqsWereEnabled;
   };
 
 }

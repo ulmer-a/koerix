@@ -50,3 +50,12 @@ enableFpuCalls:
     btrq $3, %rax
     mov %rax, %cr0
     ret
+
+.global irqEnabled
+irqEnabled:
+    pushfq
+    mov (%rsp), %rax
+    shr $9, %rax
+    and $1, %rax
+    add $0x08, %rsp
+    ret

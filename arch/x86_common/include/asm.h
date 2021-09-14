@@ -30,5 +30,4 @@ static inline void arch_yield()
   __asm__ volatile ("int $0x1f;");
 }
 
-void preemt_disable();
-void preemt_enable();
+extern "C" bool irqEnabled();

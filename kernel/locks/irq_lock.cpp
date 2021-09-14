@@ -8,12 +8,22 @@ sync::IrqDisableLock::~IrqDisableLock()
 
 void sync::IrqDisableLock::lock()
 {
-  cli();
+  verify();
+
+  m_irqsWereEnabled = irqEnabled();
+  if (m_irqsWereEnabled)
+    cli();
+
   m_locked = true;
 }
 
 void sync::IrqDisableLock::unlock()
 {
+  verify();
+  assert(m_locked);
+
   m_locked = false;
-  sti();
+
+  if (m_irqsWereEnabled)
+    sti();
 }
