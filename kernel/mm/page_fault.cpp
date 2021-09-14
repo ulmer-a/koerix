@@ -18,12 +18,12 @@
 static bool checkIfValid(size_t addr, FaultFlags flags)
 {
   if (addr < MIN_LOAD_ADDR) {
-    debug() << "PF: nullptr dereferenced!\n";
+    debug(PAGEFAULT) << "PF: nullptr dereferenced!\n";
     return false;
   }
 
   if (addr >= USER_BREAK) {
-    debug() << "PF: referencing (unmapped) kernel memory!\n";
+    debug(PAGEFAULT) << "PF: referencing (unmapped) kernel memory!\n";
     return false;
   }
 
@@ -33,7 +33,7 @@ static bool checkIfValid(size_t addr, FaultFlags flags)
 void killProgram()
 {
   auto& proc = sched::currentUserTask()->getProcess();
-  debug() << "PID " << proc.pid()
+  debug(PAGEFAULT) << "PID " << proc.pid()
           << ": KILLED due to invalid memory reference\n";
   proc.exit(-1);
 }

@@ -44,14 +44,15 @@ void IrqContext::newKernelCtx()
 
 void IrqContext::print()
 {
-  debug() << "--- Register dump (x86) ---\n"
-          << DEBUG_HEX << "  rip=" << rip
-          << ", rsp=" << rsp
-          << ", err=" << error_id << "\n"
-          << DEBUG_HEX << "  rax=" << rax
-          << ", rbx=" << rbx
-          << ", rcx=" << rcx << "\n"
-          << DEBUG_HEX << "  rdx=" << rdx
-          << ", rdi=" << rdi
-          << ", rsi=" << rsi << "\n";
+  debug(EXCEPT)
+    << "--- REGISTER DUMP (x86_64) ---\n"
+    << DEBUG_HEX << "  rip=" << rip
+    << ", rsp=" << rsp
+    << ", err=" << error_id << "\n"
+    << DEBUG_HEX << "  rax=" << rax
+    << ", rbx=" << rbx
+    << ", rcx=" << rcx << "\n"
+    << DEBUG_HEX << "  rdx=" << rdx
+    << ", rdi=" << rdi
+    << ", rsi=" << rsi << "\n";
 }

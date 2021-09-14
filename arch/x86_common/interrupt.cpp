@@ -59,19 +59,20 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
         void* addr = getPageFaultAddr();
         sti();
 
-        debug() << "fault: " << addr
-                << ", present=" << (ctx->error() & PF_PRESENT ? "y" : "n")
-                << ", user=" << (ctx->error() & PF_USER ? "y" : "n")
-                << ", write=" << (ctx->error() & PF_WRITE ? "y" : "n")
-                << ", reserved=" << (ctx->error() & PF_RESERVED ? "y" : "n")
-                << ", data=" << (ctx->error() & PF_CODE ? "n" : "y") << "\n";
-
         if (handlePageFault((size_t)addr, (FaultFlags)ctx->error())) {
           return ctx;
         }
+
+        debug(PAGEFAULT)
+          << "fault @ " << addr << ": "
+          << (ctx->error() & PF_PRESENT ? "protection, " : "non-present, ")
+          << (ctx->error() & PF_USER ? "user, " : "kernel,")
+          << (ctx->error() & PF_WRITE ? "write, " : "read, ")
+          << (ctx->error() & PF_RESERVED ? "reserved, " : "")
+          << (ctx->error() & PF_CODE ? "code" : "data") << "\n";
       }
 
-      debug() << "(!!) exception #" << ctx->irq()
+      debug(EXCEPT) << "(!!) exception #" << ctx->irq()
               << " (" << strexcept(ctx->irq()) << ")\n";
       ctx->print();
 

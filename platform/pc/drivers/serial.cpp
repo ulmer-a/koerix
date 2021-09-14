@@ -27,7 +27,7 @@ SerialPort::SerialPort()
 SerialPort::SerialPort(SerialPort::Port port, bool noIrq)
   : m_port(port)
 {
-  debug() << "init PC serial port #" << minor()
+  debug(DEVICES) << "init PC serial port #" << minor()
           << " at port " << DEBUG_HEX << (size_t)port << "\n";
 
   /* temporarily disable all IRQs */
@@ -123,7 +123,7 @@ void SerialPort::setBaudRate(SerialPort::BaudRate baud)
   outb(m_port + 1, baud >> 8);          // high byte
   outb(m_port + 3, line_ctrl & 0x7f);   // clear DLAB bit
 
-  debug() << "uart" << minor() << ": baud_rate="
+  debug(DEVICES) << "uart" << minor() << ": baud_rate="
           << (115200 / baud) << "\n";
 }
 

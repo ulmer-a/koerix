@@ -36,7 +36,7 @@ Task::Task(AddrSpace& vspace)
 
 void Task::exit()
 {
-  debug() << "tid " << tid() << ": terminating\n";
+  debug(TASK) << "tid " << tid() << ": terminating\n";
   assert(sched::currentTask() == this);
   m_state = KILLED;
   sched::yield();

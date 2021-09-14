@@ -80,8 +80,10 @@ size_t UserProcess::addTask(void* entryPoint, void* arg1, void* arg2)
 ssize_t UserProcess::fork()
 {
   assert(isOwnProcess());
-
   auto forked = new UserProcess(*this);
+
+  debug(PROCESS) << "PID " << this->pid()
+                 << " is forking PID " << forked->pid() << "\n";
   return forked->pid();
 }
 
@@ -132,7 +134,7 @@ void UserProcess::checkForDeadTasks()
 
       sched::removeTask(userTask);
       delete userTask;
-      debug() << "tid " << userTask->tid() << ": deleted\n";
+      debug(TASK) << "tid " << userTask->tid() << ": deleted\n";
 
       /* some boilerplate code to remove the task from the list and
        * not break the for loop at the same time:  */

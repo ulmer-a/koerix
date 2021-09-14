@@ -46,7 +46,7 @@ void kheap_print()
 {
   s_heapMutex.lock();
 
-  debug() << "--- HEAP DUMP ---\n";
+  debug(MEMORY) << "--- HEAP DUMP ---\n";
   HeapBlock *entry;
   for (HeapBlock* entry = heap_start;
        entry != nullptr;
@@ -58,15 +58,15 @@ void kheap_print()
 
     if (entry->available)
     {
-        debug() << "  @ " << (entry + 1) << ": " << entry->size << "B [free]\n";
+        debug(MEMORY) << "  @ " << (entry + 1) << ": " << entry->size << "B [free]\n";
     }
     else
     {
 #ifdef DEBUG
-      debug() << "  @ " << (entry + 1) << ": " << entry->size
+      debug(MEMORY) << "  @ " << (entry + 1) << ": " << entry->size
               << "B [used " << entry->function << "():" << entry->line << "]\n";
 #else
-      debug() << "  @ " << (entry + 1) << ": " << entry->size << "B [used]\n";
+      debug(MEMORY) << "  @ " << (entry + 1) << ": " << entry->size << "B [used]\n";
 #endif
     }
   }
@@ -82,7 +82,7 @@ void _kheap_check_corrupt(const char* func, unsigned line)
   {
     if (entry->magic != HEAP_MAGIC)
     {
-      debug() << "heap corruption detected in " << func << "():" << line << "\n";
+      debug(MEMORY) << "heap corruption detected in " << func << "():" << line << "\n";
       panic("heap corruption detected");
     }
   }
@@ -100,7 +100,7 @@ static void* kbrk(ssize_t increment)
       first_unmap += 1;
     size_t last_unmap = (size_t)orig_brk / PAGE_SIZE;
 
-    // debug() << "kheap: freeing pages " << first_unmap << " to " << last_unmap << "\n";
+    // debug(MEMORY) << "kheap: freeing pages " << first_unmap << " to " << last_unmap << "\n";
     for (size_t page = first_unmap; page <= last_unmap; page++)
       AddrSpace::kernel().unmap(page);
   }
@@ -111,7 +111,7 @@ static void* kbrk(ssize_t increment)
       first_map += 1;
     size_t last_map = (size_t)(kheap_break_ - 1) >> PAGE_SHIFT;
 
-    //debug() << "kheap: alloc " << (last_map - first_map + 1)
+    //debug(MEMORY) << "kheap: alloc " << (last_map - first_map + 1)
     //        << " pages @ "
     //        << (void*)(first_map << PAGE_SHIFT) << "\n";
     for (size_t page = first_map; page <= last_map; page++)
@@ -239,7 +239,7 @@ static void mergeBlocks(HeapBlock *first, HeapBlock *second)
 
 void kfree(void *ptr)
 {
-  //debug() << "kfree(): " << ptr << "\n";
+  //debug(MEMORY) << "kfree(): " << ptr << "\n";
 
   if (ptr == nullptr) {
     return;

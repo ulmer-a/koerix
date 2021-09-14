@@ -52,8 +52,10 @@ AddrSpace::AddrSpace()
   /* Create a new address space by allocating
    * a fresh Page Map Level 4 */
   m_pml4 = PageMap::get().alloc();
-
   updateKernelMappings();
+
+  debug(VSPACE) << "allocated new virtual address space (PML4 @ "
+                << PPN_TO_PTR(m_pml4) << ")\n";
 }
 
 AddrSpace* AddrSpace::clone()
@@ -89,6 +91,9 @@ AddrSpace* AddrSpace::clone()
     pageMap.addRef(pml4_old[i].ppn);
   }
 
+  debug(VSPACE) << "cloned address space with cow-semantics (PML4 @ "
+                << PPN_TO_PTR(m_pml4) << ")\n";
+
   /* it's important that the TLB will be flushed after setting all
    * the tables readonly by calling apply(). */
   this->apply();
@@ -100,26 +105,24 @@ void AddrSpace::setup()
     assert(sizeof(GenericPagingTable) == 8);
 
     /* Create a new virtual address space for the kernel */
-    debug() << "allocating kernel virtual address space\n";
     auto kernelSpace = new (&s_kernelAddrSpace) AddrSpace();
 
     /* map the whole physical memory to the upper half */
-    debug() << "mapping physical memory to the upper half...";
+    debug(VSPACE) << "mapping physical memory to the upper half...\n";
     const size_t totalPages = PageMap::get().getTotalPageCount();
     const size_t ident_page_offset = IDENT_OFFSET >> PAGE_SHIFT;
     for (size_t page = 0; page < totalPages; page++)
         kernelSpace->map(page + ident_page_offset, page, MAP_WRITE);
-    debug() << " done\n";
 
     /* Enable support for NX pages */
     s_nxEnabled = enable_nx();
-    debug() << "trying to enable NX: "
+    debug(VSPACE) << "trying to enable NX: "
             << (s_nxEnabled ? "ok\n" : "not available\n");
 
     /* Switch to the newly created address space. */
     kernelSpace->apply();
     s_initialized = true;
-    debug() << "successfully written %cr3\n";
+    debug(VSPACE) << "successfully written %cr3\n";
 }
 
 AddrSpace &AddrSpace::kernel()
@@ -212,6 +215,9 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
 
     currentTablePPN = currentLevelTableEntry.ppn;
   }
+
+  //debug(VSPACE) << PPN_TO_PTR(virt) << " -> " PPN_TO_PTR(phys)
+  //              << " (PML4 @ " << PPN_TO_PTR(m_pml4) << ")\n";
 }
 
 void AddrSpace::unmap(size_t virt)
@@ -260,9 +266,6 @@ bool AddrSpace::triggerCow(size_t virt)
   indices[1] = (virt >> 9) & 0x1ff;
   indices[0] = (virt) & 0x1ff;
 
-  debug() << "COW triggered for addr "
-          << (void*)(virt << PAGE_SHIFT) << "\n";
-
   size_t currentTablePpn = m_pml4;
   for (int level = 3; level >= 0; level--)
   {
@@ -303,6 +306,7 @@ bool AddrSpace::triggerCow(size_t virt)
          * actual table. That means we must not set any bits
          * but just copy the page */
         memcpy(new_table_ptr, old_table_ptr, PAGE_SIZE);
+        debug(VSPACE) << "cow: copying page: " << PPN_TO_PTR(virt) << "\n";
       }
       else
       {
@@ -444,7 +448,8 @@ AddrSpace::~AddrSpace()
   }
 
   pageMap.free(m_pml4);
-  m_pml4 = (size_t)-1;
 
-  debug() << "address space deleted\n";
+  debug(VSPACE) << "deleted address space (had PML4 @ "
+          << PPN_TO_PTR(m_pml4) << ")\n";
+  m_pml4 = (size_t)-1;
 }

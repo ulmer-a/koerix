@@ -5,8 +5,16 @@
 #include <context.h>
 #include <errno.h>
 #include <debug.h>
+#include <scheduler.h>
 
 #include "../../kernel/syscall_list.h"
+
+static void invalidSyscall(IrqContext* ctx)
+{
+  debug(SYSCALL) << "PID " << sched::currentPid()
+                 << ": invalid system call: #"
+                 << ctx->returnValue() << "\n";
+}
 
 void do_syscall(IrqContext* ctx)
 {
@@ -14,6 +22,7 @@ void do_syscall(IrqContext* ctx)
   if (ctx->rax >= sizeof(syscalls) / sizeof(void*))
   {
     ctx->rax = -ENOSYS;
+    invalidSyscall(ctx);
     return;
   }
 
@@ -22,6 +31,7 @@ void do_syscall(IrqContext* ctx)
   if (syscall_addr == nullptr)
   {
     ctx->rax = -ENOSYS;
+    invalidSyscall(ctx);
     return;
   }
 

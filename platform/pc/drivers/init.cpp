@@ -12,7 +12,7 @@ extern void ps2kbd_init();
 
 void init_drivers()
 {
-  debug() << "init platform drivers\n";
+  debug(DEVICES) << "init platform drivers\n";
 
   /* init timer to 50hz */
   timer_reset(50);

@@ -8,7 +8,7 @@
 
 static void ktask_runtime(KernelTask* task, void(*func)(void*))
 {
-  debug() << "kernel task #" << task->tid() << " started executing\n";
+  debug(TASK) << "kernel task #" << task->tid() << " started executing\n";
   func(task->arg());
   task->exit();
 }
@@ -23,5 +23,5 @@ KernelTask::KernelTask(void(*entry)(void* arg), void* arg)
   context()->arg1() = (size_t)this;
   context()->arg2() = (size_t)entry;
 
-  debug() << "created new kernel task with TID " << tid() << "\n";
+  debug(TASK) << "created new kernel task with TID " << tid() << "\n";
 }

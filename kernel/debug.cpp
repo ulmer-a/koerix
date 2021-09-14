@@ -9,7 +9,7 @@
 #include <mm.h>
 #include <pc/serial.h>
 
-using namespace debugging;
+using namespace dbg;
 
 static Spinlock s_debugLock;
 static bool s_initialized = false;
@@ -18,7 +18,7 @@ static pc::SerialPort s_serial;
 void panic(const char* message)
 {
   cli();
-  debug() << "**** kernel panic: " << message << "\n\n\n";
+  debug(KERNEL) << "**** kernel panic: " << message << "\n\n\n";
   for (;;) { hlt(); }
 }
 
@@ -35,6 +35,9 @@ DebugStream::~DebugStream()
   assert((size_t)m_destPtr - (size_t)m_buffer < BUFFER_SIZE);
 
   if (!s_initialized)
+    return;
+
+  if ((m_loglevel & OUTPUT_ENABLE) == 0)
     return;
 
   size_t len = strlen(m_buffer);

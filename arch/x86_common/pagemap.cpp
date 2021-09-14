@@ -71,28 +71,29 @@ static const char* get_mmap_type_str(uint32_t type)
 
 static void print_mmap_entry(stivale_mmap_entry& entry)
 {
-    debug() << "  " << DEBUG_HEX
-            << entry.base << " - " << (entry.base + entry.length - 1)
-            << ": " << get_mmap_type_str(entry.type) << "\n";
+  debug(MEMORY)
+    << "  " << DEBUG_HEX
+    << entry.base << " - " << (entry.base + entry.length - 1)
+    << ": " << get_mmap_type_str(entry.type) << "\n";
 }
 
 void create_page_bitmap()
 {
     /* Compute total RAM size */
     const auto total_pages = getSystemPageCount();
-    debug() << "Total RAM size: " << (total_pages >> 8) << "MB ("
+    debug(MEMORY) << "Total RAM size: " << (total_pages >> 8) << "MB ("
             << total_pages << " page frames)\n";
 
     /* Compute the amount of pages needed to store the page refcounter */
     size_t pagemap_pages = total_pages >> PAGE_SHIFT;
     if (total_pages % PAGE_SIZE != 0)
         pagemap_pages++;
-    debug() << "PageMap: ref counter size: ~" << (total_pages >> 10) << "KB\n";
+    debug(MEMORY) << "PageMap: ref counter size: ~" << (total_pages >> 10) << "KB\n";
 
     /* Get a memory location to store the page bitmap */
     const size_t pagemap_start_page = getFirstNFreePages(pagemap_pages);
     const auto pagemap = (uint8_t*)PPN_TO_VIRT(pagemap_start_page);
-    debug() << "PageMap: stored at " << (void*)pagemap << "\n";
+    debug(MEMORY) << "PageMap: stored at " << (void*)pagemap << "\n";
 
     /* Set initial refcount for all pages to 0xff (max) */
     memset(pagemap, 0xff, total_pages);
@@ -128,6 +129,6 @@ void create_page_bitmap()
     /* Initialize the PageManager class */
     new (&s_pagemap) PageMap(total_pages, free_pages, usable_pages, pagemap);
 
-    debug() << "Usable RAM: " << (free_pages >> 8)
+    debug(MEMORY) << "Usable RAM: " << (free_pages >> 8)
             << "/" << (total_pages >> 8) << " MB\n";
 }

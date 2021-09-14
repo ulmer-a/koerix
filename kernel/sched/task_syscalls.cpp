@@ -9,7 +9,7 @@
 
 void sys_exit(int status)
 {
-  debug() << "exit(" << status << ")\n";
+  debug(PROCESS) << "exit(" << status << ")\n";
   auto userTask = sched::currentUserTask();
   userTask->getProcess().exit(status);
 }
@@ -17,7 +17,7 @@ void sys_exit(int status)
 void sys_thread_exit(void* ret)
 {
   auto userTask = sched::currentUserTask();
-  debug() << "tid " << userTask->tid() << ": thread_exit(" << ret << ")\n";
+  debug(TASK) << "tid " << userTask->tid() << ": thread_exit(" << ret << ")\n";
   sched::currentUserTask()->exit();
 }
 
@@ -34,7 +34,11 @@ void* get_thread_ptr()
 ssize_t sys_thread_create(void* rt0, void* func, void* arg, int flags)
 {
   auto& proc = sched::currentUserTask()->getProcess();
-  return proc.addTask(rt0, func, arg);
+  auto tid = proc.addTask(rt0, func, arg);
+
+  debug(PROCESS) << "PID " << proc.pid()
+                 << ": created new thread with TID " << tid << "\n";
+  return tid;
 }
 
 size_t sys_thread_count()

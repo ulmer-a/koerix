@@ -14,11 +14,11 @@
 
 static void printIssue()
 {
-  debug() << "Koerix OS kernel\n"
+  debug(BOOT) << "Koerix OS kernel\n"
              "Copyright (C) 2017-2021 Alexander Ulmer\n";
 
   auto& pagemap = PageMap::get();
-  debug() << "Memory: " << (pagemap.getUsedMemory() >> 20) << "/"
+  debug(BOOT) << "Memory: " << (pagemap.getUsedMemory() >> 20) << "/"
           << (pagemap.getUsableMemory() >> 20) << " MB used"
              " of total " << (pagemap.getTotalMemory() >> 20) << " MB\n\n";
 }
@@ -44,7 +44,7 @@ void kernel_init(const char* cmdline)
     int error;
     auto fd = fs::open(valueBuffer, error);
     if (!fd.valid()) {
-      debug() << "warning: " << valueBuffer << ": "
+      debug(BOOT) << "warning: " << valueBuffer << ": "
               << strerror(error) << "\n";
     } else {
       mainTerm = ktl::shared_ptr<Terminal>(new Terminal(fd));

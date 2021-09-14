@@ -4,13 +4,14 @@
 #include <debug.h>
 #include <string.h>
 
-using namespace debugging;
+using namespace dbg;
 
-DebugStream::DebugStream()
+DebugStream::DebugStream(int loglevel)
     : m_currentMode(DEC)
+    , m_loglevel(loglevel)
 {
-    m_buffer[0] = 0;
-    m_destPtr = m_buffer;
+  m_buffer[0] = 0;
+  m_destPtr = m_buffer;
 }
 
 DebugStream& DebugStream::operator<<(Modifier modif)

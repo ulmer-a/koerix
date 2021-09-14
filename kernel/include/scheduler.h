@@ -15,6 +15,7 @@ namespace sched {
 
   bool isEnabled();
   Task* currentTask();
+  size_t currentPid();
   UserTask* currentUserTask();
 
   size_t taskCount();

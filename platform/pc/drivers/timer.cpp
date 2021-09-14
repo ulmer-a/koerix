@@ -16,7 +16,7 @@
 
 void timer_reset(uint16_t freqHz)
 {
-  debug() << "setting timer freq: " << freqHz << "Hz\n";
+  debug(TIMER) << "setting timer freq: " << freqHz << "Hz\n";
 
   uint16_t pit = OSCILLATOR / freqHz;
   outb(PIT_CMD, PIT_CMD_CH0 | PIT_ACCESS | PIT_RATEGEN);

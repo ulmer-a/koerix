@@ -33,7 +33,7 @@ static IrqDescriptor g_idt[256];
 
 static void setup_pic()
 {
-  debug() << "reconfigure PIC\n";
+  debug(BOOT) << "reconfigure PIC\n";
 
   outb(0x20, 0x11);   // init PIC1
   outb(0xA0, 0x11);   // init PIC2
@@ -84,8 +84,6 @@ extern "C" {
 
 static void setup_idt()
 {
-    debug() << "Setting up interrupt descriptor table\n";
-
   install_descriptor(0,  &irq0,  IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
   install_descriptor(1,  &irq1,  IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);
   install_descriptor(2,  &irq2,  IDT_PRESENT | IDT_SUPV | IDT_GATE, 0);

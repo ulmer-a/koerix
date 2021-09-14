@@ -29,7 +29,7 @@ void ProcList::checkForDeadProcesses()
     if (proc->state() == UserProcess::TO_BE_DELETED)
     {
       delete proc;
-      debug() << "proc: deleted\n";
+      debug(PROCESS) << "proc: deleted\n";
 
       auto prev = it->prev;
       m_procList.remove(it);

@@ -9,7 +9,7 @@ void _NORETURN panic(const char* msg);
 
 #ifdef DEBUG
 #define assert(x) if (!(x)) { \
-    debug() << "****\n" \
+    debug(KERNEL) << "****\n" \
                "**** in " << __FILE__ << ": " \
             << __func__ << "(), line " << __LINE__ << "\n"; \
     panic("assertion failed"); \
@@ -20,21 +20,36 @@ void _NORETURN panic(const char* msg);
 #define assert_verify(x) (x)
 #endif
 
-#define DEBUG_HEX debugging::DebugStream::HEX
-#define DEBUG_DEC debugging::DebugStream::HEX
+#define DEBUG_HEX dbg::DebugStream::HEX
+#define DEBUG_DEC dbg::DebugStream::HEX
 
-namespace debugging {
+#define OUTPUT_ENABLE BIT(10)
+#define PAGEFAULT     1 | OUTPUT_ENABLE
+#define SYSCALL       2 | OUTPUT_ENABLE
+#define PROCESS       3 | OUTPUT_ENABLE
+#define TASK          4 | OUTPUT_ENABLE
+#define VSPACE        5 | OUTPUT_ENABLE
+#define FPU           6 | OUTPUT_ENABLE
+#define KERNEL        7 | OUTPUT_ENABLE
+#define BOOT          8 | OUTPUT_ENABLE
+#define EXCEPT        9 | OUTPUT_ENABLE
+#define MEMORY       10 | OUTPUT_ENABLE
+#define LOADER       11 | OUTPUT_ENABLE
+#define TIMER        12 | OUTPUT_ENABLE
+#define DEVICES      13 | OUTPUT_ENABLE
+
+namespace dbg {
 
     class DebugStream
     {
       public:
         enum Modifier
         {
-            HEX,
-            DEC
+          HEX,
+          DEC
         };
 
-        DebugStream();
+        DebugStream(int loglevel);
         ~DebugStream();
 
         DebugStream& operator<<(char c);
@@ -58,11 +73,13 @@ namespace debugging {
         char *m_destPtr;
         Modifier m_currentMode;
         char m_buffer[BUFFER_SIZE];
+
+        int m_loglevel;
     };
 
 }
 
-static inline debugging::DebugStream debug()
+static inline dbg::DebugStream debug(int loglevel)
 {
-    return debugging::DebugStream();
+  return dbg::DebugStream(loglevel);
 }

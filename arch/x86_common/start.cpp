@@ -58,18 +58,18 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   debug_init();
 
   s_stivale = stivale;
-  debug() << "Hello, world!\n";
+  debug(BOOT) << "Hello, world!\n";
 
   /* Load our own Global Descriptor Table */
-  debug() << "Setting up Global Descriptor Table ...";
+  debug(BOOT) << "Setup: Global Descriptor Table\n";
   setup_gdt();
-  debug() << " done\n";
 
   /* Create a map of free pages from the stivale
    * memory map. */
   create_page_bitmap();
 
   /* Load an interrupt descriptor table */
+  debug(BOOT) << "Setup: Interrupt Descriptor Table\n";
   x86_irq_init();
 
   /* Create the kernel virtual memory address space and
@@ -79,7 +79,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
 
   /* enable SSE and AVX if available */
   s_sseEnabled = sse_enable();
-  debug() << "trying to enable SSE: "
+  debug(BOOT) << "trying to enable SSE: "
           << (s_sseEnabled ? "ok\n" : "not available\n");
   s_sseEnabled = sse_enable();
 

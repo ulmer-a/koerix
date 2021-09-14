@@ -33,12 +33,12 @@ bool Loader::isValidBinary() const
 
     if ((phtEntry.p_vaddr & 0xfff) != 0)
     {
-      debug() << "loader warning: trying to load ELF "
+      debug(LOADER) << "loader warning: trying to load ELF "
                  "with unaligned LOAD program headers\n";
       return false;
     }
 
-    //debug() << "load: addr=" << (void*)phtEntry.p_vaddr
+    //debug(LOADER) << "load: addr=" << (void*)phtEntry.p_vaddr
     //        << ", size=" << DEBUG_HEX << phtEntry.p_memsz << "\n";
   }
 
