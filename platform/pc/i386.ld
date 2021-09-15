@@ -1,6 +1,6 @@
 OUTPUT_FORMAT(elf32-i386)
 OUTPUT_ARCH(i386)
-ENTRY(_kernel_start)
+ENTRY(_start)
 
 SECTIONS
 {

@@ -30,7 +30,11 @@ typedef unsigned long size_t;
 #define _PAGE_ALIGN __attribute((aligned(4096)))
 #define _SECTION(s) __attribute__((section(s), used))
 
+#ifdef BITS32
+  #define BIT(x) (1ull << (x))
+#else
+  #define BIT(x) (1ul << (x))
+#endif
 
-#define BIT(x) (1ul << (x))
 #define min(x, y) ((x) < (y) ? (x) : (y))
 #define max(x, y) ((x) > (y) ? (x) : (y))
