@@ -10,6 +10,7 @@
 #include <kernel_task.h>
 #include <string.h>
 
+
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 1024*16;
 static uint8_t _INIT setup_stack[SETUP_STACK_SIZE];
@@ -18,12 +19,16 @@ stivale_struct* s_stivale;
 _SECTION(".stivalehdr")
 static struct stivale_header stivale_hdr = {
   // location of the setup stack
-  .stack = (size_t)setup_stack + SETUP_STACK_SIZE,
+  .stack = (uint64_t)setup_stack + SETUP_STACK_SIZE,
 
   // BIT(0) will ask for a graphical framebuffer
   // BIT(3) all pointers received from the bootloader
   //   will be higher-half pointers.
+ #ifdef i386
+  .flags = BIT(0),
+ #else
   .flags = BIT(0) | BIT(3),
+ #endif
 
   // let the bootloader decide the framebuffer size
   .framebuffer_width = 0,
@@ -33,7 +38,6 @@ static struct stivale_header stivale_hdr = {
   // entry point as in the corresponding ELF field
   .entry_point = 0
 };
-
 extern void kernel_init(const char* cmdline);
 static void setup_task(void* cmdline) {
   kernel_init((char*)cmdline);
