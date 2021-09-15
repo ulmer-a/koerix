@@ -20,7 +20,7 @@ static inline void hlt()
   __asm__ volatile ("hlt");
 }
 
-static inline void arch_yield()
+static inline void _yield()
 {
   /* yield() will trigger interrupt 0x1f. this will
    * cause the interrupt handler to run schedule()

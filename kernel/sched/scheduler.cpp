@@ -31,7 +31,7 @@ namespace sched {
   void yield()
   {
     if (s_schedEnable)
-      arch_yield();
+      _yield();
   }
 
   static void idle_task(void* arg)
