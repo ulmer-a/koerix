@@ -138,7 +138,7 @@ namespace sched {
           nextTask->addrSpace().apply();
         }
 
-        resetFpuFlag();
+        fpu::fpuEnableTrap();
         setKernelStackPtr(nextTask->kernelStackPtr());
 
         s_currentTask = nextTask;

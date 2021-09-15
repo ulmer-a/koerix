@@ -37,15 +37,15 @@ sse_enable:
     mov $1, %rax
     ret
 
-.global resetFpuFlag
-resetFpuFlag:
+.global fpuEnableTrap
+fpuEnableTrap:
     mov %cr0, %rax
     btsq $3, %rax
     mov %rax, %cr0
     ret
 
-.global enableFpuCalls
-enableFpuCalls:
+.global fpuClearTrap
+fpuClearTrap:
     mov %cr0, %rax
     btrq $3, %rax
     mov %rax, %cr0

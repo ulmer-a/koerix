@@ -9,7 +9,10 @@
 class Loader;
 class UserProcess;
 class UserStack;
-class FpuContext;
+
+namespace fpu {
+  class Context;
+}
 
 class UserTask : public Task
 {
@@ -31,7 +34,7 @@ class UserTask : public Task
       return m_process;
     }
 
-    inline FpuContext& getFpuContext() {
+    inline fpu::Context& getFpuContext() {
       return *m_fpuContext;
     }
 
@@ -43,5 +46,5 @@ class UserTask : public Task
     UserStack m_stack;
 
     void* m_threadPtr;
-    ktl::unique_ptr<FpuContext> m_fpuContext;
+    ktl::unique_ptr<fpu::Context> m_fpuContext;
 };

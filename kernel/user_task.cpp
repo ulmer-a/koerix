@@ -15,7 +15,7 @@ UserTask::UserTask(UserProcess& process, void* entryPoint, void* arg1, void* arg
   , m_stack(process.allocStack())
   , m_process(process)
   , m_threadPtr(nullptr)
-  , m_fpuContext(new FpuContext())
+  , m_fpuContext(new fpu::Context())
 {
   context()->newUserCtx();
   context()->instructionPtr() = (size_t)entryPoint;
@@ -45,7 +45,7 @@ UserTask::~UserTask()
 
 void UserTask::exit()
 {
-  fpuClear();
+  fpu::Context::clear();
   Task::exit();
 }
 

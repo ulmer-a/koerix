@@ -11,11 +11,11 @@
 #include <arch/asm.h>
 #include <scheduler.h>
 #include <user_task.h>
+#include <fpu.h>
 
 #define EXC_FPU_SSE     7
 #define EXC_PAGEFAULT   14
 
-extern void fpuFault();
 extern void do_syscall(IrqContext* ctx);
 
 uint64_t s_timerTicks = 0;
@@ -47,7 +47,7 @@ extern "C" IrqContext* x86_irq_handler(IrqContext* ctx)
     {
       if (ctx->irq() == EXC_FPU_SSE)
       {
-        fpuFault();
+        fpu::onFault();
         return ctx;
       }
       else if (ctx->irq() == EXC_PAGEFAULT)

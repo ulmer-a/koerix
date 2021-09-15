@@ -3,24 +3,14 @@
 
 #pragma once
 
-#include <x86/features.h>
+namespace fpu {
 
-struct FpuContextStruct;
+  struct ContextStruct;
 
-class FpuContext
-{
-  public:
-    FpuContext();
-
-    FpuContext* clone();
-
-    void save();
-    void restore() const;
-
-  private:
+  struct ContextImpl
+  {
     char m_data[512 + 16];
-    FpuContextStruct* m_context;
-};
+    ContextStruct* m_context;
+  };
 
-void fpuFault();
-void fpuClear();
+}
