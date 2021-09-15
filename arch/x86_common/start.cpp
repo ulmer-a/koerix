@@ -77,12 +77,6 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   AddrSpace::setup();
   initHeap();
 
-  /* enable SSE and AVX if available */
-  s_sseEnabled = sse_enable();
-  debug(BOOT) << "trying to enable SSE: "
-          << (s_sseEnabled ? "ok\n" : "not available\n");
-  s_sseEnabled = sse_enable();
-
   /* Create kernel setup task and enable scheduling */
   sched::setup(new KernelTask(
       setup_task, (void*)stivale->cmdline));

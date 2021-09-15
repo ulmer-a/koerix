@@ -11,6 +11,7 @@
 #include <loader.h>
 #include <user_proc.h>
 #include <pagemap.h>
+#include <fpu.h>
 
 static void printIssue()
 {
@@ -57,6 +58,9 @@ void kernel_init(const char* cmdline)
   if (!cmdline_get("init", valueBuffer)) {
     panic("no 'init' cmdline parameter: don't know what to execute");
   }
+
+  /* enable SSE and AVX if available */
+  fpu::init();
 
   void* init_bin = find_module(valueBuffer);
   assert(init_bin != nullptr);

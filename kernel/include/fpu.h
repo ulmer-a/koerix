@@ -27,6 +27,7 @@ namespace fpu {
 
   void onFault();
 
-  extern "C" void fpuEnableTrap();
-  extern "C" void fpuClearTrap();
+  void init();
+  void enableTrap();
+  void clearTrap();
 }

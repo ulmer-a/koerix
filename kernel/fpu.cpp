@@ -2,10 +2,23 @@
 #include <scheduler.h>
 #include <user_task.h>
 #include <arch/asm.h>
+#include <debug.h>
 
 namespace fpu {
 
   static UserTask* s_fpuTask = nullptr;
+  static bool s_fpuEnabled = false;
+
+  extern "C" bool fpuDetectAndEnable();
+  extern "C" void fpuEnableTrap();
+  extern "C" void fpuClearTrap();
+
+  void init()
+  {
+    s_fpuEnabled = fpuDetectAndEnable();
+    debug(FPU) << "enable FPU: "
+               << (s_fpuEnabled ? "success\n" : "not available\n");
+  }
 
   void onFault()
   {
@@ -15,7 +28,7 @@ namespace fpu {
      * the FPU/SSE context is not saved/restored on each individual
      * context switch. */
 
-    fpuClearTrap();
+    clearTrap();
 
     auto currentTask = sched::currentUserTask();
     if (s_fpuTask != currentTask)
@@ -33,9 +46,23 @@ namespace fpu {
     if (s_fpuTask == sched::currentTask())
     {
         s_fpuTask = nullptr;
-        fpuEnableTrap();
+        enableTrap();
     }
     sti();
+  }
+
+  void enableTrap()
+  {
+    if (!s_fpuEnabled)
+      return;
+    fpuEnableTrap();
+  }
+
+  void clearTrap()
+  {
+    if (!s_fpuEnabled)
+      return;
+    fpuClearTrap();
   }
 
 }
