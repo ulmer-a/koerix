@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2017-2021 Alexander Ulmer
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
 #pragma once
 
 #define PPN_TO_PTR(x)   ((void*)((x) << PAGE_SHIFT))
