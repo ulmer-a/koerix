@@ -7,8 +7,7 @@
 #include <mutex.h>
 #include <offsets.h>
 
-#define PPN_TO_PTR(x)   ((void*)((x) << PAGE_SHIFT))
-#define PPN_TO_VIRT(x)  ((void*)(((x) << PAGE_SHIFT) + IDENT_OFFSET))
+#include <arch/addr_space.h>
 
 class AddrSpace
 {
@@ -41,10 +40,7 @@ class AddrSpace
     bool triggerCow(size_t virt);
 
   private:
-    void updateKernelMappings();
-    void invalidate(size_t virt);
-    void resolve(size_t virt, Mapping& mapping);
-    bool checkForPresentEntries(GenericPagingTable* table);
+    ADDR_SPACE_IMPL
 
     size_t m_topLevelPageTable;
     Mutex m_lock;
