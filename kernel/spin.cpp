@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <spin.h>
-#include <arch/asm.h>
+#include <atomic.h>
 #include <scheduler.h>
 
 Spinlock::Spinlock()

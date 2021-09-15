@@ -5,7 +5,7 @@
 #include <mm.h>
 #include <string.h>
 #include <context.h>
-#include <arch/asm.h>
+#include <atomic.h>
 #include <debug.h>
 #include <scheduler.h>
 #include <lock.h>

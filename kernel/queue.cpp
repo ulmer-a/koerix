@@ -4,7 +4,7 @@
 #include <queue.h>
 #include <task.h>
 #include <scheduler.h>
-#include <arch/asm.h>
+#include <atomic.h>
 
 IQueue::IQueue(Lock& bufferLock)
   : m_bufferLock(bufferLock)

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <mutex.h>
-#include <arch/asm.h>
+#include <atomic.h>
 #include <task.h>
 #include <scheduler.h>
 
