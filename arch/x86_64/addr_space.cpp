@@ -6,8 +6,6 @@
 #include <string.h>
 #include <mm.h>
 #include <arch/asm.h>
-#include <x86/features.h>
-
 
 struct AddrSpace::GenericPagingTable
 {
@@ -47,6 +45,8 @@ struct AddrSpace::Mapping
 AddrSpace s_kernelAddrSpace;
 bool s_initialized = false;
 bool s_nxEnabled = false;
+
+extern "C" bool enable_nx();
 
 AddrSpace::AddrSpace()
 {

@@ -6,7 +6,6 @@
 #include <errno.h>
 #include <proc_list.h>
 #include <scheduler.h>
-#include <x86/features.h>
 #include <bits.h>
 
 
