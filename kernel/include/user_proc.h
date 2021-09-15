@@ -73,5 +73,5 @@ class UserProcess
     ktl::vector<bool> m_stackList;
 
     Mutex m_filesLock;
-    ktl::Map<size_t, fs::FileDesc> m_files;
+    lib::Map<size_t, fs::FileDesc> m_files;
 };
