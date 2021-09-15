@@ -3,7 +3,6 @@
 
 #pragma once
 
-#define PPN_TO_PTR(x)   ((void*)((x) << PAGE_SHIFT))
 #define PPN_TO_VIRT(x)  ((void*)(((x) << PAGE_SHIFT) + IDENT_OFFSET))
 
 #define ADDR_SPACE_IMPL \

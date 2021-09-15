@@ -40,11 +40,7 @@
 #if defined(_POSIX_SOURCE) || defined(_POSIX_C_SOURCE) \
  || defined(_XOPEN_SOURCE) || defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
 
-#if defined(__x86_64__) || defined(__i386__)
-    #define PAGESIZE 4096
-#else
-    #warning PAGESIZE not implemented for non-x86 architectures
-#endif
+#define PAGESIZE 4096
 
 #define PIPE_BUF 4096
 #define FILESIZEBITS 64

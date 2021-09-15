@@ -7,6 +7,8 @@
 #include <mutex.h>
 #include <offsets.h>
 
+#define PPN_TO_PTR(x)   ((void*)((x) << PAGE_SHIFT))
+
 #include <arch/addr_space.h>
 
 class AddrSpace

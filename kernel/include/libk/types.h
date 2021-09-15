@@ -15,7 +15,7 @@ typedef short int16_t;
 typedef unsigned char uint8_t;
 typedef char int8_t;
 
-#ifdef i386
+#ifdef BITS32
 typedef int ssize_t;
 typedef unsigned int size_t;
 #else

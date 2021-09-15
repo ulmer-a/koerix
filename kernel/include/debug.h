@@ -54,7 +54,7 @@ namespace dbg {
 
         DebugStream& operator<<(char c);
         DebugStream& operator<<(const char* str);
-#ifndef i386
+#ifndef BITS32
         DebugStream& operator<<(size_t i);
 #endif
         DebugStream& operator<<(int32_t i);

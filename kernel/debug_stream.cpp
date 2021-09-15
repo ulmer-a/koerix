@@ -63,7 +63,7 @@ DebugStream& DebugStream::operator<<(char c)
   return *this;
 }
 
-#ifndef i386
+#ifndef BITS32
 DebugStream& DebugStream::operator<<(size_t i)
 {
   basePrefix();

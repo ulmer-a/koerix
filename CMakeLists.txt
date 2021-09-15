@@ -6,8 +6,12 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 project(UlmerOS VERSION 0.1)
 enable_language(ASM)
 
-set(TARGET_ARCH "x86_64")
-set(TARGET_PLATFORM "pc")
+if("${TARGET_ARCH}" STREQUAL "")
+    set(TARGET_ARCH "x86_64")
+endif()
+if("${TARGET_PLATFORM}" STREQUAL "")
+    set(TARGET_PLATFORM "pc")
+endif()
 
 add_compile_options("--target=${TARGET_ARCH}-none-eabi")
 
@@ -66,7 +70,7 @@ add_library(kernel STATIC ${KERNEL_SOURCES})
 target_include_directories(kernel PRIVATE ${KERNEL_INCLUDE})
 
 add_custom_target(vmkoerix ALL
-    COMMAND "/usr/bin/ld.lld"
+    COMMAND "/usr/bin/ld.lld" -nostdlib -static
         -T ${CMAKE_CURRENT_SOURCE_DIR}/platform/${TARGET_PLATFORM}/${TARGET_ARCH}.ld
         $<TARGET_FILE:kernel> -o ${CMAKE_CURRENT_BINARY_DIR}/vmkoerix
     DEPENDS kernel
