@@ -12,8 +12,8 @@
 
 UserTask::UserTask(UserProcess& process, void* entryPoint, void* arg1, void* arg2)
   : Task(process.getAddrSpace())
-  , m_stack(process.allocStack())
   , m_process(process)
+  , m_stack(process.allocStack())
   , m_threadPtr(nullptr)
   , m_fpuContext(new fpu::Context())
 {
@@ -27,8 +27,8 @@ UserTask::UserTask(UserProcess& process, void* entryPoint, void* arg1, void* arg
 
 UserTask::UserTask(UserProcess& process, const UserTask& forkee)
   : Task(process.getAddrSpace())
-  , m_stack(forkee.m_stack)
   , m_process(process)
+  , m_stack(forkee.m_stack)
   , m_threadPtr(forkee.m_threadPtr)
   , m_fpuContext(forkee.m_fpuContext->clone())
 {

@@ -18,8 +18,8 @@ FileDesc::FileDesc()
 
 FileDesc::FileDesc(File* file, bool write)
   : m_valid(true)
-  , m_file(file)
   , m_write(write)
+  , m_file(file)
 {
   assert(m_file != nullptr);
   m_file->addRef();
@@ -27,8 +27,8 @@ FileDesc::FileDesc(File* file, bool write)
 
 FileDesc::FileDesc(const FileDesc& fd)
   : m_valid(fd.m_valid)
-  , m_file(fd.m_file)
   , m_write(fd.m_write)
+  , m_file(fd.m_file)
 {
   if (m_file)
     m_file->addRef();

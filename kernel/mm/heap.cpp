@@ -47,7 +47,6 @@ void kheap_print()
   s_heapMutex.lock();
 
   debug(MEMORY) << "--- HEAP DUMP ---\n";
-  HeapBlock *entry;
   for (HeapBlock* entry = heap_start;
        entry != nullptr;
        entry = entry->next)

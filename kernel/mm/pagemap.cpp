@@ -25,8 +25,8 @@ PageMap::PageMap(size_t pagemapSize, size_t freePages,
     : m_totalPages(pagemapSize)
     , m_usablePages(usablePages)
     , m_freePageCount(freePages)
-    , m_pagemap(initializedPagemap)
     , m_usedPages(usablePages - m_freePageCount)
+    , m_pagemap(initializedPagemap)
 {
 }
 

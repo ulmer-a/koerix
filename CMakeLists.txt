@@ -39,12 +39,12 @@ add_subdirectory(env)
 
 set(CMAKE_C_FLAGS "\
     -ffreestanding -fno-rtti -fno-exceptions -fPIC \
-    -nostdlib -nostdinc -fno-stack-protector \
+    -nostdlib -nostdinc -fno-stack-protector -Wall \
     ${ARCH_FLAGS}"
 )
 set(CMAKE_CXX_FLAGS "\
     -ffreestanding -fno-rtti -fno-exceptions -fPIC \
-    -nostdlib -nostdinc -fno-stack-protector \
+    -nostdlib -nostdinc -fno-stack-protector -Wall \
     ${ARCH_FLAGS}"
 )
 

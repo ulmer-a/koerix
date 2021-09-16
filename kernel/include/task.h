@@ -9,7 +9,7 @@
 
 class AddrSpace;
 class Lock;
-struct IrqContext;
+class IrqContext;
 
 class Task
 {

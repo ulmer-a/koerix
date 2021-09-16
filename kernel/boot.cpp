@@ -66,5 +66,5 @@ void kernel_init(const char* cmdline)
   assert(init_bin != nullptr);
   auto loader = lib::shared_ptr<Loader>(
         new Loader(init_bin));
-  auto proc = new UserProcess(loader, mainTerm);
+  new UserProcess(loader, mainTerm);
 }

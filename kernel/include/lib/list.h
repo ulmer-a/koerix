@@ -31,9 +31,9 @@ namespace lib {
     {
       public:
         List()
-          : m_first(nullptr)
+          : m_size(0)
+          , m_first(nullptr)
           , m_last(nullptr)
-          , m_size(0)
         { }
 
         ~List()
