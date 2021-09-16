@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lock.h>
+#include <sync/lock.h>
 
 namespace sync {
 

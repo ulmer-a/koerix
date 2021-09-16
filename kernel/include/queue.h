@@ -4,7 +4,7 @@
 #pragma once
 
 #include <types.h>
-#include <mutex.h>
+#include <sync/mutex.h>
 #include <list.h>
 #include <sync/irq_lock.h>
 

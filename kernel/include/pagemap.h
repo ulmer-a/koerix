@@ -5,7 +5,7 @@
 
 #include <types.h>
 #include <offsets.h>
-#include <spin.h>
+#include <sync/spin.h>
 
 class PageMap
 {

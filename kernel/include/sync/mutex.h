@@ -4,8 +4,8 @@
 #pragma once
 
 #include <list.h>
-#include <spin.h>
-#include <lock.h>
+#include <sync/spin.h>
+#include <sync/lock.h>
 
 class Task;
 

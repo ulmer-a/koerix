@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <mutex.h>
+#include <sync/mutex.h>
 #include <list.h>
 
 class UserProcess;

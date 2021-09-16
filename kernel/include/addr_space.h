@@ -4,7 +4,7 @@
 #pragma once
 
 #include <types.h>
-#include <mutex.h>
+#include <sync/mutex.h>
 #include <offsets.h>
 
 #define PPN_TO_PTR(x)   ((void*)((x) << PAGE_SHIFT))

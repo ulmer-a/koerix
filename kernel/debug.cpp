@@ -5,7 +5,7 @@
 #include <string.h>
 #include <platform.h>
 #include <term.h>
-#include <spin.h>
+#include <sync/spin.h>
 #include <mm.h>
 
 using namespace dbg;

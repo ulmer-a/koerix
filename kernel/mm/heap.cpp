@@ -7,7 +7,7 @@
  */
 
 #include <types.h>
-#include <mutex.h>
+#include <sync/mutex.h>
 #include <mm.h>
 #include <debug.h>
 #include <platform.h>

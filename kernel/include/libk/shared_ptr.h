@@ -6,7 +6,7 @@
 #include <types.h>
 #include <arch/asm.h>
 #include <debug.h>
-#include <atomic.h>
+#include <sync/atomic.h>
 
 namespace ktl {
   namespace _internal {

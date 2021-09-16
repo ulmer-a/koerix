@@ -3,7 +3,7 @@
 
 #include <pagemap.h>
 #include <debug.h>
-#include <atomic.h>
+#include <sync/atomic.h>
 
 PageMap::PageMap()
     : m_pagemap(nullptr)

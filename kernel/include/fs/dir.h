@@ -4,7 +4,7 @@
 #pragma once
 
 #include <fs/file.h>
-#include <mutex.h>
+#include <sync/mutex.h>
 #include <shared_ptr.h>
 #include <vector.h>
 

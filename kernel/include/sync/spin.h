@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <lock.h>
+#include <sync/lock.h>
 
 class Spinlock : public Lock
 {

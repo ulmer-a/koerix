@@ -6,7 +6,7 @@
 #include <shared_ptr.h>
 #include <unique_ptr.h>
 #include <vector.h>
-#include <mutex.h>
+#include <sync/mutex.h>
 #include <addr_space.h>
 #include <map.h>
 #include <fs/fd.h>

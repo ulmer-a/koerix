@@ -5,10 +5,10 @@
 #include <mm.h>
 #include <string.h>
 #include <context.h>
-#include <atomic.h>
+#include <sync/atomic.h>
 #include <debug.h>
 #include <scheduler.h>
-#include <lock.h>
+#include <sync/lock.h>
 
 #define KERNEL_STACK_SIZE 8192
 
