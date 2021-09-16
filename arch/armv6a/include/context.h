@@ -10,12 +10,12 @@ class _PACKED IrqContext
     friend void do_syscall(IrqContext* ctx);
 
   public:
-    explicit IrqContext();
+    explicit IrqContext() { }
     explicit IrqContext(const IrqContext& self);
 
-    void newUserCtx();
-    void newCompatUserCtx();
-    void newKernelCtx();
+    void newUserCtx() { }
+    void newCompatUserCtx() { }
+    void newKernelCtx() { }
 
     void print();
 

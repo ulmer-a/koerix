@@ -5,6 +5,14 @@
 #include <debug.h>
 #include <sync/atomic.h>
 
+PageMap s_pagemap;
+
+PageMap& PageMap::get()
+{
+    /* Singleton getter for the PageMap */
+    return s_pagemap;
+}
+
 PageMap::PageMap()
     : m_pagemap(nullptr)
 {

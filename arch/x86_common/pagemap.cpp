@@ -9,14 +9,8 @@
 #include <pagemap.h>
 #include <x86/stivale.h>
 
-static PageMap s_pagemap;
+extern PageMap s_pagemap;
 extern stivale_struct* s_stivale;
-
-PageMap& PageMap::get()
-{
-    /* Singleton getter for the PageMap */
-    return s_pagemap;
-}
 
 static size_t getSystemPageCount()
 {
