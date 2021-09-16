@@ -38,12 +38,12 @@ add_subdirectory(env)
 ######################################################################
 
 set(CMAKE_C_FLAGS "\
-    -ffreestanding -fno-rtti -fno-exceptions -fpie \
+    -ffreestanding -fno-rtti -fno-exceptions -fPIC \
     -nostdlib -nostdinc -fno-stack-protector \
     ${ARCH_FLAGS}"
 )
 set(CMAKE_CXX_FLAGS "\
-    -ffreestanding -fno-rtti -fno-exceptions -fpie \
+    -ffreestanding -fno-rtti -fno-exceptions -fPIC \
     -nostdlib -nostdinc -fno-stack-protector \
     ${ARCH_FLAGS}"
 )
@@ -70,7 +70,7 @@ add_library(kernel STATIC ${KERNEL_SOURCES})
 target_include_directories(kernel PRIVATE ${KERNEL_INCLUDE})
 
 add_custom_target(vmkoerix ALL
-    COMMAND "/usr/bin/ld.lld" -nostdlib -static --no-dynamic-linker -pie
+    COMMAND "/usr/bin/ld.lld" -nostdlib -static
         -T ${CMAKE_CURRENT_SOURCE_DIR}/platform/${TARGET_PLATFORM}/${TARGET_ARCH}.ld
         $<TARGET_FILE:kernel> -o ${CMAKE_CURRENT_BINARY_DIR}/vmkoerix
     DEPENDS kernel
