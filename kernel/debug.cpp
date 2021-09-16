@@ -24,6 +24,7 @@ void debug_init()
 {
   Terminal::init();
   new (&s_debugLock) Spinlock();
+  debug_print_init();
   s_initialized = true;
 }
 
@@ -37,11 +38,10 @@ DebugStream::~DebugStream()
   if ((m_loglevel & OUTPUT_ENABLE) == 0)
     return;
 
-  size_t len = strlen(m_buffer);
   s_debugLock.lock();
-#if defined(DEBUG) && defined(X86)
+#if defined(DEBUG)
   /* only print to QEMU debug IO port in debug mode */
-  qemu_print(m_buffer);
+  debug_print(m_buffer);
 #endif
 
   /* kernel output will always go to the main terminal,
@@ -49,6 +49,7 @@ DebugStream::~DebugStream()
   auto mainTerm = Terminal::getMainTerm();
   if (mainTerm != nullptr)
   {
+    size_t len = strlen(m_buffer);
     mainTerm->write(m_buffer, len);
   }
   s_debugLock.unlock();

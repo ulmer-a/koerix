@@ -3,8 +3,8 @@
 
 #pragma once
 
-extern "C" void cli();
-extern "C" void sti();
+static void cli() { }
+static void sti() { }
 
 static inline void hlt()
 {

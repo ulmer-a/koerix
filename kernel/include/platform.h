@@ -6,10 +6,7 @@
 #include <arch/asm.h>
 #include <offsets.h>
 
-#ifdef X86
-// platform-native debug print function
-// in this case: qemu and bochs 0xe9 port
-extern void qemu_print(const char* str);
-#endif
+extern void debug_print_init();
+extern void debug_print(const char* str);
 
 void init_drivers();
