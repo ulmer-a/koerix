@@ -13,13 +13,13 @@
 
 // setup stack allocation
 static const size_t SETUP_STACK_SIZE = 1024*16;
-static uint8_t _INIT setup_stack[SETUP_STACK_SIZE];
+static uint8_t _INIT _ALIGNED(16) setup_stack[SETUP_STACK_SIZE];
 stivale_struct* s_stivale;
 
 _SECTION(".stivalehdr")
 static struct stivale_header stivale_hdr = {
   // location of the setup stack
-  .stack = (uint64_t)setup_stack + SETUP_STACK_SIZE,
+  .stack = (size_t)setup_stack + SETUP_STACK_SIZE,
 
   // BIT(0) will ask for a graphical framebuffer
   // BIT(3) all pointers received from the bootloader

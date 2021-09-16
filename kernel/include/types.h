@@ -26,8 +26,9 @@ typedef unsigned long size_t;
 /* Attributes */
 #define _INIT
 #define _NORETURN __attribute__((noreturn))
-#define _PACKED __attribute((packed))
-#define _PAGE_ALIGN __attribute((aligned(4096)))
+#define _PACKED __attribute__((packed))
+#define _PAGE_ALIGN __attribute__((aligned(4096)))
+#define _ALIGNED(x) __attribute__((aligned(x)))
 #define _SECTION(s) __attribute__((section(s), used))
 
 #ifdef BITS32

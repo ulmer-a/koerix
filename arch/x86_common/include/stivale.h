@@ -46,7 +46,12 @@ struct stivale_anchor {
 /*  Information passed from the kernel to the bootloader                      */
 
 struct stivale_header {
+#ifdef i386
+    uint32_t stack;
+    uint32_t zero;
+#else
     uint64_t stack;
+#endif
     uint16_t flags;
     uint16_t framebuffer_width;
     uint16_t framebuffer_height;
