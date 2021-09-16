@@ -6,6 +6,7 @@
 #include <lib/string.h>
 #include <mm.h>
 #include <arch/asm.h>
+#include <x86/cpuinfo.h>
 
 struct AddrSpace::GenericPagingTable
 {
@@ -44,9 +45,10 @@ struct AddrSpace::Mapping
 
 AddrSpace s_kernelAddrSpace;
 bool s_initialized = false;
-bool s_nxEnabled = false;
 
-extern "C" bool enable_nx();
+/* regarding NX (no execute) pages */
+bool s_nxEnabled = false;
+extern "C" void enableNx();
 
 AddrSpace::AddrSpace()
 {
@@ -115,8 +117,9 @@ void AddrSpace::setup()
     for (size_t page = 0; page < totalPages; page++)
         kernelSpace->map(page + ident_page_offset, page, MAP_WRITE);
 
-    /* Enable support for NX pages */
-    s_nxEnabled = enable_nx();
+    /* Enable support for NX pages if available */
+    if ((s_nxEnabled = cpuid::getFeatures3().nx))
+      enableNx();
     debug(VSPACE) << "trying to enable NX: "
             << (s_nxEnabled ? "ok\n" : "not available\n");
 
@@ -204,8 +207,11 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
         /* only set protections for actual pages */
         if (flags & MAP_WRITE)  currentLevelTableEntry.write = 1;
         if (flags & MAP_USER)   currentLevelTableEntry.user = 1;
-        if (flags & MAP_NOEXEC) currentLevelTableEntry.no_exec = 1;
         if (flags & MAP_SHARED) currentLevelTableEntry.shared = 1;
+
+        /* only map a page NX if the features is actually available */
+        if (flags & MAP_NOEXEC && s_nxEnabled)
+          currentLevelTableEntry.no_exec = 1;
       }
       else
       {

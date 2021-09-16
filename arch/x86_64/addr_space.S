@@ -3,16 +3,14 @@
 
 .section .text
 
-// TODO: properly check if supported!
-.global enable_nx
-enable_nx:
+.global enableNx
+enableNx:
     mov $0xc0000080, %rcx
     rdmsr
     btsl $11, %eax
     wrmsr
     mov $1, %rax
     ret
-
 
 .global irqEnabled
 irqEnabled:
