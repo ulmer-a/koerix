@@ -3,7 +3,7 @@
 
 #include <task.h>
 #include <mm.h>
-#include <string.h>
+#include <lib/string.h>
 #include <context.h>
 #include <arch/asm.h>
 #include <debug.h>
@@ -25,13 +25,13 @@ typedef struct {
 } sched_task_info_t;
 
 namespace sched {
-    extern ktl::List<Task*> s_taskList;
+    extern lib::List<Task*> s_taskList;
 }
 
 ssize_t get_sched_task_info(size_t tid, void* info_ptr)
 {
     auto info = (sched_task_info_t*)info_ptr;
-    ktl::ListItem<Task*>* found = nullptr;
+    lib::ListItem<Task*>* found = nullptr;
     for (auto it = sched::s_taskList.begin();
          it != nullptr;
          it = it->next)

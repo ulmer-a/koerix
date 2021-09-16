@@ -5,7 +5,7 @@
 
 #include <types.h>
 #include <fs/fd.h>
-#include <shared_ptr.h>
+#include <lib/shared_ptr.h>
 
 class Terminal
 {
@@ -22,11 +22,11 @@ class Terminal
       return s_mainTerm.get();
     }
 
-    static inline void setMainTerm(ktl::shared_ptr<Terminal> term) {
+    static inline void setMainTerm(lib::shared_ptr<Terminal> term) {
       s_mainTerm = term;
     }
 
   private:
     fs::FileDesc m_fd;
-    static ktl::shared_ptr<Terminal> s_mainTerm;
+    static lib::shared_ptr<Terminal> s_mainTerm;
 };

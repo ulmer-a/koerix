@@ -7,7 +7,7 @@
 #include <platform.h>
 #include <arch/asm.h>
 #include <page_fault.h>
-#include <string.h>
+#include <lib/string.h>
 #include <arch/asm.h>
 #include <scheduler.h>
 #include <user_task.h>

@@ -5,7 +5,7 @@
 #include <scheduler.h>
 #include <user_task.h>
 #include <user_proc.h>
-#include <errno.h>
+#include <lib/errno.h>
 
 void sys_exit(int status)
 {

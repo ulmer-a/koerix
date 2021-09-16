@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <mm.h>
-#include <errno.h>
+#include <lib/errno.h>
 #include <x86/ports.h>
 #include <dev/uart.h>
 #include <interrupt.h>

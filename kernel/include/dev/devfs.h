@@ -39,7 +39,7 @@ namespace dev {
       static DeviceFs& get();
 
       void registerDevice(
-          const char* name, ktl::shared_ptr<DeviceFile> device);
+          const char* name, lib::shared_ptr<DeviceFile> device);
   };
 
 }

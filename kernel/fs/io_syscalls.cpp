@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <syscalls.h>
-#include <errno.h>
+#include <lib/errno.h>
 #include <debug.h>
 #include <scheduler.h>
 #include <user_task.h>

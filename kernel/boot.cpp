@@ -7,7 +7,7 @@
 #include <fs/vfs.h>
 #include <fs/fd.h>
 #include <module.h>
-#include <shared_ptr.h>
+#include <lib/shared_ptr.h>
 #include <loader.h>
 #include <user_proc.h>
 #include <pagemap.h>
@@ -39,7 +39,7 @@ void kernel_init(const char* cmdline)
 
   /* check whether we got a command line option instructing the kernel
    * to open a terminal with a specified device */
-  ktl::shared_ptr<Terminal> mainTerm;
+  lib::shared_ptr<Terminal> mainTerm;
   if (cmdline_get("console", valueBuffer))
   {
     int error;
@@ -48,7 +48,7 @@ void kernel_init(const char* cmdline)
       debug(BOOT) << "warning: " << valueBuffer << ": "
               << strerror(error) << "\n";
     } else {
-      mainTerm = ktl::shared_ptr<Terminal>(new Terminal(fd));
+      mainTerm = lib::shared_ptr<Terminal>(new Terminal(fd));
       Terminal::setMainTerm(mainTerm);
     }
   }
@@ -64,7 +64,7 @@ void kernel_init(const char* cmdline)
 
   void* init_bin = find_module(valueBuffer);
   assert(init_bin != nullptr);
-  auto loader = ktl::shared_ptr<Loader>(
+  auto loader = lib::shared_ptr<Loader>(
         new Loader(init_bin));
   auto proc = new UserProcess(loader, mainTerm);
 }

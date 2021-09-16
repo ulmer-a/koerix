@@ -8,7 +8,7 @@
 #include <addr_space.h>
 #include <user_task.h>
 #include <user_proc.h>
-#include <errno.h>
+#include <lib/errno.h>
 
 size_t fb_page_count()
 {

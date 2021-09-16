@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <module.h>
-#include <string.h>
+#include <lib/string.h>
 #include <x86/stivale.h>
 
 extern stivale_struct* s_stivale;

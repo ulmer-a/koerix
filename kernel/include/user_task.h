@@ -46,5 +46,5 @@ class UserTask : public Task
     UserStack m_stack;
 
     void* m_threadPtr;
-    ktl::unique_ptr<fpu::Context> m_fpuContext;
+    lib::unique_ptr<fpu::Context> m_fpuContext;
 };

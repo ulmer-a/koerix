@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <canary.h>
+#include <lib/canary.h>
 
-class Lock : public ktl::Canary
+class Lock : public lib::Canary
 {
   public:
     Lock() = default;

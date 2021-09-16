@@ -8,7 +8,7 @@
 #include <scheduler.h>
 #include <x86/stivale.h>
 #include <kernel_task.h>
-#include <string.h>
+#include <lib/string.h>
 
 
 // setup stack allocation

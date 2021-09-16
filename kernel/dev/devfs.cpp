@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <dev/devfs.h>
-#include <errno.h>
+#include <lib/errno.h>
 
 using namespace dev;
 
@@ -19,7 +19,7 @@ int DeviceFile::ioctrl(size_t cmd, size_t *arg)
 }
 
 void DeviceFs::registerDevice(
-    const char* name, ktl::shared_ptr<DeviceFile> device)
+    const char* name, lib::shared_ptr<DeviceFile> device)
 {
-  addFile(name, *(ktl::shared_ptr<File>*)&device);
+  addFile(name, *(lib::shared_ptr<File>*)&device);
 }

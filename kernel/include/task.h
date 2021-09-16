@@ -4,8 +4,8 @@
 #pragma once
 
 #include <types.h>
-#include <list.h>
-#include <unique_ptr.h>
+#include <lib/list.h>
+#include <lib/unique_ptr.h>
 
 class AddrSpace;
 class Lock;
@@ -54,7 +54,7 @@ class Task
     uint64_t m_wakeUpAt;
 
     /* kernel stack, allocated on the heap */
-    ktl::unique_ptr<uint8_t> m_kernelStack;
+    lib::unique_ptr<uint8_t> m_kernelStack;
     size_t m_kernelStackTop;
 
     /* when the task is in an interrupt or system call,

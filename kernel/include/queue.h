@@ -5,7 +5,7 @@
 
 #include <types.h>
 #include <sync/mutex.h>
-#include <list.h>
+#include <lib/list.h>
 #include <sync/irq_lock.h>
 
 class IQueue
@@ -27,7 +27,7 @@ class IQueue
     size_t m_readPtr, m_writePtr;
 
     size_t m_subscriberCount;
-    ktl::List<Task*> m_readSubscribers;
+    lib::List<Task*> m_readSubscribers;
     void wakeupSubscribers();
 };
 

@@ -3,10 +3,10 @@
 
 #include <pc/serial.h>
 #include <x86/ports.h>
-#include <errno.h>
+#include <lib/errno.h>
 #include <debug.h>
 #include <arch/asm.h>
-#include <string.h>
+#include <lib/string.h>
 #include <interrupt.h>
 
 using namespace pc;

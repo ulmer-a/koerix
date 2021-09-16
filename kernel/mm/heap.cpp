@@ -11,7 +11,7 @@
 #include <mm.h>
 #include <debug.h>
 #include <platform.h>
-#include <string.h>
+#include <lib/string.h>
 #include <addr_space.h>
 
 struct HeapBlock

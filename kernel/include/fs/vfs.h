@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <shared_ptr.h>
+#include <lib/shared_ptr.h>
 
 namespace fs {
 
@@ -12,6 +12,6 @@ namespace fs {
 
   FileDesc open(const char* filename, int& error);
 
-  bool mount(const char* filename, ktl::shared_ptr<Dir> fs, int& error);
+  bool mount(const char* filename, lib::shared_ptr<Dir> fs, int& error);
 
 }

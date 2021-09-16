@@ -4,7 +4,7 @@
 #pragma once
 
 #include <sync/mutex.h>
-#include <list.h>
+#include <lib/list.h>
 
 class UserProcess;
 
@@ -26,5 +26,5 @@ class ProcList
     static ProcList* s_instance;
 
     Mutex m_procListLock;
-    ktl::List<UserProcess*> m_procList;
+    lib::List<UserProcess*> m_procList;
 };

@@ -3,21 +3,21 @@
 
 #include <dev/devices.h>
 #include <platform.h>
-#include <list.h>
+#include <lib/list.h>
 #include <mm.h>
-#include <string.h>
+#include <lib/string.h>
 #include <dev/chardev.h>
-#include <shared_ptr.h>
+#include <lib/shared_ptr.h>
 #include <dev/devfs.h>
 #include <fs/vfs.h>
 
 namespace dev {
 
-  static ktl::shared_ptr<fs::Dir> s_devfs;
+  static lib::shared_ptr<fs::Dir> s_devfs;
 
   void setup()
   {
-    s_devfs = ktl::shared_ptr<fs::Dir>((fs::Dir*)new DeviceFs());
+    s_devfs = lib::shared_ptr<fs::Dir>((fs::Dir*)new DeviceFs());
 
     // mount the device filesystem as rootfs for now
     int error;
@@ -36,7 +36,7 @@ namespace dev {
   {
     debug(DEVICES) << "registered device '" << name << "'\n";
     DeviceFs* devfs = (DeviceFs*)s_devfs.get();
-    devfs->registerDevice(name, ktl::shared_ptr<DeviceFile>(dev));
+    devfs->registerDevice(name, lib::shared_ptr<DeviceFile>(dev));
   }
 
 }

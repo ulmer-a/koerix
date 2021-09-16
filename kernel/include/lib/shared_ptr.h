@@ -8,7 +8,7 @@
 #include <debug.h>
 #include <sync/atomic.h>
 
-namespace ktl {
+namespace lib {
   namespace _internal {
     template <typename T>
     class shared_ptr_data

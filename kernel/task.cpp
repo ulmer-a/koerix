@@ -3,7 +3,7 @@
 
 #include <task.h>
 #include <mm.h>
-#include <string.h>
+#include <lib/string.h>
 #include <context.h>
 #include <sync/atomic.h>
 #include <debug.h>

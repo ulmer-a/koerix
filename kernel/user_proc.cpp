@@ -10,8 +10,8 @@
 #include <addr_space.h>
 #include <stdio.h>
 
-UserProcess::UserProcess(ktl::shared_ptr<Loader> loader,
-                         ktl::shared_ptr<Terminal> term)
+UserProcess::UserProcess(lib::shared_ptr<Loader> loader,
+                         lib::shared_ptr<Terminal> term)
   : m_state(RUNNING)
   , m_pid(getNewPid())
   , m_addrSpace(new AddrSpace())

@@ -1,4 +1,4 @@
-#include <string.h>
+#include <lib/string.h>
 
 static const char *exceptions[] = {
   "Divide by zero",

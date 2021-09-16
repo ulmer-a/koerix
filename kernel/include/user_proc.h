@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <shared_ptr.h>
-#include <unique_ptr.h>
-#include <vector.h>
+#include <lib/shared_ptr.h>
+#include <lib/unique_ptr.h>
+#include <lib/vector.h>
 #include <sync/mutex.h>
 #include <addr_space.h>
-#include <map.h>
+#include <lib/map.h>
 #include <fs/fd.h>
 
 class Loader;
@@ -28,8 +28,8 @@ class UserProcess
       TO_BE_DELETED
     };
 
-    UserProcess(ktl::shared_ptr<Loader> loader,
-                ktl::shared_ptr<Terminal> term);
+    UserProcess(lib::shared_ptr<Loader> loader,
+                lib::shared_ptr<Terminal> term);
     explicit UserProcess(const UserProcess& forkee);
     ~UserProcess() = default;
 
@@ -62,15 +62,15 @@ class UserProcess
     ProcState m_state;
     size_t m_pid;
 
-    ktl::unique_ptr<AddrSpace> m_addrSpace;
-    ktl::shared_ptr<Loader> m_loader;
-    ktl::shared_ptr<Terminal> m_term;
+    lib::unique_ptr<AddrSpace> m_addrSpace;
+    lib::shared_ptr<Loader> m_loader;
+    lib::shared_ptr<Terminal> m_term;
 
     Mutex m_taskListLock;
-    ktl::List<UserTask*> m_taskList;
+    lib::List<UserTask*> m_taskList;
 
     mutable Mutex m_stackListLock;
-    ktl::vector<bool> m_stackList;
+    lib::vector<bool> m_stackList;
 
     Mutex m_filesLock;
     lib::Map<size_t, fs::FileDesc> m_files;

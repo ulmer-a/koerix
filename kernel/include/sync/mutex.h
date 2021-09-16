@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <list.h>
+#include <lib/list.h>
 #include <sync/spin.h>
 #include <sync/lock.h>
 
@@ -29,6 +29,6 @@ class Mutex : public Lock
 
     /* a lists of tasks waiting for this mutex
      * to be released. */
-    ktl::List<Task*> m_waitingTasks;
+    lib::List<Task*> m_waitingTasks;
     Spinlock m_waitingTasksLock;
 };

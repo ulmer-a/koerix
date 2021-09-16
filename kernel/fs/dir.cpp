@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <fs/dir.h>
-#include <errno.h>
-#include <string.h>
+#include <lib/errno.h>
+#include <lib/string.h>
 
 
 bool fs::Dir::isMountPoint() const
@@ -11,7 +11,7 @@ bool fs::Dir::isMountPoint() const
   return !m_mountOverlay.isNull();
 }
 
-bool fs::Dir::mount(ktl::shared_ptr<fs::Dir> fs, int& error)
+bool fs::Dir::mount(lib::shared_ptr<fs::Dir> fs, int& error)
 {
   ScopedLock smtx { m_mountLock };
   if (this->isMountPoint())
@@ -24,7 +24,7 @@ bool fs::Dir::mount(ktl::shared_ptr<fs::Dir> fs, int& error)
   return true;
 }
 
-ktl::shared_ptr<fs::File> fs::Dir::lookup(const char* path, int& error)
+lib::shared_ptr<fs::File> fs::Dir::lookup(const char* path, int& error)
 {
   ScopedLock smtx { m_mountLock };
   if (m_mountOverlay.isNull())
@@ -32,7 +32,7 @@ ktl::shared_ptr<fs::File> fs::Dir::lookup(const char* path, int& error)
   return m_mountOverlay->lookup(path, error);
 }
 
-ktl::shared_ptr<fs::File> fs::Dir::doLookup(const char* path, int& error)
+lib::shared_ptr<fs::File> fs::Dir::doLookup(const char* path, int& error)
 {
   ScopedLock smtx { m_fileLock };
   for (size_t i = 0; i < m_files.size(); i++)
@@ -41,7 +41,7 @@ ktl::shared_ptr<fs::File> fs::Dir::doLookup(const char* path, int& error)
       return m_files[i]->file;
   }
   error = ENOENT;
-  return ktl::shared_ptr<fs::File>();
+  return lib::shared_ptr<fs::File>();
 }
 
 bool fs::Dir::matchesFileName(const char* path, const char* reference)
@@ -64,7 +64,7 @@ ssize_t fs::Dir::write(char* buf, size_t len)
   return -ENOTSUP;
 }
 
-void fs::Dir::addFile(const char* name, ktl::shared_ptr<fs::File> file)
+void fs::Dir::addFile(const char* name, lib::shared_ptr<fs::File> file)
 {
   ScopedLock smtx { m_fileLock };
   auto entry = new Direntry;

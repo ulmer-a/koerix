@@ -3,7 +3,7 @@
 
 #include <syscalls.h>
 #include <context.h>
-#include <errno.h>
+#include <lib/errno.h>
 #include <debug.h>
 #include <scheduler.h>
 

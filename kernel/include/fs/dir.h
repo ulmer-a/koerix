@@ -5,8 +5,8 @@
 
 #include <fs/file.h>
 #include <sync/mutex.h>
-#include <shared_ptr.h>
-#include <vector.h>
+#include <lib/shared_ptr.h>
+#include <lib/vector.h>
 
 namespace fs {
 
@@ -16,33 +16,33 @@ namespace fs {
       struct Direntry
       {
         char name[256];
-        ktl::shared_ptr<File> file;
+        lib::shared_ptr<File> file;
       };
 
       Dir() = default;
       ~Dir() = default;
 
       bool isMountPoint() const;
-      bool mount(ktl::shared_ptr<Dir> fs, int& error);
+      bool mount(lib::shared_ptr<Dir> fs, int& error);
 
       bool isDir() const final { return true; }
-      ktl::shared_ptr<File> lookup(const char* path, int& error);
+      lib::shared_ptr<File> lookup(const char* path, int& error);
 
     protected:
       ssize_t read(char* buf, size_t len) override;
       ssize_t write(char* buf, size_t len) override;
 
-      void addFile(const char* name, ktl::shared_ptr<File> file);
+      void addFile(const char* name, lib::shared_ptr<File> file);
 
     private:
       bool matchesFileName(const char* path, const char* reference);
-      ktl::shared_ptr<File> doLookup(const char* path, int& error);
+      lib::shared_ptr<File> doLookup(const char* path, int& error);
 
       Mutex m_fileLock;
-      ktl::vector<Direntry*> m_files;
+      lib::vector<Direntry*> m_files;
 
       Mutex m_mountLock;
-      ktl::shared_ptr<Dir> m_mountOverlay;
+      lib::shared_ptr<Dir> m_mountOverlay;
   };
 
 }

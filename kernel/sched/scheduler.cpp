@@ -3,7 +3,7 @@
 
 #include <scheduler.h>
 #include <arch/asm.h>
-#include <list.h>
+#include <lib/list.h>
 #include <task.h>
 #include <context.h>
 #include <mm.h>
@@ -23,7 +23,7 @@ namespace sched {
   /* the scheduler picks it's tasks from s_taskList. It's important
    * that the list is not modified when the scheduler runs. only the
    * helpers may modify it when the scheduler is disabled.  */
-  ktl::List<Task*> s_taskList;
+  lib::List<Task*> s_taskList;
 
   bool s_schedEnable = false;
   Task* s_currentTask;
@@ -49,7 +49,7 @@ namespace sched {
   {
     assert(!s_schedEnable);
 
-    new (&s_taskList) ktl::List<Task*>();
+    new (&s_taskList) lib::List<Task*>();
     s_taskList.push_back(initialTask);
     s_taskList.push_back(new KernelTask(idle_task));
     s_schedEnable = true;
@@ -63,7 +63,7 @@ namespace sched {
     /* pre-allocate the memory required by push_back()
      * so that we don't call 'new' when the scheduler is
      * not running (might yield a deadlock)  */
-    void* mem = kmalloc(sizeof(ktl::ListItem<Task*>));
+    void* mem = kmalloc(sizeof(lib::ListItem<Task*>));
 
     s_schedEnable = false;
     s_taskList.push_back(task, mem);

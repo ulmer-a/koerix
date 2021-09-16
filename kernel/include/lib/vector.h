@@ -5,9 +5,9 @@
 
 #include <types.h>
 #include <debug.h>
-#include <string.h>
+#include <lib/string.h>
 
-namespace ktl {
+namespace lib {
 
   template <typename T>
   class vector

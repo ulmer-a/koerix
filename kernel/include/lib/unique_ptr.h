@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace ktl {
+namespace lib {
   template <typename T>
   class unique_ptr
   {

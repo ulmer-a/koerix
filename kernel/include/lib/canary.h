@@ -8,7 +8,7 @@
 
 #define MAGIC 0xdeadbeef
 
-namespace ktl {
+namespace lib {
 
   /* Deriving from the Canary class will put a 32bit word into
    * your object, which at strategic locations can be checked

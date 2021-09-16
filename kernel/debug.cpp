@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <debug.h>
-#include <string.h>
+#include <lib/string.h>
 #include <platform.h>
 #include <term.h>
 #include <sync/spin.h>

@@ -5,19 +5,19 @@
 #include <fs/dir.h>
 #include <fs/file.h>
 #include <fs/fd.h>
-#include <errno.h>
-#include <string.h>
+#include <lib/errno.h>
+#include <lib/string.h>
 
 namespace fs {
 
-  static ktl::shared_ptr<Dir> s_root;
+  static lib::shared_ptr<Dir> s_root;
 
-  ktl::shared_ptr<File> lookup(const char* path, int& error)
+  lib::shared_ptr<File> lookup(const char* path, int& error)
   {
     if (s_root == nullptr)
     {
       error = ENOENT;
-      return ktl::shared_ptr<fs::File>();
+      return lib::shared_ptr<fs::File>();
     }
 
     return s_root->lookup(path, error);
@@ -32,7 +32,7 @@ namespace fs {
     return file->open(error);
   }
 
-  bool mount(const char* filename, ktl::shared_ptr<Dir> fs, int& error)
+  bool mount(const char* filename, lib::shared_ptr<Dir> fs, int& error)
   {
     if (strcmp(filename, "/") == 0)
     {

@@ -3,7 +3,7 @@
 
 #include <types.h>
 #include <mm.h>
-#include <string.h>
+#include <lib/string.h>
 #include <debug.h>
 #include <addr_space.h>
 #include <pagemap.h>

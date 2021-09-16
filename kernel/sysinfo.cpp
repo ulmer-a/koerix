@@ -3,7 +3,7 @@
 
 #include <syscalls.h>
 #include <pagemap.h>
-#include <errno.h>
+#include <lib/errno.h>
 #include <proc_list.h>
 #include <scheduler.h>
 #include <bits.h>

@@ -37,7 +37,7 @@ ssize_t IQueue::read(char* buffer, size_t len)
   atomic_add(&m_subscriberCount, 1);
   if (m_available == 0)
   {
-    void* mem = kmalloc(sizeof(ktl::ListItem<Task*>));
+    void* mem = kmalloc(sizeof(lib::ListItem<Task*>));
     m_bufferLock.lock();
     m_readSubscribers.push_back(sched::currentTask(), mem);
     sched::currentTask()->sleepAndUnlock(&m_bufferLock);

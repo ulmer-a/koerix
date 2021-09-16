@@ -50,7 +50,6 @@ set(CMAKE_CXX_FLAGS "\
 
 set(KERNEL_INCLUDE
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel/include/
-    ${CMAKE_CURRENT_SOURCE_DIR}/kernel/include/libk
     ${CMAKE_CURRENT_SOURCE_DIR}/arch/${TARGET_ARCH}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/${TARGET_PLATFORM}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libc/${TARGET_ARCH}/include

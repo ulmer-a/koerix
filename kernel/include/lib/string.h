@@ -6,7 +6,7 @@
 #pragma once
 
 #include <types.h>
-#include <stdarg.h>
+#include <lib/stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,7 +3,7 @@
 
 #include <fs/fd.h>
 #include <fs/file.h>
-#include <errno.h>
+#include <lib/errno.h>
 
 using namespace fs;
 

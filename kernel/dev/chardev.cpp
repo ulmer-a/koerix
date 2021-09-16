@@ -3,7 +3,7 @@
 
 #include <dev/chardev.h>
 #include <arch/asm.h>
-#include <errno.h>
+#include <lib/errno.h>
 
 namespace devices {
 

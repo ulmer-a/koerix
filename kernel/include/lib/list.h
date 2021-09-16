@@ -4,10 +4,10 @@
 #pragma once
 
 #include <types.h>
-#include <canary.h>
+#include <lib/canary.h>
 #include <mm.h>
 
-namespace ktl {
+namespace lib {
 
     template<typename T>
     class ListItem
