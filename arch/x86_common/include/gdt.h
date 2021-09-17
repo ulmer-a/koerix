@@ -33,24 +33,25 @@
  *  7 (9) x 64bit total
  */
 
+
+/* segment descriptor flags. they can be combined to
+ * create different variations of segment descriptors. */
+#define PRESENT         BIT(47)                       // selector is present
+#define DPL_USER        BIT(45) | BIT(46)             // user mode
+#define CODE            BIT(41) | BIT(43) | BIT(44)   // code segment
+#define DATA            BIT(41) | BIT(44)             // data segment writable
+#define MAX_LIMIT       0x8f00000000ffff              // maximum segment limit
+#define LONGMODE        BIT(53)             // long mode / compatibility mode
+#define OPSIZE32        BIT(54)             // set compat. op size to 32bit
+
 #ifdef i386
   #define GDT_ENTRIES     7
   #define TSS_INDEX       5
+  #define MODE OPSIZE32
 #else
-  /* segment descriptor flags. they can be combined to
-   * create different variations of segment descriptors. */
-  #define PRESENT         BIT(47)             // selector is present
-  #define CODE            BIT(43) | BIT(44)   // code segment
-  #define CODE_R          BIT(41)             // code segment readable
-  #define DATA            BIT(44)             // data segment
-  #define DATA_W          BIT(41)             // data segment writable
-  #define LONGMODE        BIT(53)             // long mode / compatibility mode
-  #define DPL_USER        BIT(45) | BIT(46)   // user mode
-  #define OPSIZE32        BIT(54)             // set compat. op size to 32bit
-  #define MAX_LIMIT       0x8f00000000ffff    // maximum segment limit´
-
   #define GDT_ENTRIES     9
   #define TSS_INDEX       7
+  #define MODE LONGMODE
 #endif
 
 typedef struct
@@ -80,17 +81,13 @@ typedef struct
 #ifdef i386
   typedef struct
   {
-    uint16_t link;
-    uint16_t reserved0;
-    uint32_t esp0;
-    uint16_t ss0;
-    uint16_t reserved1;
+    uint32_t prev_tss;   // for hardware multitasking
+    uint32_t esp0;       // kernel SP
+    uint32_t ss0;        // kernel SS
     uint32_t esp1;
-    uint16_t ss1;
-    uint16_t reserved2;
+    uint32_t ss1;
     uint32_t esp2;
-    uint16_t ss2;
-    uint16_t reserved3;
+    uint32_t ss2;
     uint32_t cr3;
     uint32_t eip;
     uint32_t eflags;
@@ -102,21 +99,15 @@ typedef struct
     uint32_t ebp;
     uint32_t esi;
     uint32_t edi;
-    uint16_t es;
-    uint16_t reserved4;
-    uint16_t cs;
-    uint16_t reserved5;
-    uint16_t ss;
-    uint16_t reserved6;
-    uint16_t ds;
-    uint16_t reserved7;
-    uint16_t fs;
-    uint16_t reserved8;
-    uint16_t gs;
-    uint16_t reserved9;
-    uint16_t ldtr;
-    uint32_t reserved10;
-    uint16_t iopb;
+    uint32_t es;         // kernel ES
+    uint32_t cs;         // kernel CS
+    uint32_t ss;         // kernel SS
+    uint32_t ds;         // kernel DS
+    uint32_t fs;         // kernel FS
+    uint32_t gs;         // kernel GS
+    uint32_t ldt;        // unused: no LDT
+    uint16_t trap;
+    uint16_t iopb_offset;
   } _PACKED tss_t;
 #else
   typedef struct
@@ -152,7 +143,7 @@ static void load_gdt()
   __asm__ volatile("lgdt %0" : : "g"(s_gdt_descriptor));
 }
 
-static void setup_tss(tssd_t* td)
+static void _INIT setup_tss(tssd_t* td)
 {
   uint64_t addr = (uint64_t)&s_tss;
 
@@ -177,22 +168,22 @@ static void setup_tss(tssd_t* td)
   );
 }
 
-void setup_gdt()
+void _INIT setup_gdt()
 {
   s_gdt[0] = 0;
 
-  /* 64bit long mode kernel segment descriptors */
-  s_gdt[1] = PRESENT | LONGMODE | MAX_LIMIT | CODE | CODE_R;
-  s_gdt[2] = PRESENT | LONGMODE | MAX_LIMIT | DATA | DATA_W;
+  /* kernel segment descriptors */
+  s_gdt[1] = PRESENT | MODE | MAX_LIMIT | CODE;
+  s_gdt[2] = PRESENT | MODE | MAX_LIMIT | DATA;
 
-  /* 64bit long mode user segment descriptors*/
-  s_gdt[3] = PRESENT | LONGMODE | MAX_LIMIT | CODE | CODE_R | DPL_USER;
-  s_gdt[4] = PRESENT | LONGMODE | MAX_LIMIT | DATA | DATA_W | DPL_USER;
+  /* user segment descriptors*/
+  s_gdt[3] = PRESENT | MODE | MAX_LIMIT | CODE | DPL_USER;
+  s_gdt[4] = PRESENT | MODE | MAX_LIMIT | DATA  | DPL_USER;
 
 #ifndef i386
   /* 32bit compatibility mode user segment descriptors */
-  s_gdt[5] = PRESENT | OPSIZE32 | MAX_LIMIT | CODE | CODE_R | DPL_USER;
-  s_gdt[6] = PRESENT | OPSIZE32 | MAX_LIMIT | DATA | DATA_W | DPL_USER;
+  s_gdt[5] = PRESENT | OPSIZE32 | MAX_LIMIT | CODE | DPL_USER;
+  s_gdt[6] = PRESENT | OPSIZE32 | MAX_LIMIT | DATA | DPL_USER;
 #endif
 
   /* load the global descriptor table */
