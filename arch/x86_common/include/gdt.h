@@ -12,7 +12,16 @@
  * user segment selectors, the 64 bit operating system can also
  * run 32bit x86 programs in compatibility mode.
  *
- * Usable segment selector values
+ * GDT entry count:
+ *  1 Null descriptor
+ *  2 Kernel segment descriptors
+ *  2 User segment descriptors
+ *  2 32 bit User segment descriptors (x86_64 only)
+ *  1 Task state segment 128 bit
+ *  ----------------------------------------------
+ *  7 (9) x 64bit total
+ *
+ * Usable segment selector values:
  *  0x08 -> Kernel code segment
  *  0x10 -> Kernel data segment
  *  0x1b -> User code segment
@@ -23,26 +32,15 @@
 
 #include <types.h>
 
-/* GDT entry count:
- *  1 Null descriptor
- *  2 Kernel segment descriptors
- *  2 User segment descriptors
- *  2 32bit User segment descriptors (x86_64 only)
- *  1 Task state segment (128bit)
- *  --------------------------------------
- *  7 (9) x 64bit total
- */
-
-
-/* segment descriptor flags. they can be combined to
+/* basic segment descriptor flags. they can be combined to
  * create different variations of segment descriptors. */
 #define PRESENT         BIT(47)                       // selector is present
 #define DPL_USER        BIT(45) | BIT(46)             // user mode
 #define CODE            BIT(41) | BIT(43) | BIT(44)   // code segment
-#define DATA            BIT(41) | BIT(44)             // data segment writable
+#define DATA            BIT(41) | BIT(44)             // data segment
 #define MAX_LIMIT       0x8f00000000ffff              // maximum segment limit
-#define LONGMODE        BIT(53)             // long mode / compatibility mode
-#define OPSIZE32        BIT(54)             // set compat. op size to 32bit
+#define LONGMODE        BIT(53)             // for 64 bit code/data
+#define OPSIZE32        BIT(54)             // for 32 bit code/data
 
 #ifdef i386
   #define GDT_ENTRIES     7
@@ -163,8 +161,9 @@ static void _INIT setup_tss(tssd_t* td)
   s_tss.iopb_offset = sizeof(tss_t);
 
   __asm__ volatile(
-    "mov $0x3b, %ax;"
-    "ltr %ax;"
+    "mov $0x3b, %%ax;"
+    "ltr %%ax;"
+    ::: "ax"
   );
 }
 
@@ -178,7 +177,7 @@ void _INIT setup_gdt()
 
   /* user segment descriptors*/
   s_gdt[3] = PRESENT | MODE | MAX_LIMIT | CODE | DPL_USER;
-  s_gdt[4] = PRESENT | MODE | MAX_LIMIT | DATA  | DPL_USER;
+  s_gdt[4] = PRESENT | MODE | MAX_LIMIT | DATA | DPL_USER;
 
 #ifndef i386
   /* 32bit compatibility mode user segment descriptors */
