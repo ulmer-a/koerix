@@ -67,6 +67,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   debug(BOOT) << "Setup: Global Descriptor Table\n";
   setup_gdt();
 
+#ifndef i386
   /* Create a map of free pages from the stivale
    * memory map. */
   create_page_bitmap();
@@ -84,6 +85,7 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   sched::setup(new KernelTask(
       setup_task, (void*)stivale->cmdline));
   sched::yield();
+#endif
 
   /* This will never be reached */
   for (;;) { hlt(); }

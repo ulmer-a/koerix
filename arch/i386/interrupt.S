@@ -66,3 +66,12 @@ irq_syscall:
     pushl $0
     pushl $0x80
     jmp save_context
+
+.global irqEnabled
+irqEnabled:
+    pushfl
+    mov (%esp), %eax
+    shr $9, %eax
+    and $1, %eax
+    add $0x04, %esp
+    ret

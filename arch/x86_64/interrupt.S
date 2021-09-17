@@ -82,3 +82,12 @@ irq_syscall:
     pushq $0
     pushq $0x80
     jmp save_context
+
+.global irqEnabled
+irqEnabled:
+    pushfq
+    mov (%rsp), %rax
+    shr $9, %rax
+    and $1, %rax
+    add $0x08, %rsp
+    ret
