@@ -161,7 +161,11 @@ static void _INIT setup_tss(tssd_t* td)
   s_tss.iopb_offset = sizeof(tss_t);
 
   __asm__ volatile(
+  #ifdef i386
+    "mov $0x2b, %%ax;"
+  #else
     "mov $0x3b, %%ax;"
+  #endif
     "ltr %%ax;"
     ::: "ax"
   );
