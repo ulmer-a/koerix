@@ -17,6 +17,8 @@
 .section .text
 
 save_context:
+    push %ds
+    push %es
     push %fs
     push %gs
     push %ebp
@@ -41,6 +43,8 @@ save_context:
     pop %ebp
     pop %gs
     pop %fs
+    pop %es
+    pop %ds
     add $8, %esp
     iretl
 

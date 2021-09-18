@@ -61,10 +61,15 @@ class _PACKED IrqContext
     size_t ebp;
     size_t gs;
     size_t fs;
+    size_t es;
+    size_t ds;
     size_t irq_id;
     size_t error_id;
     size_t eip;
     size_t cs;
+
+    /* the following registers are only pushed
+     * onto the stack when a privilege change occurs. */
     size_t eflags;
     size_t esp;
     size_t ss;

@@ -71,11 +71,13 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   /* Create a map of free pages from the stivale
    * memory map. */
   create_page_bitmap();
+#endif
 
   /* Load an interrupt descriptor table */
   debug(BOOT) << "Setup: Interrupt Descriptor Table\n";
   x86_irq_init();
 
+#ifndef i386
   /* Create the kernel virtual memory address space and
    * setup the kernel heap */
   AddrSpace::setup();
