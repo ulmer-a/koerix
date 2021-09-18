@@ -67,11 +67,9 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   debug(BOOT) << "Setup: Global Descriptor Table\n";
   setup_gdt();
 
-#ifndef i386
   /* Create a map of free pages from the stivale
    * memory map. */
   create_page_bitmap();
-#endif
 
   /* Load an interrupt descriptor table */
   debug(BOOT) << "Setup: Interrupt Descriptor Table\n";
