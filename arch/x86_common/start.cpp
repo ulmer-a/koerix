@@ -75,10 +75,10 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   debug(BOOT) << "Setup: Interrupt Descriptor Table\n";
   x86_irq_init();
 
-#ifndef i386
   /* Create the kernel virtual memory address space and
    * setup the kernel heap */
   AddrSpace::setup();
+#ifndef i386
   initHeap();
 
   /* Create kernel setup task and enable scheduling */

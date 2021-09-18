@@ -3,7 +3,8 @@
 
 #pragma once
 
-#define PPN_TO_VIRT(x)  ((void*)(((x) << PAGE_SHIFT) + IDENT_OFFSET))
+extern void* _ppn_to_virt(size_t ppn);
+#define PPN_TO_VIRT(x)  _ppn_to_virt(x)
 
 #define ADDR_SPACE_IMPL \
   void updateKernelMappings(); \
@@ -12,3 +13,4 @@
   bool checkForPresentEntries(GenericPagingTable* table);
 
 #define m_pdir m_topLevelPageTable
+#define m_pdpt m_topLevelPageTable
