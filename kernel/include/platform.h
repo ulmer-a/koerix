@@ -6,7 +6,9 @@
 #include <arch/asm.h>
 #include <offsets.h>
 
+#ifdef DEBUG
 extern void debug_print_init();
 extern void debug_print(const char* str);
+#endif
 
 void init_drivers();
