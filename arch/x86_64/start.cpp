@@ -1,12 +1,15 @@
-// SPDX-FileCopyrightText: 2017-2021 Alexander Ulmer <alexulmer1999@gmail.com>
+// SPDX-FileCopyrightText: 2017-2021 Alexander Ulmer
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include <types.h>
+#include <x86/init.h>
+#include <x86/stivale.h>
+
+
 #include <platform.h>
 #include <debug.h>
 #include <addr_space.h>
 #include <scheduler.h>
-#include <x86/stivale.h>
 #include <kernel_task.h>
 #include <lib/string.h>
 
@@ -50,22 +53,14 @@ extern void create_page_bitmap();
 
 bool s_sseEnabled = false;
 
-extern char _bss_start;
-extern char _bss_end;
-
 extern void debug_init();
 
-extern "C" void _NORETURN _start(struct stivale_struct *stivale)
+extern "C" void _NORETURN x86_init(struct stivale_struct *stivale)
 {
-  memset((void*)&_bss_start, 0, (size_t)_bss_end - (size_t)_bss_start);
   debug_init();
 
   s_stivale = stivale;
   debug(BOOT) << "Hello, world!\n";
-
-  /* Load our own Global Descriptor Table */
-  debug(BOOT) << "Setup: Global Descriptor Table\n";
-  setup_gdt();
 
   /* Create a map of free pages from the stivale
    * memory map. */
@@ -78,14 +73,12 @@ extern "C" void _NORETURN _start(struct stivale_struct *stivale)
   /* Create the kernel virtual memory address space and
    * setup the kernel heap */
   AddrSpace::setup();
-#ifndef i386
   initHeap();
 
   /* Create kernel setup task and enable scheduling */
   sched::setup(new KernelTask(
       setup_task, (void*)stivale->cmdline));
   sched::yield();
-#endif
 
   /* This will never be reached */
   for (;;) { hlt(); }

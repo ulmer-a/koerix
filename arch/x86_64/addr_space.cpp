@@ -46,10 +46,6 @@ struct AddrSpace::Mapping
 AddrSpace s_kernelAddrSpace;
 bool s_initialized = false;
 
-/* regarding NX (no execute) pages */
-bool s_nxEnabled = false;
-extern "C" void enableNx();
-
 AddrSpace::AddrSpace()
 {
   /* Create a new address space by allocating
@@ -116,12 +112,6 @@ void AddrSpace::setup()
     const size_t ident_page_offset = IDENT_OFFSET >> PAGE_SHIFT;
     for (size_t page = 0; page < totalPages; page++)
         kernelSpace->map(page + ident_page_offset, page, MAP_WRITE);
-
-    /* Enable support for NX pages if available */
-    if ((s_nxEnabled = cpuid::getFeatures3().nx))
-      enableNx();
-    debug(VSPACE) << "trying to enable NX: "
-            << (s_nxEnabled ? "ok\n" : "not available\n");
 
     /* Switch to the newly created address space. */
     kernelSpace->apply();
@@ -208,10 +198,7 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
         if (flags & MAP_WRITE)  currentLevelTableEntry.write = 1;
         if (flags & MAP_USER)   currentLevelTableEntry.user = 1;
         if (flags & MAP_SHARED) currentLevelTableEntry.shared = 1;
-
-        /* only map a page NX if the features is actually available */
-        if (flags & MAP_NOEXEC && s_nxEnabled)
-          currentLevelTableEntry.no_exec = 1;
+        if (flags & MAP_NOEXEC) currentLevelTableEntry.no_exec = 1;
       }
       else
       {
