@@ -1,13 +1,5 @@
 #include <lib/string.h>
 
-size_t strlen(const char* str)
-{
-  size_t len = 0;
-  while (*str++)
-    len++;
-  return len;
-}
-
 void *memmove(void *dest, const void *src, size_t length);
 void *memccpy(void *dest, const void *src, uint8_t c, size_t length);
 
@@ -28,6 +20,14 @@ void *memccpy(void *dest, const void *src, uint8_t c, size_t length);
     while (size--)
       *s++ = c;
     return block;
+  }
+
+  size_t strlen(const char* str)
+  {
+    size_t len = 0;
+    while (*str++)
+      len++;
+    return len;
   }
 #endif
 

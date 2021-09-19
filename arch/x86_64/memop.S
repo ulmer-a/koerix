@@ -13,6 +13,21 @@ memset:
   mov %r8, %rax
   ret
 
+// size_t strlen(const char* str)
+.global strlen
+.type strlen,@function
+strlen:
+  mov %rdi, %rax
+  sl1:
+  movb (%rax), %cl
+  test %cl, %cl
+  jz sl2
+  inc %rax
+  jmp sl1
+  sl2:
+  sub %rdi, %rax
+  ret
+
 // SPDX-FileCopyrightText: 2005-2020 Rich Felker, et al.
 // SPDX-License-Identifier: MIT
 
