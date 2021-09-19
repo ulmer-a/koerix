@@ -17,17 +17,15 @@ _start:
     movabsq $_bss_start, %rax
     sub %rax, %rcx
     xor %rdx, %rdx
-_start_1:
-    test %rcx, %rcx
-    jz _start_2
+    s1: test %rcx, %rcx
+    jz s2
     mov %rdx, (%rax)
     dec %rcx
     inc %rax
-    jmp _start_1
+    jmp s1
 
-_start_2:
     // setup global descriptor table
-    callq setup_gdt
+    s2: callq setup_gdt
 
     // enable NX bit
     mov $0xc0000080, %rcx
@@ -38,4 +36,3 @@ _start_2:
     // call C++ entry point
     mov %r12, %rdi
     jmp x86_init
-
