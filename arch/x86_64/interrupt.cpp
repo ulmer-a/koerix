@@ -12,6 +12,7 @@
 #include <scheduler.h>
 #include <user_task.h>
 #include <fpu.h>
+#include <x86/ports.h>
 
 #define EXC_FPU_SSE     7
 #define EXC_PAGEFAULT   14

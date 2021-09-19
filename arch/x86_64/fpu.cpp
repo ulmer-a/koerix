@@ -5,7 +5,7 @@
 #include <mm.h>
 #include <user_task.h>
 #include <scheduler.h>
-#include <x86/asm.h>
+#include <arch/asm.h>
 #include <lib/string.h>
 
 namespace fpu {
