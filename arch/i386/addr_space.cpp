@@ -45,6 +45,7 @@ bool s_initialized = false;
 /* regarding NX (no execute) pages */
 bool s_nxEnabled = false;
 extern "C" void enableNx();
+extern "C" void enablePagingAndJump();
 
 AddrSpace::AddrSpace()
 {
@@ -67,12 +68,16 @@ void AddrSpace::setup()
   /* Create a new virtual address space for the kernel */
   auto kernelSpace = new (&s_kernelAddrSpace) AddrSpace();
 
-  /* map the whole physical memory to the upper half */
+  /* map the first 2GiB of physical memory to the upper half */
   debug(VSPACE) << "mapping physical memory to the upper half...\n";
-  const size_t totalPages = PageMap::get().getTotalPageCount();
+  const size_t totalPages = min(PageMap::get().getTotalPageCount(), USER_BREAK >> PAGE_SHIFT);
   const size_t ident_page_offset = IDENT_OFFSET >> PAGE_SHIFT;
   for (size_t page = 0; page < totalPages; page++)
       kernelSpace->map(page + ident_page_offset, page, MAP_WRITE);
+
+  /* temporarily identity-map the low 2 GiB */
+  memcpy(PPN_TO_PTR(kernelSpace->m_pdpt), (void*)((uint64_t*)
+     PPN_TO_PTR(kernelSpace->m_pdpt) + 2), sizeof(uint64_t) * 2);
 
   /* Enable support for NX pages if available */
   if ((s_nxEnabled = cpuid::getFeatures3().nx))
@@ -82,8 +87,12 @@ void AddrSpace::setup()
 
   /* Switch to the newly created address space. */
   kernelSpace->apply();
+
+  /* set PAE and PG bits, and jump to the high half. */
+  enablePagingAndJump();
+
   s_initialized = true;
-  debug(VSPACE) << "successfully written %cr3\n";
+  debug(VSPACE) << "successfully enabled PAE, PG\n";
 }
 
 AddrSpace& AddrSpace::kernel()
