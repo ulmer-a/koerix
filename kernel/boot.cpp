@@ -48,6 +48,7 @@ void kernel_init(const char* cmdline)
       debug(BOOT) << "warning: " << valueBuffer << ": "
               << strerror(error) << "\n";
     } else {
+      debug(BOOT) << "allocating console on " << valueBuffer << "\n";
       mainTerm = lib::shared_ptr<Terminal>(new Terminal(fd));
       Terminal::setMainTerm(mainTerm);
     }

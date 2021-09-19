@@ -34,7 +34,7 @@ namespace dev {
 
   void registerDevice(const char* name, DeviceFile* dev)
   {
-    debug(DEVICES) << "registered device '" << name << "'\n";
+    debug(DEVICES) << "registering device '" << name << "'\n";
     DeviceFs* devfs = (DeviceFs*)s_devfs.get();
     devfs->registerDevice(name, lib::shared_ptr<DeviceFile>(dev));
   }

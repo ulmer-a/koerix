@@ -18,12 +18,13 @@ struct AddrSpace::GenericPagingTable
   uint64_t accessed                  : 1;
   uint64_t dirty                     : 1;
   uint64_t zero1                     : 2;
-  uint64_t available1                : 3;
-  uint64_t ppn                       : 28;
-  uint64_t zero2                     : 12;
   uint64_t cow_was_writable          : 1;
   uint64_t shared                    : 1;
-  uint64_t available2                : 9;
+  uint64_t available1                : 1;
+  uint64_t ppn                       : 28;
+  uint64_t zero2                     : 12;
+  uint64_t available2                : 7;
+  uint64_t protection_key            : 4;
   uint64_t no_exec                   : 1;
 } _PACKED;
 
@@ -51,6 +52,7 @@ AddrSpace::AddrSpace()
   /* Create a new address space by allocating
    * a fresh Page Map Level 4 */
   m_pml4 = PageMap::get().alloc();
+  memset(PPN_TO_VIRT(m_pml4), 0, PAGE_SIZE);
   updateKernelMappings();
 
   debug(VSPACE) << "allocated new virtual address space (PML4 @ "
