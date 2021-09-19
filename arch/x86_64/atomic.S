@@ -17,7 +17,6 @@ atomic_add:
 // uint8_t atomic_add8(uint8_t* mem, int8_t increment)
 .global atomic_add8
 atomic_add8:
-  mov %rsi, %rax
-  lock xaddb %al, (%rdi)
-  movzb %al, %rax
+  lock xaddb %sil, (%rdi)
+  movzb %sil, %rax
   ret

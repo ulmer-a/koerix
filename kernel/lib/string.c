@@ -8,26 +8,28 @@ size_t strlen(const char* str)
   return len;
 }
 
-void *memcpy(void *dest, const void *src, size_t length)
-{
-  unsigned char *s1 = (unsigned char *)dest;
-  const unsigned char *s2 = (const unsigned char *)src;
-
-  while (length--)
-    *s1++ = *s2++;
-  return dest;
-}
-
 void *memmove(void *dest, const void *src, size_t length);
 void *memccpy(void *dest, const void *src, uint8_t c, size_t length);
 
-void *memset(void *block, uint8_t c, size_t size)
-{
-  unsigned char *s = (unsigned char*)block;
-  while (size--)
-    *s++ = c;
-  return block;
-}
+#ifndef x86_64
+  void *memcpy(void *dest, const void *src, size_t length)
+  {
+    unsigned char *s1 = (unsigned char *)dest;
+    const unsigned char *s2 = (const unsigned char *)src;
+
+    while (length--)
+      *s1++ = *s2++;
+    return dest;
+  }
+
+  void *memset(void *block, uint8_t c, size_t size)
+  {
+    unsigned char *s = (unsigned char*)block;
+    while (size--)
+      *s++ = c;
+    return block;
+  }
+#endif
 
 char *strcpy(char *dest, const char* src)
 {
