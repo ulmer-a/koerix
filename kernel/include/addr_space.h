@@ -19,7 +19,8 @@ class AddrSpace
       MAP_USER    = BIT(0),
       MAP_WRITE   = BIT(1),
       MAP_NOEXEC  = BIT(2),
-      MAP_SHARED = BIT(3)
+      MAP_SHARED  = BIT(3),
+      MAP_NOCACHE = BIT(4)
     };
 
     struct Mapping;

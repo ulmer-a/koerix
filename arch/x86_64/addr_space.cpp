@@ -197,10 +197,11 @@ void AddrSpace::map(size_t virt, size_t phys, int flags)
       if (level == 0)
       {
         /* only set protections for actual pages */
-        if (flags & MAP_WRITE)  currentLevelTableEntry.write = 1;
-        if (flags & MAP_USER)   currentLevelTableEntry.user = 1;
-        if (flags & MAP_SHARED) currentLevelTableEntry.shared = 1;
-        if (flags & MAP_NOEXEC) currentLevelTableEntry.no_exec = 1;
+        if (flags & MAP_WRITE)    currentLevelTableEntry.write = 1;
+        if (flags & MAP_USER)     currentLevelTableEntry.user = 1;
+        if (flags & MAP_SHARED)   currentLevelTableEntry.shared = 1;
+        if (flags & MAP_NOEXEC)   currentLevelTableEntry.no_exec = 1;
+        if (flags & MAP_NOCACHE)  currentLevelTableEntry.cache_disable = 1;
       }
       else
       {

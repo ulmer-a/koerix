@@ -30,7 +30,8 @@ void* fb_map()
   for (size_t i = 0; i < count; i++)
   {
     addrSpace.map(virt_start_page + i, start_page + i, AddrSpace::MAP_SHARED |
-      AddrSpace::MAP_USER | AddrSpace::MAP_WRITE | AddrSpace::MAP_NOEXEC);
+      AddrSpace::MAP_USER | AddrSpace::MAP_WRITE | AddrSpace::MAP_NOEXEC |
+      AddrSpace::MAP_NOCACHE);
   }
   return (void*)FRAMEBUFFER_ADDR;
 }
