@@ -8,7 +8,7 @@
 
 void timer_reset(uint16_t freqHz);
 
-extern void ps2kbd_init();
+extern void ps2_init();
 
 void init_drivers()
 {
@@ -21,5 +21,5 @@ void init_drivers()
     new pc::SerialPort(pc::SerialPort::COM1)
   );
 
-  ps2kbd_init();
+  ps2_init();
 }
