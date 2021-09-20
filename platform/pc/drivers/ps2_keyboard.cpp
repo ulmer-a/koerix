@@ -8,6 +8,7 @@
 #include <interrupt.h>
 #include <debug.h>
 #include <dev/devices.h>
+#include <scheduler.h>
 
 class PS2Keyboard;
 
@@ -49,6 +50,19 @@ class PS2Controller
     PS2Controller();
 
   private:
+    bool selfTest() {
+      outb(CMD_PORT, 0xaa);
+
+      size_t attempts = 5;
+      while (attempts-- && (inb(STATUS_PORT) & 1) == 0)
+        sched::yield();
+
+      /* some PS/2 controllers apparently return 0x65 instead
+       * of 0x55, so allow that, too. */
+      uint8_t result = inb(DATA_PORT);
+      return result == 0x55 || result == 0x65;
+    }
+
     ConfigByte readConfig() {
       outb(CMD_PORT, 0x20);
       uint8_t config = inb(DATA_PORT);
@@ -66,8 +80,10 @@ class PS2Controller
     }
 
     void flushOutBuffer() {
-      while (readStatus().outBufferFull)
-        inb(DATA_PORT);
+      /* don't poll the status byte here, because if
+       * there's no controller, we could get stuck
+       * in an endless loop. */
+      inb(DATA_PORT);
     }
 
     void setPort1IrqEnable(bool enable = true) {
@@ -133,15 +149,35 @@ PS2Controller::PS2Controller()
 
   flushOutBuffer();
 
+  /* performing a configuration update */
   auto config = readConfig();
+  bool couldBeDualChannel = config.clkPort2;
   config.irqPort1 = 0;
   config.irqPort2 = 0;
   config.translPort1 = 0;
   writeConfig(config);
 
-  // TODO Perform self test
-  // TODO detect second port
-  // TODO: perform interface tests
+  /* perform the PS2 controller self test. by now, this is the only
+   * way to know whether there actually is a controller or not.
+   * better: detect via ACPI */
+  if (!selfTest())
+  {
+    debug(DEVICES) << "ps/2: self test failed. probably not present\n";
+    return;
+  }
+
+  /* check if the controller supports two channels */
+  bool isDualChannel = false;
+  if (couldBeDualChannel)
+  {
+    setPort2Enable();
+    config = readConfig();
+    if (config.clkPort2 == 0)
+      isDualChannel = true;
+    setPort2Enable(false);
+  }
+  debug(DEVICES) << "ps/2 channels: "
+                 << (isDualChannel ? "2" : "1") << "\n";
 
   auto kbd = new PS2Keyboard(*this);
   dev::registerDevice("keyboard", kbd);
