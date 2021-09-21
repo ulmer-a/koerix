@@ -18,9 +18,6 @@ UserProcess::UserProcess(lib::shared_ptr<Loader> loader,
   , m_loader(loader)
   , m_term(term)
 {
-  /* add this process to the global list of processes */
-  ProcList::get().onAddProcess(this);
-
   assert(m_loader->isValid());
 
   /* open file descriptors for standard IO */
@@ -32,6 +29,12 @@ UserProcess::UserProcess(lib::shared_ptr<Loader> loader,
   /* create a main thread for this process, the entry point
    * is defined by the entry address found in the ELF binary. */
   addTask(m_loader->entryAddr());
+
+  /* add this process to the global list of processes, but only
+   * after we started the first thread (as soon as the task is
+   * on the list, the cleanup task periodically checks if it has
+   * no more threads left) */
+  ProcList::get().onAddProcess(this);
 }
 
 UserProcess::UserProcess(const UserProcess& forkee)
