@@ -29,3 +29,5 @@ static inline void _yield()
 }
 
 extern "C" bool irqEnabled();
+
+void printStackTrace();

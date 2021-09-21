@@ -17,6 +17,7 @@ void panic(const char* message)
 {
   cli();
   debug(KERNEL) << "**** kernel panic: " << message << "\n\n\n";
+  printStackTrace();
   for (;;) { hlt(); }
 }
 

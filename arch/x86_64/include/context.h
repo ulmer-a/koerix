@@ -51,7 +51,6 @@ class _PACKED IrqContext
       return rdx;
     }
 
-  private:
     size_t r15;
     size_t r14;
     size_t r13;
