@@ -11,6 +11,10 @@
 #include <dev/devfs.h>
 #include <fs/vfs.h>
 
+namespace pci {
+  void busEnumeration();
+}
+
 namespace dev {
 
   static lib::shared_ptr<fs::Dir> s_devfs;
@@ -24,6 +28,7 @@ namespace dev {
     if (!fs::mount("/", s_devfs, error))
       assert(false);
 
+    pci::busEnumeration();
     init_drivers();
   }
 
