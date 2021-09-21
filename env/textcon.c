@@ -53,12 +53,7 @@ static void drawText(size_t x, size_t y, const char* str,
   }
 }
 
-const char* banner =
-"\n     _  __               _         ___  ____\n"
-"    | |/ /___   ___ _ __(_)_  __  / _ \\/ ___|\n"
-"    | ' // _ \\ / _ \\ '__| \\ \\/ / | | | \\___ \\\n"
-"    | . \\ (_) |  __/ |  | |>  <  | |_| |___) |\n"
-"    |_|\\_\\___/ \\___|_|  |_/_/\\_\\  \\___/|____/\n\n\n";
+
 const char* banner2 =
 "Koerix OS Console\n"
 "Copyright (C) 2017-2021 Alexander Ulmer\n\n";
