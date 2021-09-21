@@ -67,8 +67,6 @@ class _PACKED IrqContext
     size_t rbx;
     size_t rax;
     size_t rbp;
-    size_t gs;
-    size_t fs;
     size_t irq_id;
     size_t error_id;
     size_t rip;

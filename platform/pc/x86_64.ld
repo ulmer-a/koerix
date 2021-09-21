@@ -15,7 +15,7 @@ PHDRS
 SECTIONS
 {
     /* relocate to the higher half */
-    . = 0xffff800000100000;
+    . = 0xffffffff80100000;
     _kernel_start = .;
  
     .text : {

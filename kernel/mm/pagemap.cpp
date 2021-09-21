@@ -106,3 +106,11 @@ void PageMap::free(size_t ppn)
     m_freePageCount += 1;
   }
 }
+
+extern char _kernel_start;
+extern char _kernel_end;
+
+size_t PageMap::getKernelBinSize()
+{
+  return (size_t)&_kernel_end - (size_t)&_kernel_start;
+}

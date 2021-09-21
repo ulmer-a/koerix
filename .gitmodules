@@ -1,3 +1,0 @@
-[submodule "platform/pc/limine"]
-	path = platform/pc/limine
-	url = https://github.com/ulmer-a/limine

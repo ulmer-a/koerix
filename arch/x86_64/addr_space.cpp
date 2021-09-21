@@ -103,22 +103,31 @@ AddrSpace* AddrSpace::clone()
 
 void AddrSpace::setup()
 {
-    assert(sizeof(GenericPagingTable) == 8);
+  assert(sizeof(GenericPagingTable) == 8);
 
-    /* Create a new virtual address space for the kernel */
-    auto kernelSpace = new (&s_kernelAddrSpace) AddrSpace();
+  /* Create a new virtual address space for the kernel */
+  auto kernelSpace = new (&s_kernelAddrSpace) AddrSpace();
 
-    /* map the whole physical memory to the upper half */
-    debug(VSPACE) << "mapping physical memory to the upper half...\n";
-    const size_t totalPages = PageMap::get().getTotalPageCount();
-    const size_t ident_page_offset = IDENT_OFFSET >> PAGE_SHIFT;
-    for (size_t page = 0; page < totalPages; page++)
-        kernelSpace->map(page + ident_page_offset, page, MAP_WRITE);
+  debug(VSPACE) << "installing memory mappings...\n";
 
-    /* Switch to the newly created address space. */
-    kernelSpace->apply();
-    s_initialized = true;
-    debug(VSPACE) << "successfully written %cr3\n";
+  /* map the whole physical memory to the upper half */
+  const size_t totalPages = PageMap::get().getTotalPageCount();
+  const size_t ident_page_offset = IDENT_OFFSET >> PAGE_SHIFT;
+  for (size_t page = 0; page < totalPages; page++)
+    kernelSpace->map(page + ident_page_offset, page, MAP_WRITE | MAP_NOEXEC);
+
+  /* map the kernel binary to the top 2GB of memory */
+  const size_t kernelBinPages = PageMap::get().getKernelBinSize() >> PAGE_SHIFT;
+  const size_t kernel_code_offset = (KERNEL_CODE - CODE_OFFSET) >> PAGE_SHIFT;
+  const size_t code_page_offset = CODE_OFFSET >> PAGE_SHIFT;
+  for (size_t page = 0; page < kernelBinPages; page++)
+    kernelSpace->map(page + code_page_offset + kernel_code_offset,
+                     page + kernel_code_offset, 0);
+
+  /* Switch to the newly created address space. */
+  kernelSpace->apply();
+  s_initialized = true;
+  debug(VSPACE) << "successfully written %cr3\n";
 }
 
 AddrSpace &AddrSpace::kernel()

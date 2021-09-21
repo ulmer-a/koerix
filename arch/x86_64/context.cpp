@@ -8,7 +8,7 @@
 
 IrqContext::IrqContext()
 {
-  assert(sizeof(IrqContext) == 24*8);
+  assert(sizeof(IrqContext) == 22*8);
   memset((void*)this, 0, sizeof(IrqContext));
   rflags = 0x0200;
 }
@@ -22,24 +22,18 @@ void IrqContext::newUserCtx()
 {
   cs = 0x1b;
   ss = 0x23;
-  fs = 0x23;
-  gs = 0x23;
 }
 
 void IrqContext::newCompatUserCtx()
 {
   cs = 0x2b;
   ss = 0x33;
-  fs = 0x33;
-  gs = 0x33;
 }
 
 void IrqContext::newKernelCtx()
 {
   cs = 0x08;
   ss = 0x10;
-  fs = 0x10;
-  gs = 0x10;
 }
 
 void IrqContext::print()

@@ -17,8 +17,6 @@
 .section .text
 
 save_context:
-    push %fs
-    push %gs
     push %rbp
     push %rax
     push %rbx
@@ -55,8 +53,6 @@ save_context:
     pop %rbx
     pop %rax
     pop %rbp
-    pop %gs
-    pop %fs
     add $0x10, %rsp
     iretq
 

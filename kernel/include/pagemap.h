@@ -37,6 +37,8 @@ class PageMap
     uint64_t getFreeMemory() { return getFreePageCount() << PAGE_SHIFT; }
     uint64_t getUsedMemory() { return getUsedPageCount() << PAGE_SHIFT; }
 
+    size_t getKernelBinSize();
+
   private:
     Spinlock m_lock;
     size_t m_totalPages;      // absolute pages count
