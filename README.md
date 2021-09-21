@@ -25,12 +25,9 @@ stating the exact license and copyright holder. If they don't: please tell me or
 a pull request.
 
 ## Roadmap
-Currently, my goal is to make the codebase more stable before implementing lots of
-new features, because it still doesn't run stable on my real-hardware testbeds. Things
-I want to do/implement in the near future:
-* Get it to run on my test hardware (some x86\_64 PCs): Will be done soon. When something
-works in QEMU but not on real hardware it is almost always related to some memory not
-being properly initialized (on QEMU all the memory is zero-initialized).
+Now that the OS actually runs quite nicely on real hardware, it's time to implement some
+new features:
+* Fixing any stability issues (race conditions)
 * Add APIC and SMP support (supported by limine bootloader): I want to add it as soon
 as possible in order to be able to detect synchronization issues early.
 * Writing a driver for SATA drives and implementing ext2 filesystem support: pretty much
