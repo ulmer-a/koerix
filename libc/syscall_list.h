@@ -23,3 +23,4 @@ syscall_w_errno   pipe                17
 syscall_w_errno   dup2                18
 syscall_w_errno   execve              19
 syscall_w_errno   open                20
+syscall_w_errno   waitpid             21
